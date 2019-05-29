@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TractorNavigator</string>
+    <string name="title_activity_main">TractorNavigator</string>
+    <string name="package_name">com.tractornavigator</string>
+    <string name="fileprovider_authority">com.tractornavigator.fileprovider</string>
+    <string name="custom_url_scheme">com.tractornavigator</string>
+</resources>

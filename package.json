@@ -14,13 +14,13 @@
     "test.watch": "stencil test --spec --e2e --watch"
   },
   "dependencies": {
-    "@capacitor/android": "^1.0.0",
-    "@capacitor/cli": "^1.0.0",
-    "@capacitor/core": "^1.0.0",
-    "@ionic/core": "4.5.0-dev.201905231138.1ad37d1",
+    "@capacitor/android": "^1.1.0",
+    "@capacitor/cli": "^1.1.0",
+    "@capacitor/core": "^1.1.0",
+    "@ionic/core": "4.6.0",
     "mapbox-gl": "^1.0.0"
   },
   "devDependencies": {
-    "@stencil/core": "1.0.0-beta.5"
+    "@stencil/core": "1.1.3"
   }
 }

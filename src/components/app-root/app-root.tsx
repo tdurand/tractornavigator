@@ -18,7 +18,7 @@ export class AppRoot {
           <ion-tab-bar slot="bottom">
             <ion-tab-button tab="map">
               <ion-icon name="map"></ion-icon>
-              <ion-label>Map</ion-label>
+              <ion-label>Navigation</ion-label>
             </ion-tab-button>
             <ion-tab-button tab="gps-status">
               <ion-icon name="locate"></ion-icon>
@@ -27,6 +27,10 @@ export class AppRoot {
             <ion-tab-button tab="history">
               <ion-icon name="list"></ion-icon>
               <ion-label>History</ion-label>
+            </ion-tab-button>
+            <ion-tab-button tab="about">
+              <ion-icon name="airplane"></ion-icon>
+              <ion-label>Use offline</ion-label>
             </ion-tab-button>
             <ion-tab-button tab="about">
               <ion-icon name="information-circle"></ion-icon>

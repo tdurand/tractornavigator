@@ -9,9 +9,7 @@
   ],
   "scripts": {
     "build": "stencil build",
-    "start": "stencil build --dev --watch --serve",
-    "test": "stencil test --spec --e2e",
-    "test.watch": "stencil test --spec --e2e --watch"
+    "start": "stencil build --dev --watch --serve"
   },
   "dependencies": {
     "@capacitor/android": "^1.1.0",

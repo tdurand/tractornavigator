@@ -19,4 +19,4 @@ This app
 ### Acknowledgements:
 
 
-Based on [Ionic PWA toolkit](https://ionicframework.com/pwa/toolkit) augmented with capacitor [https://capacitor.ionicframework.com](https://capacitor.ionicframework.com)
+Based on [Ionic PWA toolkit](https://github.com/ionic-team/ionic-pwa-toolkit) augmented with capacitor [https://capacitor.ionicframework.com](https://capacitor.ionicframework.com)

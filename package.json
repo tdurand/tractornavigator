@@ -16,6 +16,7 @@
     "@capacitor/cli": "^1.1.0",
     "@capacitor/core": "^1.1.0",
     "@ionic/core": "4.6.0",
+    "@mapbox/mapbox-gl-draw": "^1.1.2",
     "mapbox-gl": "^1.1.0"
   },
   "devDependencies": {
@@ -24,6 +25,7 @@
     "@types/puppeteer": "1.12.4",
     "jest": "24.8.0",
     "jest-cli": "24.8.0",
-    "puppeteer": "1.18.1"
+    "puppeteer": "1.18.1",
+    "rollup-plugin-node-polyfills": "^0.2.1"
   }
 }

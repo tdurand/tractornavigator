@@ -2,6 +2,13 @@ import { Component, h, State } from '@stencil/core';
 import mapboxgl from 'mapbox-gl';
 import { Plugins, GeolocationPosition } from '@capacitor/core';
 import config from '../../config.json';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
+
+/*
+
+Todo include styles via module import instead of copy paste in app-home.css , when upgrading mapboxgl or mapboxgl-draw it might break
+
+*/
 
 const { Geolocation } = Plugins;
 
@@ -22,6 +29,10 @@ export class AppHome {
       style: 'mapbox://styles/mapbox/satellite-v9',
       zoom: 17
     });
+
+    var Draw = new MapboxDraw();
+
+    map.addControl(Draw, 'bottom-left');
 
     var size = 100;
 
@@ -129,6 +140,11 @@ export class AppHome {
 
       <ion-content>
         <div id="map"></div>
+        <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+          <ion-fab-button>
+            <ion-icon name="create"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
       </ion-content>
     ];
   }

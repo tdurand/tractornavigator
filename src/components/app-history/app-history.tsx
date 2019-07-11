@@ -1,4 +1,5 @@
 import { Component, h } from '@stencil/core';
+import { toastController } from '@ionic/core';
 
 
 var unfinishedTracks = [{
@@ -43,6 +44,25 @@ var finishedTracks = [{
   styleUrl: 'app-history.css'
 })
 export class AppHistory {
+  
+  async presentToastWithOptions() {  
+    const toast = await toastController.create({
+      message: "Features show history details + be able to continue from a started tracking will be implemented in M2",
+      color: 'dark',
+      buttons: [
+        {
+          text: 'OK',
+          role: 'cancel'
+        }
+      ]
+    });
+  
+    return await toast.present();
+  }
+
+  componentDidLoad() {
+    this.presentToastWithOptions();
+  }
 
   render() {
     return [
@@ -59,7 +79,7 @@ export class AppHistory {
         <ion-list>
           <ion-item-divider>
             <ion-label>
-              Unfinished
+              Unfinished fields
             </ion-label>
           </ion-item-divider>
           {unfinishedTracks.map((item, index) =>
@@ -79,7 +99,7 @@ export class AppHistory {
           )}
           <ion-item-divider>
             <ion-label>
-              Finished
+              Finished fields
             </ion-label>
           </ion-item-divider>
           {finishedTracks.map((item, index) =>

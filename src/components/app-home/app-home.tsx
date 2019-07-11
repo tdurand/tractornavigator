@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import { Plugins, GeolocationPosition } from '@capacitor/core';
 import config from '../../config.json';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import { toastController } from '@ionic/core';
 const { SplashScreen } = Plugins;
 
 /*
@@ -20,6 +21,25 @@ const { Geolocation } = Plugins;
 export class AppHome {
 
   @State() position: GeolocationPosition;
+
+  async presentToastNavigationM2() {  
+    const toast = await toastController.create({
+      message: "Isn't ready yet, working on it, check other pages ;-)",
+      color: 'dark',
+      buttons: [
+        {
+          text: 'OK',
+          role: 'cancel'
+        }
+      ]
+    });
+  
+    return await toast.present();
+  }
+
+  componentDidRender() {
+    this.presentToastNavigationM2();
+  }
 
   componentDidLoad() {
 

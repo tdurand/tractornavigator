@@ -3,6 +3,8 @@ import mapboxgl from 'mapbox-gl';
 import { Plugins, GeolocationPosition } from '@capacitor/core';
 import config from '../../config.json';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import { Plugins } from '@capacitor/core';
+const { SplashScreen } = Plugins;
 
 /*
 
@@ -22,6 +24,8 @@ export class AppHome {
 
   componentDidLoad() {
 
+    SplashScreen.hide();
+
     mapboxgl.accessToken = config.mapboxToken;
 
     const map = new mapboxgl.Map({
@@ -33,6 +37,10 @@ export class AppHome {
     var Draw = new MapboxDraw();
 
     map.addControl(Draw, 'bottom-left');
+
+    map.on('draw.create', () => {
+      console.log('blabla')
+    });
 
     var size = 100;
 
@@ -140,9 +148,9 @@ export class AppHome {
 
       <ion-content>
         <div id="map"></div>
-        <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+        <ion-fab vertical="bottom" horizontal="center" slot="fixed" style={{transform: 'scale(1.5)', bottom: '40px'}}>
           <ion-fab-button>
-            <ion-icon name="create"></ion-icon>
+            <ion-icon name="navigate"></ion-icon>
           </ion-fab-button>
         </ion-fab>
       </ion-content>

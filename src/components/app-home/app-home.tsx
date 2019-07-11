@@ -26,6 +26,7 @@ export class AppHome {
     const toast = await toastController.create({
       message: "Isn't ready yet, working on it, check other pages ;-)",
       color: 'dark',
+      position: 'top',
       buttons: [
         {
           text: 'OK',

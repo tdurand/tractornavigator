@@ -36,8 +36,7 @@ export class AppGPSSettings {
           <li>Number of <strong>Galileo</strong> satellites in range: 3</li>
           <li>Signal strength: <img src="/assets/accuracy-range.png" /></li>
         </ul>
-
-        
+        <p class="text-small"><i>Note: this will be implemented in M2</i></p>
         <p class="text-bold">L5 Galileo band use</p>
         <p>Your phone supports dual frequency and Galileo satellites are in range to get extra accuracy boost thanks to L5 band</p>
         <p class="text-small"><i>This will be implemented in M2</i></p>

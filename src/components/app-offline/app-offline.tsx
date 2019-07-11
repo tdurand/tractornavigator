@@ -11,6 +11,7 @@ export class AppOffline {
     const toast = await toastController.create({
       message: "Feature Offline mode will be implemented in M2, it will consist in caching the satellite tiles for a selected area",
       color: 'dark',
+      position: 'top',
       buttons: [
         {
           text: 'OK',

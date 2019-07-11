@@ -49,6 +49,7 @@ export class AppHistory {
     const toast = await toastController.create({
       message: "Features show history details + be able to continue from a started tracking will be implemented in M2",
       color: 'dark',
+      position: 'top',
       buttons: [
         {
           text: 'OK',

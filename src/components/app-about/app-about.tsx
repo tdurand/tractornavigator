@@ -18,7 +18,18 @@ export class AppAbout {
       </ion-header>,
 
       <ion-content class="ion-padding">
-        About this app blablablabla
+        <img src="/assets/logo_gsa.svg" />
+        <p>This app is developed as part of the <a href="https://www.gsa.europa.eu/mygalileoapp">MyGalileoApp Challenge 2019</a></p>
+        <p class="text-bold">Team</p>
+        <ul>
+          <li>Vincent Duret</li>
+          <li>Thibault Durand</li>
+        </ul>
+        <p class="text-bold">Mentoring</p>
+        <ul>
+          <li>Lukasz Bonenberg</li>
+          <li>Miquel Garcia-Fernandez</li>
+        </ul>
       </ion-content>
     ];
   }

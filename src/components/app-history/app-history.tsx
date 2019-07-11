@@ -1,5 +1,5 @@
 import { Component, h } from '@stencil/core';
-import { toastController } from '@ionic/core';
+import { toastController, alertController } from '@ionic/core';
 
 
 var unfinishedTracks = [{
@@ -45,7 +45,7 @@ var finishedTracks = [{
 })
 export class AppHistory {
   
-  async presentToastWithOptions() {  
+  async presentToastHistoryM2() {  
     const toast = await toastController.create({
       message: "Features show history details + be able to continue from a started tracking will be implemented in M2",
       color: 'dark',
@@ -60,8 +60,29 @@ export class AppHistory {
     return await toast.present();
   }
 
+  async presentAlertM2Continue() {  
+    const alert = await alertController.create({
+      header: 'Continue guiding',
+      subHeader: 'To be implemented in M2',
+      message: 'Recorded track will load in the Navigation for you to finish from you left it',
+      buttons: ['Cancel', 'OK']
+    });
+    return await alert.present();
+  }
+
+  async presentAlertM2Reload() {  
+    const alert = await alertController.create({
+      header: 'Re-load pattern',
+      subHeader: 'To be implemented in M2',
+      message: 'Re-Load in navigation with same guiding pattern',
+      buttons: ['Cancel', 'OK']
+    });
+    return await alert.present();
+  }
+  
+
   componentDidLoad() {
-    this.presentToastWithOptions();
+    this.presentToastHistoryM2();
   }
 
   render() {
@@ -91,7 +112,10 @@ export class AppHistory {
                 <h3>{item.name}</h3>
                 <p>{item.date} | {item.length}km</p>
               </ion-label>
-              <ion-button slot="end">
+              <ion-button 
+                slot="end"
+                onClick={() => this.presentAlertM2Continue()}
+              >
                   <ion-icon name="play" slot="end"></ion-icon>
                 Continue
               </ion-button>
@@ -111,9 +135,13 @@ export class AppHistory {
                 <h3>{item.name}</h3>
                 <p>{item.date} | {item.length}km</p>
               </ion-label>
-              <ion-button slot="end" color="medium">
+              <ion-button 
+                slot="end" 
+                color="medium"
+                onClick={() => this.presentAlertM2Reload()}
+              >
                   <ion-icon name="refresh" slot="end"></ion-icon>
-                Redo
+                Reload
               </ion-button>
             </ion-item>
           )}

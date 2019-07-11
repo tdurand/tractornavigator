@@ -3,7 +3,6 @@ import mapboxgl from 'mapbox-gl';
 import { Plugins, GeolocationPosition } from '@capacitor/core';
 import config from '../../config.json';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
-import { Plugins } from '@capacitor/core';
 const { SplashScreen } = Plugins;
 
 /*

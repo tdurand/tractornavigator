@@ -33,9 +33,11 @@ export class AppHome {
   @State() mode: any = MODE.FREEMOVING;
   @State() mapRendered: boolean = false;
   @State() mapLoaded: boolean = false;
-  loadingScreen: any;
+  @State() areaDrawn: boolean = false;
+  loadingScreen: any
   Draw: any;
   map: any;
+  
 
   async presentToastErrorGPS() {
     const toast = await toastController.create({
@@ -152,6 +154,13 @@ export class AppHome {
     this.Draw.changeMode('draw_polygon');
   }
 
+  cancelFieldSelection() {
+    // TODO
+    // Draw remove polygon
+    // Remove grid
+    this.areaDrawn = false;
+  }
+
   componentDidLoad() {
 
     this.presentLoading();
@@ -176,6 +185,7 @@ export class AppHome {
     });
 
     this.map.on('draw.create', (feature) => {
+      this.areaDrawn = true;
       var bbox = turfBbox(feature.features[0])
       // console.log(bbox);
       var bbox = bbox;
@@ -184,6 +194,12 @@ export class AppHome {
       //var options = {units: 'kilometers'};
       var squareGrid = turfSquareGrid(bbox, cellSide);
       this.createGridLayer(this.map, squareGrid);
+      
+      // TODO
+      // add button to redraw
+      // Show modal asking for cellSide ("pas")
+      // On OK : this.createGridLayer(this.map, squareGrid);
+      // Remove drawn polygon
     });
 
     this.map.on('render', () => {
@@ -231,10 +247,13 @@ export class AppHome {
                 Select area
               </ion-button>
             }
-            {this.mode === MODE.SELECTING_FIELD &&
-              <ion-fab-button>
-                <ion-icon name="checkmark"></ion-icon>
-              </ion-fab-button>
+            {this.mode === MODE.SELECTING_FIELD && this.areaDrawn &&
+              <ion-button
+                color="primary"
+                onClick={() => this.cancelFieldSelection()}
+              >
+                Cancel
+              </ion-button>
             }
           </ion-fab>
         }

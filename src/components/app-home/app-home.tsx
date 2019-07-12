@@ -7,7 +7,8 @@ import pointGeojson from '../../assets/geojson/point.json';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 const { SplashScreen } = Plugins;
 import { PulsingDot, styleMapboxOffline } from '../../helpers/utils';
-import turfBbox from '@turf/bbox'
+import turfBbox from '@turf/bbox';
+import turfSquareGrid from '@turf/square-grid';
 const { Geolocation } = Plugins;
 
 /*
@@ -77,6 +78,15 @@ export class AppHome {
       "layout": {
         "icon-image": "pulsing-dot"
       }
+    });
+  }
+
+  createGridLayer(map, geojson) {
+    map.addSource('grid', { type: 'geojson', data: geojson })
+    map.addLayer({
+      "id": "grid",
+      "type": "line",
+      "source": "grid"
     });
   }
 
@@ -155,7 +165,8 @@ export class AppHome {
       center: [4.7677,46.3139],
       // style: 'mapbox://styles/mapbox/satellite-v9',
       style: styleMapboxOffline,
-      zoom: 10
+      zoom: 17,
+      minZoom: 16
     });
 
     // Add drawing tools
@@ -166,14 +177,13 @@ export class AppHome {
 
     this.map.on('draw.create', (feature) => {
       var bbox = turfBbox(feature.features[0])
-      console.log(bbox);
-
-
-      // var bbox = [-95, 30 ,-85, 40];
-      // var cellSide = 50; // cell size
-      // var options = {units: 'kilometers'};
-
-      // var squareGrid = turf.squareGrid(bbox, cellSide, options);
+      // console.log(bbox);
+      var bbox = bbox;
+      var cellSide = 0.01; // cell size
+      // 1km = 1000m , 0.1 = 100m, 0.01 = 10m
+      //var options = {units: 'kilometers'};
+      var squareGrid = turfSquareGrid(bbox, cellSide);
+      this.createGridLayer(this.map, squareGrid);
     });
 
     this.map.on('render', () => {

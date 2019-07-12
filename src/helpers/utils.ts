@@ -113,7 +113,7 @@ export const styleMapboxOffline = {
     "id": "area-white",
     "type": "fill",
     "source": "countries",
-    "filter":["in","ADM0_A3",'ATA'],
+    "filter":["in","ADM0_A3",'ATA','FRA','FRO'],
     "source-layer": "country",
     "paint": {
       "fill-color": "#F0F8FF"
@@ -122,7 +122,7 @@ export const styleMapboxOffline = {
     "id": "area-red",
     "type": "fill",
     "source": "countries",
-    "filter":["in","ADM0_A3",'AFG','ALD','BEN','BLR','BWA','COK','COL','DNK','DOM','ERI','FIN','FRA','FRO','GIB','GNB','GNQ','GRC','GTM','JPN','KIR','LKA','MHL','MMR','MWI','NCL','OMN','RWA','SMR','SVK','SYR','TCD','TON','URY','WLF'],
+    "filter":["in","ADM0_A3",'AFG','ALD','BEN','BLR','BWA','COK','COL','DNK','DOM','ERI','FIN','GIB','GNB','GNQ','GRC','GTM','JPN','KIR','LKA','MHL','MMR','MWI','NCL','OMN','RWA','SMR','SVK','SYR','TCD','TON','URY','WLF'],
     "source-layer": "country",
     "paint": {
       "fill-color": "#fdaf6b"

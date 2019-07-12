@@ -6,7 +6,7 @@ import config from '../../config.json';
 import pointGeojson from '../../assets/geojson/point.json';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 const { SplashScreen } = Plugins;
-import { PulsingDot } from '../../helpers/utils';
+import { PulsingDot, styleMapboxOffline } from '../../helpers/utils';
 import turfBbox from '@turf/bbox'
 const { Geolocation } = Plugins;
 
@@ -154,7 +154,7 @@ export class AppHome {
       container: 'map',
       center: [4.7677,46.3139],
       // style: 'mapbox://styles/mapbox/satellite-v9',
-      style: 'mapbox://styles/mapbox/streets-v11',
+      style: styleMapboxOffline,
       zoom: 10
     });
 
@@ -211,7 +211,7 @@ export class AppHome {
 
       <ion-content>
         <div id="map"></div>
-        {/* {this.mapLoaded &&
+        {this.mapLoaded &&
           <ion-fab vertical="bottom" horizontal="center" slot="fixed">
             {this.mode === MODE.FREEMOVING &&
               <ion-button
@@ -227,7 +227,7 @@ export class AppHome {
               </ion-fab-button>
             }
           </ion-fab>
-        } */}
+        }
       </ion-content>
     ];
   }

@@ -40,7 +40,8 @@ export class AppHome {
   loadingScreen: any
   Draw: any;
   map: any;
-  
+  toastDrawingHelpShown: boolean = false;
+
 
   async presentToastErrorGPS() {
     const toast = await toastController.create({
@@ -55,6 +56,26 @@ export class AppHome {
             if (this.loadingScreen) {
               this.loadingScreen.dismiss();
             }
+          }
+        }
+      ]
+    });
+
+    return await toast.present();
+  }
+
+  async presentToastDrawingHelp() {
+    const toast = await toastController.create({
+      message: "Select on the map the area you want to cover, finish by linking to the first point",
+      duration: 5000,
+      color: 'dark',
+      position: 'top',
+      buttons: [
+        {
+          text: 'OK',
+          role: 'cancel',
+          handler: () => {
+            this.toastDrawingHelpShown = true;
           }
         }
       ]
@@ -158,9 +179,13 @@ export class AppHome {
   }
 
   enableSelectFieldMode() {
+    // TODO add Toast explaining what to do
     this.mode = MODE.SELECTING_FIELD;
     this.isDrawingArea = true;
     this.Draw.changeMode('draw_polygon');
+    if(!this.toastDrawingHelpShown) {
+      this.presentToastDrawingHelp();
+    }
   }
 
   removeFieldSelection() {
@@ -192,7 +217,7 @@ export class AppHome {
 
     this.map = new mapboxgl.Map({
       container: 'map',
-      center: [4.7677,46.3139],
+      center: [4.7677, 46.3139],
       // style: 'mapbox://styles/mapbox/satellite-v9',
       style: styleMapboxOffline,
       zoom: 17,
@@ -216,7 +241,7 @@ export class AppHome {
       //var options = {units: 'kilometers'};
       var squareGrid = turfSquareGrid(bbox, cellSide);
       this.createGridLayer(this.map, squareGrid);
-      
+
       // TODO
       // add button to redraw
       // Show modal asking for cellSide ("pas")
@@ -227,7 +252,7 @@ export class AppHome {
 
     this.map.on('render', () => {
 
-      if(this.mapRendered === false) {
+      if (this.mapRendered === false) {
         console.log('first render')
         this.mapRendered = true;
         this.map.resize();
@@ -261,40 +286,45 @@ export class AppHome {
       <ion-content>
         <div id="map"></div>
         {this.mapLoaded &&
-          <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-            {this.mode === MODE.FREEMOVING &&
-              <ion-button
-                color="primary"
-                onClick={() => this.enableSelectFieldMode()}
-              >
-                Select area
+          <div class="ctas-container">
+            <div class="ctas-help">
+              
+            </div>
+            <div class="ctas-buttons">
+              {this.mode === MODE.FREEMOVING &&
+                <ion-button
+                  color="primary"
+                  onClick={() => this.enableSelectFieldMode()}
+                >
+                  Select area
               </ion-button>
-            }
-            {this.mode === MODE.SELECTING_FIELD && (this.isDrawingArea || this.areaDrawn) &&
-              <ion-button
-                color="secondary"
-                onClick={() => this.removeFieldSelection()}
-              >
-                Cancel
+              }
+              {this.mode === MODE.SELECTING_FIELD && (this.isDrawingArea || this.areaDrawn) &&
+                <ion-button
+                  color="secondary"
+                  onClick={() => this.removeFieldSelection()}
+                >
+                  Cancel
               </ion-button>
-            }
-            {this.mode === MODE.SELECTING_FIELD && this.areaDrawn &&
-              <ion-button
-                color="primary"
-                onClick={() => this.confirmFieldSelection()}
-              >
-                Confirm
+              }
+              {this.mode === MODE.SELECTING_FIELD && this.areaDrawn &&
+                <ion-button
+                  color="primary"
+                  onClick={() => this.confirmFieldSelection()}
+                >
+                  Confirm
               </ion-button>
-            }
-            {this.mode === MODE.NAVIGATION && this.readyToNavigate &&
-              <ion-button
-                color="primary"
-                onClick={() => this.startNavigation()}
-              >
-                Start navigation
+              }
+              {this.mode === MODE.NAVIGATION && this.readyToNavigate &&
+                <ion-button
+                  color="primary"
+                  onClick={() => this.startNavigation()}
+                >
+                  Start navigation
               </ion-button>
-            }
-          </ion-fab>
+              }
+            </div>
+          </div>
         }
       </ion-content>
     ];

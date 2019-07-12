@@ -3,6 +3,23 @@
     height: 100%;
 }
 
+.ctas-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    position: fixed;
+    right: 0;
+    left: 0;
+    bottom: 15px;
+}
+
+.ctas-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 
 .mapboxgl-map {

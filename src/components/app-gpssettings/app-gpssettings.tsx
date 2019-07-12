@@ -35,6 +35,7 @@ export class AppGPSSettings {
           <li>Number of Satellites in range: 15</li>
           <li>Number of <strong>Galileo</strong> satellites in range: 3</li>
           <li>Signal strength: <img src="/assets/accuracy-range.png" /></li>
+          <li>Estimated accuracy: 2m</li>
         </ul>
         <p class="text-small"><i>Note: this will be implemented in M2</i></p>
         <p class="text-bold">L5 Galileo band use</p>

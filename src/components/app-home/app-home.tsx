@@ -4,7 +4,6 @@ import { Plugins, GeolocationPosition } from '@capacitor/core';
 import config from '../../config.json';
 import pointGeojson from '../../assets/geojson/point.json';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
-import { toastController } from '@ionic/core';
 const { SplashScreen } = Plugins;
 import { PulsingDot } from '../../helpers/utils';
 

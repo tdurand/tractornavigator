@@ -17,7 +17,10 @@
     "@capacitor/core": "^1.1.0",
     "@ionic/core": "4.6.0",
     "@mapbox/mapbox-gl-draw": "^1.1.2",
-    "mapbox-gl": "^1.1.0"
+    "@turf/bbox": "^6.0.1",
+    "@turf/square-grid": "^6.0.2",
+    "mapbox-gl": "^1.1.0",
+    "mapbox-gl-draw-rectangle-mode": "^1.0.4"
   },
   "devDependencies": {
     "@stencil/core": "1.1.4",

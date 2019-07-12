@@ -19,7 +19,8 @@ Todo include styles via module import instead of copy paste in app-home.css , wh
 
 const MODE = {
   SELECTING_FIELD: "selecting_field",
-  FREEMOVING: "freemoving"
+  FREEMOVING: "freemoving",
+  NAVIGATION: "navigation"
 }
 
 @Component({
@@ -34,6 +35,8 @@ export class AppHome {
   @State() mapRendered: boolean = false;
   @State() mapLoaded: boolean = false;
   @State() areaDrawn: boolean = false;
+  @State() isDrawingArea: boolean = false;
+  @State() readyToNavigate: boolean = false;
   loadingScreen: any
   Draw: any;
   map: any;
@@ -96,6 +99,11 @@ export class AppHome {
     map.getSource('position').setData(this.positionGeojson);
   }
 
+  removeGridLayer(map) {
+    map.removeLayer('grid');
+    map.removeSource('grid');
+  }
+
   onLocationError() {
     this.presentToastErrorGPS();
     if (this.loadingScreen) {
@@ -151,14 +159,27 @@ export class AppHome {
 
   enableSelectFieldMode() {
     this.mode = MODE.SELECTING_FIELD;
+    this.isDrawingArea = true;
     this.Draw.changeMode('draw_polygon');
   }
 
-  cancelFieldSelection() {
+  removeFieldSelection() {
     // TODO
     // Draw remove polygon
+    this.Draw.deleteAll();
     // Remove grid
     this.areaDrawn = false;
+    this.mode = MODE.FREEMOVING;
+    this.removeGridLayer(this.map);
+  }
+
+  confirmFieldSelection() {
+    this.readyToNavigate = true;
+    this.mode = MODE.NAVIGATION;
+  }
+
+  startNavigation() {
+    // todo
   }
 
   componentDidLoad() {
@@ -185,6 +206,7 @@ export class AppHome {
     });
 
     this.map.on('draw.create', (feature) => {
+      this.isDrawingArea = false;
       this.areaDrawn = true;
       var bbox = turfBbox(feature.features[0])
       // console.log(bbox);
@@ -200,6 +222,7 @@ export class AppHome {
       // Show modal asking for cellSide ("pas")
       // On OK : this.createGridLayer(this.map, squareGrid);
       // Remove drawn polygon
+      this.Draw.deleteAll();
     });
 
     this.map.on('render', () => {
@@ -247,12 +270,28 @@ export class AppHome {
                 Select area
               </ion-button>
             }
+            {this.mode === MODE.SELECTING_FIELD && (this.isDrawingArea || this.areaDrawn) &&
+              <ion-button
+                color="secondary"
+                onClick={() => this.removeFieldSelection()}
+              >
+                Cancel
+              </ion-button>
+            }
             {this.mode === MODE.SELECTING_FIELD && this.areaDrawn &&
               <ion-button
                 color="primary"
-                onClick={() => this.cancelFieldSelection()}
+                onClick={() => this.confirmFieldSelection()}
               >
-                Cancel
+                Confirm
+              </ion-button>
+            }
+            {this.mode === MODE.NAVIGATION && this.readyToNavigate &&
+              <ion-button
+                color="primary"
+                onClick={() => this.startNavigation()}
+              >
+                Start navigation
               </ion-button>
             }
           </ion-fab>

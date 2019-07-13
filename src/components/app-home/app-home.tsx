@@ -194,6 +194,7 @@ export class AppHome {
     this.Draw.deleteAll();
     // Remove grid
     this.areaDrawn = false;
+    this.readyToNavigate = false;
     this.mode = MODE.FREEMOVING;
     this.removeGridLayer(this.map);
   }
@@ -305,7 +306,7 @@ export class AppHome {
                   onClick={() => this.removeFieldSelection()}
                 >
                   Cancel
-              </ion-button>
+                </ion-button>
               }
               {this.mode === MODE.SELECTING_FIELD && this.areaDrawn &&
                 <ion-button
@@ -316,12 +317,20 @@ export class AppHome {
               </ion-button>
               }
               {this.mode === MODE.NAVIGATION && this.readyToNavigate &&
-                <ion-button
-                  color="primary"
-                  onClick={() => this.startNavigation()}
-                >
-                  Start navigation
-              </ion-button>
+                <div>
+                  <ion-button
+                    color="secondary"
+                    onClick={() => this.removeFieldSelection()}
+                  >
+                    Cancel
+                  </ion-button>
+                  <ion-button
+                    color="primary"
+                    onClick={() => this.startNavigation()}
+                  >
+                    Start navigation
+                  </ion-button>
+                </div>
               }
             </div>
           </div>

@@ -4,6 +4,7 @@ import { Plugins, GeolocationPosition } from '@capacitor/core';
 import { loadingController, toastController } from '@ionic/core';
 import config from '../../config.json';
 import pointGeojson from '../../assets/geojson/point.json';
+import lineGeojson from '../../assets/geojson/line.json';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 const { SplashScreen } = Plugins;
 import { PulsingDot, styleMapboxOffline } from '../../helpers/utils';
@@ -30,13 +31,16 @@ const MODE = {
 export class AppHome {
 
   @State() position: GeolocationPosition;
+  @State() positionHistory: Array<GeolocationPosition> = [];
   @State() positionGeojson: any = pointGeojson;
+  traceGeojson: any = lineGeojson;
   @State() mode: any = MODE.FREEMOVING;
   @State() mapRendered: boolean = false;
   @State() mapLoaded: boolean = false;
   @State() areaDrawn: boolean = false;
   @State() isDrawingArea: boolean = false;
   @State() readyToNavigate: boolean = false;
+  @State() isNavigating: boolean = false;
   loadingScreen: any
   Draw: any;
   map: any;
@@ -116,13 +120,38 @@ export class AppHome {
     });
   }
 
+  createTraceLayer(map, geojson) {
+    map.addSource('trace', { type: 'geojson', data: geojson });
+    map.addLayer({
+      "id": "trace",
+      "type": "line",
+      "source": "trace",
+      "paint": {
+        "line-color": "yellow",
+        "line-opacity": 0.75,
+        "line-width": 5
+      }
+    });
+  }
+
   updatePositionInSource(map) {
     map.getSource('position').setData(this.positionGeojson);
+  }
+
+  updateTraceDisplay(map, geojson) {
+    console.log(geojson)
+    map.getSource('trace').setData(geojson);
+    map.panTo([this.position.coords.longitude, this.position.coords.latitude]);
   }
 
   removeGridLayer(map) {
     map.removeLayer('grid');
     map.removeSource('grid');
+  }
+
+  removeTraceLayer(map) {
+    map.removeLayer('trace');
+    map.removeSource('trace');
   }
 
   onLocationError() {
@@ -158,6 +187,7 @@ export class AppHome {
         timeout: 15000
       }, (position) => {
         if (position) {
+          console.log('got new position');
           if (this.loadingScreen) {
             this.loadingScreen.dismiss();
           }
@@ -168,6 +198,11 @@ export class AppHome {
             this.createPositionLayerAndSource(this.map);
           }
           this.updatePositionInSource(this.map);
+          if(this.mode === MODE.NAVIGATION && this.isNavigating) {
+            console.log('add position to trace data');
+            this.addPositionToTraceData(position);
+            this.updateTraceDisplay(this.map, this.traceGeojson);
+          }
         } else {
           this.onLocationError();
         }
@@ -183,9 +218,29 @@ export class AppHome {
     this.mode = MODE.SELECTING_FIELD;
     this.isDrawingArea = true;
     this.Draw.changeMode('draw_polygon');
-    if(!this.toastDrawingHelpShown) {
+    if (!this.toastDrawingHelpShown) {
       this.presentToastDrawingHelp();
     }
+  }
+
+  onFinishDraw(feature) {
+    this.isDrawingArea = false;
+    this.areaDrawn = true;
+    var bbox = turfBbox(feature.features[0])
+    // console.log(bbox);
+    var bbox = bbox;
+    var cellSide = 0.01; // cell size
+    // 1km = 1000m , 0.1 = 100m, 0.01 = 10m
+    //var options = {units: 'kilometers'};
+    var squareGrid = turfSquareGrid(bbox, cellSide);
+    this.createGridLayer(this.map, squareGrid);
+
+    // TODO
+    // add button to redraw
+    // Show modal asking for cellSide ("pas")
+    // On OK : this.createGridLayer(this.map, squareGrid);
+    // Remove drawn polygon
+    this.Draw.deleteAll();
   }
 
   removeFieldSelection() {
@@ -204,8 +259,29 @@ export class AppHome {
     this.mode = MODE.NAVIGATION;
   }
 
+  addPositionToTraceData(position) {
+    this.positionHistory.push(position);
+    this.traceGeojson.features[0].geometry.coordinates = this.positionHistory.map((position) => {
+      return [position.coords.longitude, position.coords.latitude]
+    });
+  }
+
   startNavigation() {
+    this.isNavigating = true;
     // todo
+    this.addPositionToTraceData(this.position);
+    this.createTraceLayer(this.map, this.traceGeojson)
+    this.updateTraceDisplay(this.map, this.traceGeojson);
+  }
+
+  stopNavigation() {
+    this.isNavigating = false;
+    this.removeTraceLayer(this.map);
+    // Reset position history
+    this.positionGeojson = lineGeojson;
+    this.positionHistory = [];
+
+    // TODO , go to history
   }
 
   componentDidLoad() {
@@ -232,23 +308,7 @@ export class AppHome {
     });
 
     this.map.on('draw.create', (feature) => {
-      this.isDrawingArea = false;
-      this.areaDrawn = true;
-      var bbox = turfBbox(feature.features[0])
-      // console.log(bbox);
-      var bbox = bbox;
-      var cellSide = 0.01; // cell size
-      // 1km = 1000m , 0.1 = 100m, 0.01 = 10m
-      //var options = {units: 'kilometers'};
-      var squareGrid = turfSquareGrid(bbox, cellSide);
-      this.createGridLayer(this.map, squareGrid);
-
-      // TODO
-      // add button to redraw
-      // Show modal asking for cellSide ("pas")
-      // On OK : this.createGridLayer(this.map, squareGrid);
-      // Remove drawn polygon
-      this.Draw.deleteAll();
+      this.onFinishDraw(feature);
     });
 
     this.map.on('render', () => {
@@ -289,7 +349,7 @@ export class AppHome {
         {this.mapLoaded &&
           <div class="ctas-container">
             <div class="ctas-help">
-              
+
             </div>
             <div class="ctas-buttons">
               {this.mode === MODE.FREEMOVING &&
@@ -316,7 +376,7 @@ export class AppHome {
                   Confirm
               </ion-button>
               }
-              {this.mode === MODE.NAVIGATION && this.readyToNavigate &&
+              {this.mode === MODE.NAVIGATION && this.readyToNavigate && !this.isNavigating &&
                 <div>
                   <ion-button
                     color="secondary"
@@ -331,6 +391,14 @@ export class AppHome {
                     Start navigation
                   </ion-button>
                 </div>
+              }
+              {this.mode === MODE.NAVIGATION && this.isNavigating &&
+                <ion-button
+                  color="danger"
+                  onClick={() => this.stopNavigation()}
+                >
+                  Stop navigation
+              </ion-button>
               }
             </div>
           </div>

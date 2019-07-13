@@ -7,7 +7,8 @@ import pointGeojson from '../../assets/geojson/point.json';
 import lineGeojson from '../../assets/geojson/line.json';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 const { SplashScreen } = Plugins;
-import { PulsingDot, styleMapboxOffline } from '../../helpers/utils';
+import { PulsingDot } from '../../helpers/utils';
+import { styleMapboxOffline } from '../../helpers/utils';
 import turfBbox from '@turf/bbox';
 import turfSquareGrid from '@turf/square-grid';
 const { Geolocation } = Plugins;
@@ -116,7 +117,12 @@ export class AppHome {
     map.addLayer({
       "id": "grid",
       "type": "line",
-      "source": "grid"
+      "source": "grid",
+      "paint": {
+        "line-color": "blue",
+        "line-opacity": 0.75,
+        "line-width": 2
+      }
     });
   }
 
@@ -295,7 +301,7 @@ export class AppHome {
     this.map = new mapboxgl.Map({
       container: 'map',
       center: [4.7677, 46.3139],
-      // style: 'mapbox://styles/mapbox/satellite-v9',
+      //style: 'mapbox://styles/mapbox/satellite-v9',
       style: styleMapboxOffline,
       zoom: 17,
       minZoom: 16

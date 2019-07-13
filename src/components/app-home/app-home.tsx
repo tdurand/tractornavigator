@@ -393,12 +393,14 @@ export class AppHome {
                 </div>
               }
               {this.mode === MODE.NAVIGATION && this.isNavigating &&
-                <ion-button
-                  color="danger"
-                  onClick={() => this.stopNavigation()}
-                >
-                  Stop navigation
-              </ion-button>
+                <ion-router-link href="history">
+                  <ion-button
+                    color="danger"
+                    onClick={() => this.stopNavigation()}
+                  >
+                    Stop navigation
+                  </ion-button>
+                </ion-router-link>
               }
             </div>
           </div>

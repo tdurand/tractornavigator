@@ -301,6 +301,9 @@ export class AppHome {
       minZoom: 16
     });
 
+    const navControl = new mapboxgl.NavigationControl();
+    this.map.addControl(navControl, 'top-right');
+
     // Add drawing tools
     this.Draw = new MapboxDraw({
       displayControlsDefault: false,

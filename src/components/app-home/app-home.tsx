@@ -200,6 +200,7 @@ export class AppHome {
         if (!this.map.getSource("position")) {
           this.createPositionLayerAndSource(this.map);
         }
+        this.updatePositionInSource(this.map);
         this.map.panTo({ lon: position.coords.longitude, lat: position.coords.latitude })
       } else {
         this.onLocationError();
@@ -317,7 +318,7 @@ export class AppHome {
     this.isNavigating = false;
     this.removeTraceLayer(this.map);
     // Reset position history
-    this.positionGeojson = lineGeojson;
+    this.positionGeojson = pointGeojson;
     this.positionHistory = [];
 
     // TODO , go to history

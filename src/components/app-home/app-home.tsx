@@ -31,7 +31,14 @@ const MODE = {
 })
 export class AppHome {
 
-  @State() position: GeolocationPosition;
+  @State() position: GeolocationPosition = {
+    coords: {
+      latitude: 46.3139,
+      longitude: 4.7677,
+      accuracy: 10
+    },
+    timestamp: 1563200377015
+  };
   @State() positionHistory: Array<GeolocationPosition> = [];
   @State() positionGeojson: any = pointGeojson;
   traceGeojson: any = lineGeojson;
@@ -42,8 +49,8 @@ export class AppHome {
   @State() isDrawingArea: boolean = false;
   @State() readyToNavigate: boolean = false;
   @State() isNavigating: boolean = false;
-  loadingScreen: any;
-  loadingScreenMap: any;
+  loadingScreen: any = false;
+  loadingScreenMap: any = false;
   Draw: any;
   map: any;
   toastDrawingHelpShown: boolean = false;
@@ -176,6 +183,7 @@ export class AppHome {
     }
   }
 
+  // Geoloc with native android API, Raw measurements use to be implemented in M2
   startWatchingGeoloc() {
     Geolocation.getCurrentPosition({
       timeout: 15000
@@ -183,11 +191,15 @@ export class AppHome {
       if (position) {
         if (this.loadingScreen) {
           this.loadingScreen.dismiss();
-          if(!this.mapLoaded) {
+          if(!this.mapLoaded && !this.loadingScreenMap) {
             this.presentLoadingMap();
           }
         }
         this.position = position;
+        this.positionGeojson.features[0].geometry.coordinates = [this.position.coords.longitude, this.position.coords.latitude];
+        if (!this.map.getSource("position")) {
+          this.createPositionLayerAndSource(this.map);
+        }
         this.map.panTo({ lon: position.coords.longitude, lat: position.coords.latitude })
       } else {
         this.onLocationError();
@@ -196,7 +208,7 @@ export class AppHome {
       setTimeout(() => {
         if (this.loadingScreen) {
           this.loadingScreen.dismiss();
-          if(!this.mapLoaded) {
+          if(!this.mapLoaded && !this.loadingScreenMap) {
             this.presentLoadingMap();
           }
         }
@@ -210,7 +222,7 @@ export class AppHome {
           console.log('got new position');
           if (this.loadingScreen) {
             this.loadingScreen.dismiss();
-            if(!this.mapLoaded) {
+            if(!this.mapLoaded && !this.loadingScreenMap) {
               this.presentLoadingMap();
             }
           }

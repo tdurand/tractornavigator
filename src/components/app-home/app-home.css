@@ -21,6 +21,19 @@
     align-items: center;
 }
 
+.btn-geolocate {
+    position: absolute;
+    right: 10px;
+    top: 0;
+    z-index: 1;
+    width: 30px;
+    height: 30px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    background-color: white;
+    top: 110px;
+}
+
 
 .mapboxgl-map {
     font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;

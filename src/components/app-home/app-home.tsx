@@ -42,7 +42,8 @@ export class AppHome {
   @State() isDrawingArea: boolean = false;
   @State() readyToNavigate: boolean = false;
   @State() isNavigating: boolean = false;
-  loadingScreen: any
+  loadingScreen: any;
+  loadingScreenMap: any;
   Draw: any;
   map: any;
   toastDrawingHelpShown: boolean = false;
@@ -98,6 +99,14 @@ export class AppHome {
     await this.loadingScreen.present();
   }
 
+  async presentLoadingMap() {
+    this.loadingScreenMap = await loadingController.create({
+      message: 'Loading map with satellite imagery...',
+    });
+
+    await this.loadingScreenMap.present();
+  }
+
   createPositionLayerAndSource(map) {
     let pulsingDot = new PulsingDot(map);
     map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 2 });
@@ -145,7 +154,7 @@ export class AppHome {
   }
 
   updateTraceDisplay(map, geojson) {
-    console.log(geojson)
+    // console.log(geojson)
     map.getSource('trace').setData(geojson);
     map.panTo([this.position.coords.longitude, this.position.coords.latitude]);
   }
@@ -174,7 +183,9 @@ export class AppHome {
       if (position) {
         if (this.loadingScreen) {
           this.loadingScreen.dismiss();
-          console.log(this.loadingScreen);
+          if(!this.mapLoaded) {
+            this.presentLoadingMap();
+          }
         }
         this.position = position;
         this.map.panTo({ lon: position.coords.longitude, lat: position.coords.latitude })
@@ -185,6 +196,9 @@ export class AppHome {
       setTimeout(() => {
         if (this.loadingScreen) {
           this.loadingScreen.dismiss();
+          if(!this.mapLoaded) {
+            this.presentLoadingMap();
+          }
         }
       }, 1000)
 
@@ -196,6 +210,9 @@ export class AppHome {
           console.log('got new position');
           if (this.loadingScreen) {
             this.loadingScreen.dismiss();
+            if(!this.mapLoaded) {
+              this.presentLoadingMap();
+            }
           }
           this.position = position;
           // Update layer
@@ -294,6 +311,12 @@ export class AppHome {
     // TODO , go to history
   }
 
+  // componentDidRender() {
+  //   if(this.mapLoaded) {
+  //     this.updatePositionInSource(this.map);
+  //   }
+  // }
+
   componentDidLoad() {
 
     this.presentLoading();
@@ -336,6 +359,9 @@ export class AppHome {
     this.map.on('load', () => {
       console.log('map loaded')
       this.mapLoaded = true;
+      if(this.loadingScreenMap) {
+        this.loadingScreenMap.dismiss();
+      }
       // Add position
       this.positionGeojson.features[0].geometry.coordinates = [this.position.coords.longitude, this.position.coords.latitude];
       if (!this.map.getSource("position")) {
@@ -362,7 +388,6 @@ export class AppHome {
         {this.mapLoaded &&
           <div class="ctas-container">
             <div class="ctas-help">
-
             </div>
             <div class="ctas-buttons">
               {this.mode === MODE.FREEMOVING &&
@@ -417,6 +442,18 @@ export class AppHome {
               }
             </div>
           </div>
+        }
+        {this.mapLoaded &&
+          <button 
+            class="btn-geolocate mapboxgl-ctrl-icon mapboxgl-ctrl-geolocate" 
+            type="button" 
+            aria-label="Geolocate" 
+            aria-pressed="false"
+            onClick={() => {
+              this.updatePositionInSource(this.map)
+              this.map.panTo([this.position.coords.longitude, this.position.coords.latitude]);
+            }}
+          ></button>
         }
       </ion-content>
     ];

@@ -10,11 +10,6 @@ gps) that enables you to:
 - Record and load saved trajectories to pick up work from where you left and avoid passing
 two times in the same area
 
-This app
-
-
-
-
 
 ### Acknowledgements:
 

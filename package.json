@@ -19,6 +19,7 @@
     "@mapbox/mapbox-gl-draw": "^1.1.2",
     "@turf/bbox": "^6.0.1",
     "@turf/square-grid": "^6.0.2",
+    "@turf/transform-rotate": "^5.1.5",
     "mapbox-gl": "^1.1.0",
     "mapbox-gl-draw-rectangle-mode": "^1.0.4"
   },

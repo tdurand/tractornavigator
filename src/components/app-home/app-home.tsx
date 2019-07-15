@@ -8,9 +8,9 @@ import lineGeojson from '../../assets/geojson/line.json';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 const { SplashScreen } = Plugins;
 import { PulsingDot } from '../../helpers/utils';
-import { styleMapboxOffline } from '../../helpers/utils';
 import turfBbox from '@turf/bbox';
 import turfSquareGrid from '@turf/square-grid';
+import turfTransformRotate from '@turf/transform-rotate';
 const { Geolocation } = Plugins;
 
 /*
@@ -239,7 +239,11 @@ export class AppHome {
     // 1km = 1000m , 0.1 = 100m, 0.01 = 10m
     //var options = {units: 'kilometers'};
     var squareGrid = turfSquareGrid(bbox, cellSide);
-    this.createGridLayer(this.map, squareGrid);
+    var bearing = this.map.getBearing();
+    var squareGridRotated = turfTransformRotate(squareGrid, bearing, {
+      mutate: true
+    });  
+    this.createGridLayer(this.map, squareGridRotated);
 
     // TODO
     // add button to redraw
@@ -301,8 +305,8 @@ export class AppHome {
     this.map = new mapboxgl.Map({
       container: 'map',
       center: [4.7677, 46.3139],
-      //style: 'mapbox://styles/mapbox/satellite-v9',
-      style: styleMapboxOffline,
+      style: 'mapbox://styles/mapbox/satellite-v9',
+      //style: styleMapboxOffline,
       zoom: 17,
       minZoom: 16
     });

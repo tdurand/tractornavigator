@@ -12,6 +12,7 @@ import turfBbox from '@turf/bbox';
 import turfSquareGrid from '@turf/square-grid';
 import turfTransformRotate from '@turf/transform-rotate';
 const { Geolocation } = Plugins;
+//import { styleMapboxOffline } from '../../helpers/utils';
 
 /*
 

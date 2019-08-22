@@ -4,7 +4,7 @@ App for Galileo App Challenge 2019.
 
 See video of current prototype https://www.youtube.com/watch?v=jX0ccm-nKyk  
 
-[![Demo video](https://img.youtube.com/vi/jX0ccm-nKyk/0.jpg)](https://www.youtube.com/watch?v=jX0ccm-nKyk)
+[![Demo video](https://img.youtube.com/vi/jX0ccm-nKyk/1.jpg)](https://www.youtube.com/watch?v=jX0ccm-nKyk)
 
 
 Tractor navigator provides guidance for farmers driving tractors. It is a navigation app (like your car

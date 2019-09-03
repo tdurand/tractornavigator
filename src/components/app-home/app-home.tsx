@@ -335,6 +335,11 @@ export class AppHome {
 
     this.presentLoading();
 
+    Plugins.GnssPlugin.customCall({value: "test"}).then((res) => {
+      console.log(res.value);
+    });
+    console.log('blabla');
+
     SplashScreen.hide();
 
     mapboxgl.accessToken = config.mapboxToken;

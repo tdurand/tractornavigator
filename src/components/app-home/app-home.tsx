@@ -50,6 +50,7 @@ export class AppHome {
   @State() isDrawingArea: boolean = false;
   @State() readyToNavigate: boolean = false;
   @State() isNavigating: boolean = false;
+  isPresentingLoadingScreen: boolean = false;
   loadingScreen: any = false;
   loadingScreenMap: any = false;
   Draw: any;
@@ -99,12 +100,17 @@ export class AppHome {
   }
 
   async presentLoading() {
+    this.isPresentingLoadingScreen = true;
     this.loadingScreen = await loadingController.create({
       message: 'Getting your location...',
       duration: 15000
     });
 
-    await this.loadingScreen.present();
+    // Here will need to see if we still need to present it.
+    if(this.isPresentingLoadingScreen) {
+      await this.loadingScreen.present();
+    }
+    this.isPresentingLoadingScreen = false;
   }
 
   async presentLoadingMap() {
@@ -178,6 +184,7 @@ export class AppHome {
   }
 
   onLocationError() {
+    console.log('onLocationError');
     this.presentToastErrorGPS();
     if (this.loadingScreen) {
       this.loadingScreen.dismiss();
@@ -189,8 +196,14 @@ export class AppHome {
     Geolocation.getCurrentPosition({
       timeout: 15000
     }).then((position) => {
+      console.log(position);
       if (position) {
-        if (this.loadingScreen) {
+        // PB Here, loadingScreen hasn't been yet initialised but will be, in progress
+        // TODO be able to cancel the presentLoadingScreen()..
+        console.log(this.loadingScreen);
+        if (this.loadingScreen || this.isPresentingLoadingScreen) {
+          this.isPresentingLoadingScreen = false;
+          console.log('Dismiss loading screen')
           this.loadingScreen.dismiss();
           if(!this.mapLoaded && !this.loadingScreenMap) {
             this.presentLoadingMap();
@@ -204,6 +217,7 @@ export class AppHome {
         this.updatePositionInSource(this.map);
         this.map.panTo({ lon: position.coords.longitude, lat: position.coords.latitude })
       } else {
+        console.log('position null when getCurrentPosition, calling onLocationError');
         this.onLocationError();
       }
 
@@ -241,13 +255,11 @@ export class AppHome {
             this.updateTraceDisplay(this.map, this.traceGeojson);
           }
         } else {
+          console.log('position null when watchPosition, calling onLocationError');
           this.onLocationError();
         }
       })
-    }).catch((error) => {
-      console.log(error);
-      this.onLocationError();
-    });
+    })
   }
 
   enableSelectFieldMode() {
@@ -335,10 +347,10 @@ export class AppHome {
 
     this.presentLoading();
 
-    Plugins.GnssPlugin.customCall({value: "test"}).then((res) => {
-      console.log(res.value);
-    });
-    console.log('blabla');
+    //Plugins.GnssPlugin.customCall({value: "test"}).then((res) => {
+    //  console.log(res.value);
+    //});
+    //console.log('blabla');
 
     SplashScreen.hide();
 

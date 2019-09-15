@@ -1,10 +1,22 @@
-import { Component, h } from '@stencil/core';
+import { Component, h, Prop } from '@stencil/core';
+/* Workaround because of : https://github.com/ionic-team/stencil-redux/issues/22 */ 
+/* tslint:disable:no-import-side-effect */
+import '@stencil/redux';
+/* tslint:enable:no-import-side-effect */
+import { Store } from "@stencil/redux";
+import { configureStore } from "../../statemanagement/store";
 
 @Component({
   tag: 'app-root',
   styleUrl: 'app-root.css'
 })
 export class AppRoot {
+
+  @Prop({ context: "store" }) store: Store;
+
+  componentWillLoad() {
+    this.store.setStore(configureStore({}));
+  }
 
   render() {
     return (

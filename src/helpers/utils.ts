@@ -4,6 +4,21 @@ export function sayHello() {
   return Math.random() < 0.5 ? 'Hello' : 'Hola';
 }
 
+export function geopositionToObject(geoposition) {
+  return {
+    timestamp: geoposition.timestamp,
+    coords: {
+      accuracy: geoposition.coords.accuracy,
+      altitude: geoposition.coords.altitude,
+      altitudeAccuracy: geoposition.coords.altitudeAccuracy,
+      heading: geoposition.coords.heading,
+      latitude: geoposition.coords.latitude,
+      longitude: geoposition.coords.longitude,
+      speed: geoposition.coords.speed
+    }
+  }
+}
+
 export class PulsingDot {
 
   size = 100;

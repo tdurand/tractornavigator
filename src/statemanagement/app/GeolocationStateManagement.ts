@@ -8,10 +8,7 @@ interface GeolocationState {
 
 const getInitialState = (): GeolocationState => {
     return {
-        position: {
-            timestamp: undefined,
-            coords: undefined
-        }
+        position: null
     };
 };
 
@@ -31,8 +28,8 @@ export function getPosition() {
         Geolocation.getCurrentPosition({
             timeout: 15000
         }).then((position) => {
-            // Need to parse geoposition DOM element to normal object otherwise redux can't parse it
-            // in reducer     
+            // Need to transform geoposition DOM element to normal object otherwise redux can't parse it reducer:
+            //  
             dispatch(setPosition(geopositionToObject(position)));
         })
     }

@@ -1,4 +1,4 @@
-import { Component, h, State, Prop } from '@stencil/core';
+import { Component, h, State, Prop, Watch } from '@stencil/core';
 import { Plugins } from '@capacitor/core';
 import { Store, Action } from "@stencil/redux";
 import { getPosition } from '../../statemanagement/app/GeolocationStateManagement';
@@ -19,6 +19,11 @@ Todo include styles via module import instead of copy paste in app-home.css , wh
 export class AppHome {
 
   @State() position: Geolocation;
+  @Watch('position')
+  watchHandler(position: Geolocation) {
+    console.log('The new value of position is');
+    console.log(position);
+  }
   getPosition: Action;
 
   @Prop({ context: "store" }) store: Store;

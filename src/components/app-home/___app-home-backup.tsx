@@ -27,7 +27,7 @@ const MODE = {
 }
 
 @Component({
-  tag: 'app-home',
+  tag: 'app-home-backup',
   styleUrl: 'app-home.css'
 })
 export class AppHome {

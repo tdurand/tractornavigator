@@ -23,7 +23,9 @@ export class AppHome {
   watchHandler(position: Geolocation) {
     console.log('The new value of position is');
     console.log(position);
+    // Todo here update position on the map
   }
+
   getPosition: Action;
 
   @Prop({ context: "store" }) store: Store;

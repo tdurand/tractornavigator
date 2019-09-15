@@ -14,7 +14,7 @@ const getInitialState = (): GeolocationState => {
 
 
 const SET_POSITION = 'Geolocation/SET_POSITION';
-const GET_POSITION = 'Geolocation/GET_POSITION';
+//const GET_POSITION = 'Geolocation/GET_POSITION';
 
 export function setPosition(position: GeolocationPosition) {
     return {

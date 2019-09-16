@@ -2,19 +2,25 @@ import { loadingController } from '@ionic/core';
 
 export default class LoadingIndicator {
 
-  constructor() {
+  isLoading: boolean
+  message: string
+
+  constructor(message) {
     this.isLoading = false;
+    this.message = message;
   }
 
   async present() {
     this.isLoading = true;
     return await loadingController.create({
-      message: 'Getting your location...'
+      message: this.message
     }).then(a => {
       a.present().then(() => {
-        console.log('presented');
+        //console.log('presented');
         if (!this.isLoading) {
-          a.dismiss().then(() => console.log('abort presenting'));
+          a.dismiss().then(() => {
+          //console.log('abort presenting')
+          });
         }
       });
     });
@@ -22,6 +28,8 @@ export default class LoadingIndicator {
 
   async dismiss() {
     this.isLoading = false;
-    return await loadingController.dismiss().then(() => console.log('dismissed'));
+    return await loadingController.dismiss().then(() => {
+      //console.log('dismissed')
+    });
   }
 }

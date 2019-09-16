@@ -13,7 +13,6 @@ export namespace Components {
   interface AppGpssettings {}
   interface AppHistory {}
   interface AppHome {}
-  interface AppHomeBackup {}
   interface AppOffline {}
   interface AppRoot {}
   interface AppTabs {}
@@ -46,12 +45,6 @@ declare global {
     new (): HTMLAppHomeElement;
   };
 
-  interface HTMLAppHomeBackupElement extends Components.AppHomeBackup, HTMLStencilElement {}
-  var HTMLAppHomeBackupElement: {
-    prototype: HTMLAppHomeBackupElement;
-    new (): HTMLAppHomeBackupElement;
-  };
-
   interface HTMLAppOfflineElement extends Components.AppOffline, HTMLStencilElement {}
   var HTMLAppOfflineElement: {
     prototype: HTMLAppOfflineElement;
@@ -74,7 +67,6 @@ declare global {
     'app-gpssettings': HTMLAppGpssettingsElement;
     'app-history': HTMLAppHistoryElement;
     'app-home': HTMLAppHomeElement;
-    'app-home-backup': HTMLAppHomeBackupElement;
     'app-offline': HTMLAppOfflineElement;
     'app-root': HTMLAppRootElement;
     'app-tabs': HTMLAppTabsElement;
@@ -86,7 +78,6 @@ declare namespace LocalJSX {
   interface AppGpssettings extends JSXBase.HTMLAttributes<HTMLAppGpssettingsElement> {}
   interface AppHistory extends JSXBase.HTMLAttributes<HTMLAppHistoryElement> {}
   interface AppHome extends JSXBase.HTMLAttributes<HTMLAppHomeElement> {}
-  interface AppHomeBackup extends JSXBase.HTMLAttributes<HTMLAppHomeBackupElement> {}
   interface AppOffline extends JSXBase.HTMLAttributes<HTMLAppOfflineElement> {}
   interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
   interface AppTabs extends JSXBase.HTMLAttributes<HTMLAppTabsElement> {}
@@ -96,7 +87,6 @@ declare namespace LocalJSX {
     'app-gpssettings': AppGpssettings;
     'app-history': AppHistory;
     'app-home': AppHome;
-    'app-home-backup': AppHomeBackup;
     'app-offline': AppOffline;
     'app-root': AppRoot;
     'app-tabs': AppTabs;

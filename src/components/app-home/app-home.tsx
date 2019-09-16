@@ -6,6 +6,7 @@ import { getAndWatchPosition } from '../../statemanagement/app/GeolocationStateM
 import { blankMapStyle } from '../../helpers/utils';
 import { point } from '@turf/helpers';
 const { SplashScreen } = Plugins;
+import LoadingIndicator from './loadingIndicator';
 
 //import { styleMapboxOffline } from '../../helpers/utils';
 
@@ -26,6 +27,13 @@ export class AppHome {
   watchHandler(position: GeolocationPosition) {
     console.log('Got a new position');
     this.position = position;
+
+    if(!this.position) {
+      this.isGettingPositionLoader.present();
+    } else {
+      this.isGettingPositionLoader.dismiss();
+    }
+    
     if(this.mapIsReady) {
       this.updatePosition(position);
     }
@@ -34,6 +42,7 @@ export class AppHome {
   getAndWatchPosition: Action;
   map: any;
   mapIsReady: boolean = false;
+  isGettingPositionLoader: any = new LoadingIndicator();
 
   @Prop({ context: "store" }) store: Store;
 
@@ -54,6 +63,9 @@ export class AppHome {
 
   componentDidLoad() {
     SplashScreen.hide();
+    
+    this.isGettingPositionLoader.present()
+
     this.getAndWatchPosition();
 
     this.map = new mapboxgl.Map({

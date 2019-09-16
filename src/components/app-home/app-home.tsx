@@ -1,7 +1,10 @@
 import { Component, h, State, Prop, Watch } from '@stencil/core';
-import { Plugins } from '@capacitor/core';
+import { Plugins, GeolocationPosition } from '@capacitor/core';
 import { Store, Action } from "@stencil/redux";
+import mapboxgl from 'mapbox-gl';
 import { getPosition } from '../../statemanagement/app/GeolocationStateManagement';
+import { blankMapStyle } from '../../helpers/utils';
+import { point } from '@turf/helpers';
 const { SplashScreen } = Plugins;
 
 //import { styleMapboxOffline } from '../../helpers/utils';
@@ -18,15 +21,19 @@ Todo include styles via module import instead of copy paste in app-home.css , wh
 })
 export class AppHome {
 
-  @State() position: Geolocation;
+  @State() position: GeolocationPosition;
   @Watch('position')
-  watchHandler(position: Geolocation) {
-    console.log('The new value of position is');
-    console.log(position);
-    // Todo here update position on the map
+  watchHandler(position: GeolocationPosition) {
+    console.log('Got a new position');
+    this.position = position;
+    if(this.mapIsReady) {
+      this.updatePosition(position);
+    }
   }
 
   getPosition: Action;
+  map: any;
+  mapIsReady: boolean = false;
 
   @Prop({ context: "store" }) store: Store;
 
@@ -48,6 +55,56 @@ export class AppHome {
   componentDidLoad() {
     SplashScreen.hide();
     this.getPosition();
+
+    this.map = new mapboxgl.Map({
+      container: 'map',
+      style: blankMapStyle,
+      zoom: 17,
+      minZoom: 16
+    });
+
+    this.map.on('load', () => {
+      this.mapIsReady = true;
+      this.map.resize();
+      console.log('Map loaded');
+      // Init source
+      // Position
+      this.updatePosition(this.position);
+    });
+  }
+
+  updatePosition(position) {
+    if(position) {
+      this.map.setCenter([position.coords.longitude, position.coords.latitude]);
+      this.addOrUpdatePositionToMap(position);
+    }
+  }
+
+  addOrUpdatePositionToMap(position) {
+    let source = this.map.getSource('position');
+    let coords = [0,0]
+    if(position) {
+      coords = [position.coords.longitude, position.coords.latitude]
+    }
+    if(source) {
+      console.log('Update position source');
+      source.setData(point(coords))
+    } else {
+      console.log('Add position source');
+      this.map.addSource("position", {
+        "type": "geojson",
+        "data": point(coords)
+      });
+      this.map.addLayer({
+        "id": "position",
+        "source": "position",
+        "type": "circle",
+        "paint": {
+          "circle-radius": 10,
+          "circle-color": "#B42222"
+        }
+      })
+    }
   }
 
   render() {

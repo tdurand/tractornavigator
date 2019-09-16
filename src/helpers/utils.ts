@@ -309,3 +309,26 @@ export const styleMapboxOffline = {
     }
   }]
 };
+
+
+export const blankMapStyle = {
+  "version": 8,
+  "sources": {
+    "point": {
+      "type": "geojson",
+      "data": {
+        "type": "Point",
+        "coordinates": [0,0]
+      }
+    }
+  },
+  "layers": [{
+    "id": "point",
+    "source": "point",
+    "type": "circle",
+    "paint": {
+      "circle-radius": 0.1,
+      "circle-color": "transparent"
+    }
+  }]
+}

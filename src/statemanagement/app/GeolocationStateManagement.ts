@@ -23,14 +23,27 @@ export function setPosition(position: GeolocationPosition) {
     }
 }
 
-export function getPosition() {
+export function getAndWatchPosition() {
     return (dispatch) => {
         Geolocation.getCurrentPosition({
             timeout: 15000
         }).then((position) => {
+            // TODO handle error ?
             // Need to transform geoposition DOM element to normal object otherwise redux can't parse it reducer:
-            //  
             dispatch(setPosition(geopositionToObject(position)));
+        })
+
+        Geolocation.watchPosition({
+            enableHighAccuracy: true,
+            timeout: 15000
+        }, (position) => {
+            // TODO dispatch watcher enabled
+            if (position) {
+                dispatch(setPosition(geopositionToObject(position)));
+            } else {
+                console.log('position null when watchPosition, todo need to dispatch onLocationError');
+                // TODO do something
+            }
         })
     }
 }

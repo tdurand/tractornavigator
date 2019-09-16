@@ -4,7 +4,8 @@ import { Store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
 import { getAndWatchPosition } from '../../statemanagement/app/GeolocationStateManagement';
 // import { blankMapStyle } from '../../helpers/utils';
-import { point } from '@turf/helpers';
+import { point, lineString } from '@turf/helpers';
+import destination from '@turf/destination';
 const { SplashScreen } = Plugins;
 import LoadingIndicator from '../../helpers/loadingIndicator';
 import GuidingLines from '../../helpers/guidinglines';
@@ -232,19 +233,60 @@ export class AppHome {
     }
   }
 
+
+  addOrUpdateHeadingLine(position) {
+    if (position && position.coords.heading) {
+      let source = this.map.getSource('heading-line');
+      // Create heading line from position 
+      let pointA = point([position.coords.longitude, position.coords.latitude]);
+      let heading = position.coords.heading;
+      this.map.setBearing(heading);
+      // Convert heading to -180 180
+      if(heading > 180) {
+        heading -= 360;
+      }
+      let pointB = destination(pointA, 1, heading);
+      let headingLine = lineString([
+        pointA.geometry.coordinates,
+        pointB.geometry.coordinates
+      ]);
+      if (source) {
+        console.log('Update position source');
+        source.setData(headingLine)
+      } else {
+        console.log('Create position source and layer');
+        this.map.addSource("heading-line", {
+          "type": "geojson",
+          "data": headingLine
+        });
+        this.map.addLayer({
+          "id": "heading-line",
+          "source": "heading-line",
+          "type": "line",
+          "paint": {
+            "line-color": "red",
+            "line-width": 3
+          }
+        })
+      }
+    }
+  }
+
   updatePosition(position) {
     if (position) {
       this.map.setCenter([position.coords.longitude, position.coords.latitude]);
-      this.addOrUpdatePositionToMap(position);
       this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, position);
+      this.addOrUpdateHeadingLine(position);
+      this.addOrUpdatePositionToMap(position);
     }
   }
 
   refreshDataLayers() {
     console.log('refreshDataLayers');
-    this.addOrUpdatePositionToMap(this.position);
     this.addOrUpdateGuidinglineToMap(this.guidingLines);
     this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, this.position);
+    this.addOrUpdateHeadingLine(this.position);
+    this.addOrUpdatePositionToMap(this.position);
   }
 
   render() {

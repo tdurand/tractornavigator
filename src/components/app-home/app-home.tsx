@@ -2,7 +2,7 @@ import { Component, h, State, Prop, Watch } from '@stencil/core';
 import { Plugins, GeolocationPosition } from '@capacitor/core';
 import { Store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
-import { getPosition } from '../../statemanagement/app/GeolocationStateManagement';
+import { getAndWatchPosition } from '../../statemanagement/app/GeolocationStateManagement';
 import { blankMapStyle } from '../../helpers/utils';
 import { point } from '@turf/helpers';
 const { SplashScreen } = Plugins;
@@ -31,7 +31,7 @@ export class AppHome {
     }
   }
 
-  getPosition: Action;
+  getAndWatchPosition: Action;
   map: any;
   mapIsReady: boolean = false;
 
@@ -48,13 +48,13 @@ export class AppHome {
     });
 
     this.store.mapDispatchToProps(this, {
-      getPosition
+      getAndWatchPosition
     });
   }
 
   componentDidLoad() {
     SplashScreen.hide();
-    this.getPosition();
+    this.getAndWatchPosition();
 
     this.map = new mapboxgl.Map({
       container: 'map',

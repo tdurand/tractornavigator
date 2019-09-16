@@ -39,6 +39,7 @@ export function getAndWatchPosition() {
         }, (position) => {
             // TODO dispatch watcher enabled
             if (position) {
+                console.log('Dispatch watch position')
                 dispatch(setPosition(geopositionToObject(position)));
             } else {
                 console.log('position null when watchPosition, todo need to dispatch onLocationError');

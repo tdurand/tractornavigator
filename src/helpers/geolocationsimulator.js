@@ -31,6 +31,35 @@ export default function Geosimulation(params) {
         nextCoord();
     };
 
+    /**
+     * Since not all browsers implement this we have our own utility that will
+     * convert from radians into degrees
+     *
+     * @param rad - The radians to be converted into degrees
+     * @return degrees
+     */
+    function _toDeg(rad) {
+        return rad * 180 / Math.PI;
+    }
+
+    /**
+     * Calculate the bearing between two positions as a value from 0-360
+     *
+     * @param lat1 - The latitude of the first position
+     * @param lng1 - The longitude of the first position
+     * @param lat2 - The latitude of the second position
+     * @param lng2 - The longitude of the second position
+     *
+     * @return int - The bearing between 0 and 360
+     */
+     function bearing(lat1,lng1,lat2,lng2) {
+        var dLon = (lng2-lng1);
+        var y = Math.sin(dLon) * Math.cos(lat2);
+        var x = Math.cos(lat1)*Math.sin(lat2) - Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
+        var brng = _toDeg(Math.atan2(y, x));
+        return 360 - ((brng + 360) % 360);
+    }
+
     //private functions
 
     //advance to next coordinate in array
@@ -43,6 +72,7 @@ export default function Geosimulation(params) {
             //set current coordinate, to make sure it makes the jump
             _current.coords.latitude = coord.latitude;
             _current.coords.longitude = coord.longitude;
+            _current.coords.heading = coord.heading;
 
             //set rate of change
             //distance between points with direction for lat and lon (km)
@@ -81,8 +111,16 @@ export default function Geosimulation(params) {
     function step() {
         _currentStep++;
         if (_currentStep < _numSteps) {
+            var _previousLat = _current.coords.latitude;
+            var _previousLng = _current.coords.longitude;
             _current.coords.latitude += _rate.latitude;
             _current.coords.longitude += _rate.longitude;
+            _current.coords.heading = bearing(
+                _previousLat,
+                _previousLng,
+                _current.coords.latitude,
+                _current.coords.longitude
+            )
             setTimeout(step, UPDATE_INTERVAL);
         } else {
             nextCoord();
@@ -96,6 +134,7 @@ export default function Geosimulation(params) {
 
     navigator.geolocation.watchPosition = function (cb, error, options) {
         var sendPos = function () {
+            console.log(_current.coords.heading);
             cb(_current);
             _watchTimer = setTimeout(sendPos, 1000);
         };

@@ -40,7 +40,7 @@ export class AppHome {
     } else {
       this.isGettingPositionLoader.dismiss();
 
-      // Super ugly code..
+      // Super ugly code.. Handle position history in redux store...
       if (this.positionHistory.length > 0) {
         // Do not push to history if duplicate
         const latestPosition = this.positionHistory[this.positionHistory.length - 1];

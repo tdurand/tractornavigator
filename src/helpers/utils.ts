@@ -1,4 +1,5 @@
-
+import lineOffset from '@turf/line-offset';
+import { polygon } from '@turf/helpers';
 
 export function sayHello() {
   return Math.random() < 0.5 ? 'Hello' : 'Hola';
@@ -331,4 +332,20 @@ export const blankMapStyle = {
       "circle-color": "transparent"
     }
   }]
+}
+
+// Using this because turf buffer funciton isn't working properly for some reason
+// Width in meters
+export function lineToPolygon(line, width) {
+  let offsetLineRight = lineOffset(line, width / 2, {units: 'meters'});
+  let offsetLineLeft = lineOffset(line, -width / 2, {units: 'meters'});
+  let linePolygonCoordinates = [];
+  linePolygonCoordinates.push(offsetLineLeft.geometry.coordinates[0]);
+  offsetLineRight.geometry.coordinates.map((coordinate) => {
+    linePolygonCoordinates.push(coordinate);
+  })
+  offsetLineLeft.geometry.coordinates.reverse().map((coordinate) => {
+    linePolygonCoordinates.push(coordinate);
+  })
+  return polygon([linePolygonCoordinates])
 }

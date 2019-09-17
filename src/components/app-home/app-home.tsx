@@ -13,6 +13,8 @@ import config from '../../config.json';
 
 import Geosimulation from '../../helpers/geolocationsimulator';
 
+import { lineToPolygon } from '../../helpers/utils';
+
 //import { styleMapboxOffline } from '../../helpers/utils';
 
 /*
@@ -38,6 +40,18 @@ export class AppHome {
     } else {
       this.isGettingPositionLoader.dismiss();
 
+      // Super ugly code..
+      if (this.positionHistory.length > 0) {
+        // Do not push to history if duplicate
+        const latestPosition = this.positionHistory[this.positionHistory.length - 1];
+        if (
+          position.coords.longitude !== latestPosition[0] ||
+          position.coords.latitude !== latestPosition[1]) {
+          this.positionHistory.push([position.coords.longitude, position.coords.latitude])
+        }
+      } else {
+        this.positionHistory.push([position.coords.longitude, position.coords.latitude])
+      }
       // Compute derived data from position change
       // TODO compute this in the position change handler
       // const closestLineGeojson = guidingLines.getClosestLine(position).line;
@@ -46,6 +60,8 @@ export class AppHome {
       }
     }
   }
+
+  positionHistory: any[] = []
 
   getAndWatchPosition: Action;
   map: any;
@@ -233,7 +249,6 @@ export class AppHome {
     }
   }
 
-
   addOrUpdateHeadingLine(position) {
     if (position && position.coords.heading) {
       let source = this.map.getSource('heading-line');
@@ -242,7 +257,7 @@ export class AppHome {
       let heading = position.coords.heading;
       this.map.setBearing(heading);
       // Convert heading to -180 180
-      if(heading > 180) {
+      if (heading > 180) {
         heading -= 360;
       }
       let pointB = destination(pointA, 1, heading);
@@ -250,6 +265,7 @@ export class AppHome {
         pointA.geometry.coordinates,
         pointB.geometry.coordinates
       ]);
+
       if (source) {
         console.log('Update position source');
         source.setData(headingLine)
@@ -272,12 +288,45 @@ export class AppHome {
     }
   }
 
+  addOrUpdateTraceHistory(positionHistory) {
+    if (positionHistory.length > 1) {
+      let source = this.map.getSource('trace-history');
+      // TODO replace 10 by tool width
+      // Could improve perfs of this by avoiding recomputing everything each new position, but just push the new ones...
+      const linePositionHistory = lineString(positionHistory);
+      // This doesn't work if line history contains duplicates
+      // Using this because turf buffer funciton isn't working properly for some reason
+      // Width in meters
+      const traceAsPolygon = lineToPolygon(linePositionHistory, 10);
+      if (source) {
+        console.log('Update position source');
+        source.setData(traceAsPolygon)
+      } else {
+        console.log('Create position source and layer');
+        this.map.addSource("trace-history", {
+          "type": "geojson",
+          "data": traceAsPolygon
+        });
+        this.map.addLayer({
+          "id": "trace-history",
+          "source": "trace-history",
+          "type": "fill",
+          "paint": {
+            "fill-color": "blue",
+            "fill-opacity": 0.4
+          }
+        })
+      }
+    }
+  }
+
   updatePosition(position) {
     if (position) {
       this.map.setCenter([position.coords.longitude, position.coords.latitude]);
       this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, position);
       this.addOrUpdateHeadingLine(position);
       this.addOrUpdatePositionToMap(position);
+      this.addOrUpdateTraceHistory(this.positionHistory);
     }
   }
 
@@ -287,6 +336,7 @@ export class AppHome {
     this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, this.position);
     this.addOrUpdateHeadingLine(this.position);
     this.addOrUpdatePositionToMap(this.position);
+    this.addOrUpdateTraceHistory(this.positionHistory);
   }
 
   render() {

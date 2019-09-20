@@ -16,6 +16,10 @@ export namespace Components {
   interface AppOffline {}
   interface AppRoot {}
   interface AppTabs {}
+  interface GuidingInterface {}
+  interface GuidingSetup {
+    'onGuidingLinesDefined': Function;
+  }
 }
 
 declare global {
@@ -62,6 +66,18 @@ declare global {
     prototype: HTMLAppTabsElement;
     new (): HTMLAppTabsElement;
   };
+
+  interface HTMLGuidingInterfaceElement extends Components.GuidingInterface, HTMLStencilElement {}
+  var HTMLGuidingInterfaceElement: {
+    prototype: HTMLGuidingInterfaceElement;
+    new (): HTMLGuidingInterfaceElement;
+  };
+
+  interface HTMLGuidingSetupElement extends Components.GuidingSetup, HTMLStencilElement {}
+  var HTMLGuidingSetupElement: {
+    prototype: HTMLGuidingSetupElement;
+    new (): HTMLGuidingSetupElement;
+  };
   interface HTMLElementTagNameMap {
     'app-about': HTMLAppAboutElement;
     'app-gpssettings': HTMLAppGpssettingsElement;
@@ -70,6 +86,8 @@ declare global {
     'app-offline': HTMLAppOfflineElement;
     'app-root': HTMLAppRootElement;
     'app-tabs': HTMLAppTabsElement;
+    'guiding-interface': HTMLGuidingInterfaceElement;
+    'guiding-setup': HTMLGuidingSetupElement;
   }
 }
 
@@ -81,6 +99,10 @@ declare namespace LocalJSX {
   interface AppOffline extends JSXBase.HTMLAttributes<HTMLAppOfflineElement> {}
   interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
   interface AppTabs extends JSXBase.HTMLAttributes<HTMLAppTabsElement> {}
+  interface GuidingInterface extends JSXBase.HTMLAttributes<HTMLGuidingInterfaceElement> {}
+  interface GuidingSetup extends JSXBase.HTMLAttributes<HTMLGuidingSetupElement> {
+    'onGuidingLinesDefined'?: Function;
+  }
 
   interface IntrinsicElements {
     'app-about': AppAbout;
@@ -90,6 +112,8 @@ declare namespace LocalJSX {
     'app-offline': AppOffline;
     'app-root': AppRoot;
     'app-tabs': AppTabs;
+    'guiding-interface': GuidingInterface;
+    'guiding-setup': GuidingSetup;
   }
 }
 

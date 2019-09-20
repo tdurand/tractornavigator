@@ -2,7 +2,7 @@ import { Component, h, State, Prop, Watch } from '@stencil/core';
 import { Plugins, GeolocationPosition } from '@capacitor/core';
 import { Store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
-import { getAndWatchPosition } from '../../statemanagement/app/GeolocationStateManagement';
+import { getAndWatchPosition, simulateGeolocation } from '../../statemanagement/app/GeolocationStateManagement';
 // import { blankMapStyle } from '../../helpers/utils';
 import { point, lineString } from '@turf/helpers';
 import destination from '@turf/destination';
@@ -10,8 +10,6 @@ const { SplashScreen } = Plugins;
 import LoadingIndicator from '../../helpers/loadingIndicator';
 import GuidingLines from '../../helpers/guidinglines';
 import config from '../../config.json';
-
-import Geosimulation from '../../helpers/geolocationsimulator';
 
 import { lineToPolygon } from '../../helpers/utils';
 
@@ -29,6 +27,7 @@ Todo include styles via module import instead of copy paste in app-home.css , wh
 })
 export class AppHome {
 
+  @State() positionsHistory: Array<Array<Number>>;
   @State() position: GeolocationPosition;
   @Watch('position')
   watchHandler(position: GeolocationPosition) {
@@ -39,19 +38,6 @@ export class AppHome {
       this.isGettingPositionLoader.present();
     } else {
       this.isGettingPositionLoader.dismiss();
-
-      // Super ugly code.. Handle position history in redux store...
-      if (this.positionHistory.length > 0) {
-        // Do not push to history if duplicate
-        const latestPosition = this.positionHistory[this.positionHistory.length - 1];
-        if (
-          position.coords.longitude !== latestPosition[0] ||
-          position.coords.latitude !== latestPosition[1]) {
-          this.positionHistory.push([position.coords.longitude, position.coords.latitude])
-        }
-      } else {
-        this.positionHistory.push([position.coords.longitude, position.coords.latitude])
-      }
       // Compute derived data from position change
       // TODO compute this in the position change handler
       // const closestLineGeojson = guidingLines.getClosestLine(position).line;
@@ -61,15 +47,13 @@ export class AppHome {
     }
   }
 
-  positionHistory: any[] = []
-
   getAndWatchPosition: Action;
   map: any;
   mapIsReady: boolean = false;
   mapFirstRender: boolean = false;
   isGettingPositionLoader: LoadingIndicator = new LoadingIndicator("Getting your position...");
 
-
+  @State() isDefiningGuidingLines: boolean = false;
   guidingLines: any = null;
 
   @Prop({ context: "store" }) store: Store;
@@ -77,10 +61,11 @@ export class AppHome {
   componentWillLoad() {
     this.store.mapStateToProps(this, state => {
       const {
-        geolocation: { position }
+        geolocation: { position, positionsHistory }
       } = state;
       return {
-        position
+        position,
+        positionsHistory
       };
     });
 
@@ -92,15 +77,7 @@ export class AppHome {
   componentDidLoad() {
     SplashScreen.hide();
 
-    var coordinates = [
-      { latitude: 46.30785436578275, longitude: 1.7742705345153809 },
-      { latitude: 46.30727628127203, longitude: 1.7754185199737547 },
-      { latitude: 46.30691312249563, longitude: 1.7756867408752441 },
-      { latitude: 46.30700205956158, longitude: 1.776491403579712 },
-      { latitude: 46.30722440159435, longitude: 1.7767703533172605 }
-    ]
-    var simulation = Geosimulation({ coords: coordinates, speed: 15 });
-    simulation.start();
+    simulateGeolocation();
 
     this.isGettingPositionLoader.present()
 
@@ -143,25 +120,6 @@ export class AppHome {
       // Init source
       // Position
       this.updatePosition(this.position);
-
-      // Create guiding lines
-      // will do this after asking the reference line and the size on the thing behind the tractor
-      let bbox = this.map.getBounds().toArray().flat()
-      this.guidingLines = new GuidingLines(10,
-        [
-          [
-            1.7742168903350828,
-            46.30783954317925
-          ],
-          [
-            1.7760729789733887,
-            46.30626832444591
-          ]
-        ],
-        bbox
-      );
-      this.guidingLines.generate();
-      this.addOrUpdateGuidinglineToMap(this.guidingLines);
     });
   }
 
@@ -288,12 +246,12 @@ export class AppHome {
     }
   }
 
-  addOrUpdateTraceHistory(positionHistory) {
-    if (positionHistory.length > 1) {
+  addOrUpdateTraceHistory(positionsHistory) {
+    if (positionsHistory.length > 1) {
       let source = this.map.getSource('trace-history');
       // TODO replace 10 by tool width
       // Could improve perfs of this by avoiding recomputing everything each new position, but just push the new ones...
-      const linePositionHistory = lineString(positionHistory);
+      const linePositionHistory = lineString(positionsHistory);
       // This doesn't work if line history contains duplicates
       // Using this because turf buffer funciton isn't working properly for some reason
       // Width in meters
@@ -326,7 +284,7 @@ export class AppHome {
       this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, position);
       this.addOrUpdateHeadingLine(position);
       this.addOrUpdatePositionToMap(position);
-      this.addOrUpdateTraceHistory(this.positionHistory);
+      this.addOrUpdateTraceHistory(this.positionsHistory);
     }
   }
 
@@ -336,7 +294,31 @@ export class AppHome {
     this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, this.position);
     this.addOrUpdateHeadingLine(this.position);
     this.addOrUpdatePositionToMap(this.position);
-    this.addOrUpdateTraceHistory(this.positionHistory);
+    this.addOrUpdateTraceHistory(this.positionsHistory);
+  }
+
+  createGuidingLines() {
+    // Create guiding lines
+    // will do this after asking the reference line and the size on the thing behind the tractor
+    let bbox = this.map.getBounds().toArray().flat()
+    this.guidingLines = new GuidingLines(10,
+      [
+        [
+          1.7742168903350828,
+          46.30783954317925
+        ],
+        [
+          1.7760729789733887,
+          46.30626832444591
+        ]
+      ],
+      bbox
+    );
+    this.guidingLines.generate();
+    this.addOrUpdateGuidinglineToMap(this.guidingLines);
+    
+
+    this.isDefiningGuidingLines = false;
   }
 
   render() {
@@ -349,6 +331,23 @@ export class AppHome {
 
       <ion-content>
         <div id="map"></div>
+        <div class="ctas-container">
+          <div class="ctas-help">
+          </div>
+          <div class="ctas-buttons">
+            {!this.isDefiningGuidingLines && !this.guidingLines &&
+              <ion-button
+                color="primary"
+                onClick={() => this.isDefiningGuidingLines = true}
+              >
+                Start guiding
+              </ion-button>
+            }
+          </div>
+        </div>
+        {this.isDefiningGuidingLines &&
+          <guiding-setup onGuidingLinesDefined={() => this.createGuidingLines() } />
+        }
       </ion-content>
     ];
   }

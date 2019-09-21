@@ -3,7 +3,7 @@ import { Plugins, GeolocationPosition } from '@capacitor/core';
 import { Store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
 import { getAndWatchPosition, simulateGeolocation } from '../../statemanagement/app/GeolocationStateManagement';
-// import { blankMapStyle } from '../../helpers/utils';
+import { setDistanceToClosestGuidingLine } from '../../statemanagement/app/GuidingStateManagement';
 import { point, lineString } from '@turf/helpers';
 import destination from '@turf/destination';
 const { SplashScreen } = Plugins;
@@ -14,6 +14,7 @@ import config from '../../config.json';
 import { lineToPolygon } from '../../helpers/utils';
 
 //import { styleMapboxOffline } from '../../helpers/utils';
+// import { blankMapStyle } from '../../helpers/utils';
 
 /*
 
@@ -48,12 +49,15 @@ export class AppHome {
   }
 
   getAndWatchPosition: Action;
+  setDistanceToClosestGuidingLine: Action;
+
   map: any;
   mapIsReady: boolean = false;
   mapFirstRender: boolean = false;
   isGettingPositionLoader: LoadingIndicator = new LoadingIndicator("Getting your position...");
 
   @State() isDefiningGuidingLines: boolean = false;
+  @State() referenceLine: Array<Array<number>>;
   guidingLines: any = null;
 
   @Prop({ context: "store" }) store: Store;
@@ -61,16 +65,19 @@ export class AppHome {
   componentWillLoad() {
     this.store.mapStateToProps(this, state => {
       const {
-        geolocation: { position, positionsHistory }
+        geolocation: { position, positionsHistory },
+        guiding: { referenceLine }
       } = state;
       return {
         position,
-        positionsHistory
+        positionsHistory,
+        referenceLine
       };
     });
 
     this.store.mapDispatchToProps(this, {
-      getAndWatchPosition
+      getAndWatchPosition,
+      setDistanceToClosestGuidingLine
     });
   }
 
@@ -109,7 +116,7 @@ export class AppHome {
 
     this.map.on('style.load', () => {
       // Triggered when `setStyle` is called.
-      this.refreshDataLayers();
+      this.updatePosition(this.position);
     });
 
     this.map.on('load', () => {
@@ -124,23 +131,24 @@ export class AppHome {
   }
 
   addOrUpdatePositionToMap(position) {
-    let source = this.map.getSource('position');
     let coords = [0, 0]
     if (position) {
       coords = [position.coords.longitude, position.coords.latitude]
     }
+    const layerAndSourceId = 'position'
+    let source = this.map.getSource(layerAndSourceId);
     if (source) {
       console.log('Update position source');
       source.setData(point(coords))
     } else {
       console.log('Create position source and layer');
-      this.map.addSource("position", {
+      this.map.addSource(layerAndSourceId, {
         "type": "geojson",
         "data": point(coords)
       });
       this.map.addLayer({
-        "id": "position",
-        "source": "position",
+        "id": layerAndSourceId,
+        "source": layerAndSourceId,
         "type": "circle",
         "paint": {
           "circle-radius": 10,
@@ -148,40 +156,47 @@ export class AppHome {
         }
       })
     }
+    return layerAndSourceId;
   }
 
   addOrUpdateGuidinglineToMap(guidingLines) {
     if (!guidingLines) {
       return;
     }
-    let source = this.map.getSource('guiding-lines');
+    const layerAndSourceId = 'guiding-lines'
+    let source = this.map.getSource(layerAndSourceId);
     if (source) {
       console.log('Update guiding lines source')
       source.setData(guidingLines.getGeojson())
     } else {
       console.log('Create guiding lines source and layer')
-      this.map.addSource("guiding-lines", {
+      this.map.addSource(layerAndSourceId, {
         "type": "geojson",
         "data": guidingLines.getGeojson()
       })
 
       this.map.addLayer({
-        "id": "guiding-lines",
+        "id": layerAndSourceId,
         "type": "line",
-        "source": "guiding-lines",
+        "source": layerAndSourceId,
         "paint": {
           "line-color": "white",
           "line-width": 2
         }
       });
     }
+    return layerAndSourceId;
   }
 
   addOrUpdateClosestGuidingLineToMap(guidingLines, position) {
+    const layerAndSourceId = 'closest-guiding-line';
     if (guidingLines && position) {
-      let sourceClosestLine = this.map.getSource('closest-guiding-line');
-      // TODO compute this in the position change handler
-      const closestLineGeojson = guidingLines.getClosestLine([position.coords.longitude, position.coords.latitude]).line;
+      let sourceClosestLine = this.map.getSource(layerAndSourceId);
+      // TODO compute this in the position change handler In state management
+      // And store closest line in guidinglinestatemanagement
+      const closestLine = guidingLines.getClosestLine([position.coords.longitude, position.coords.latitude]);
+      const closestLineGeojson = closestLine.line;
+      this.setDistanceToClosestGuidingLine(closestLine.distance);
       console.log('Closest guiding line');
       console.log(closestLineGeojson);
       if (sourceClosestLine) {
@@ -189,27 +204,29 @@ export class AppHome {
         sourceClosestLine.setData(closestLineGeojson)
       } else {
         console.log('Create closest guiding lines source and layer')
-        this.map.addSource("closest-guiding-line", {
+        this.map.addSource(layerAndSourceId, {
           "type": "geojson",
           "data": closestLineGeojson
         })
 
         this.map.addLayer({
-          "id": "closest-guiding-line",
+          "id": layerAndSourceId,
           "type": "line",
-          "source": "closest-guiding-line",
+          "source": layerAndSourceId,
           "paint": {
             "line-color": "green",
             "line-width": 10
           }
         });
       }
+      return layerAndSourceId;
     }
   }
 
   addOrUpdateHeadingLine(position) {
+    const layerAndSourceId = 'heading-line';
     if (position && position.coords.heading) {
-      let source = this.map.getSource('heading-line');
+      let source = this.map.getSource(layerAndSourceId);
       // Create heading line from position 
       let pointA = point([position.coords.longitude, position.coords.latitude]);
       let heading = position.coords.heading;
@@ -229,26 +246,28 @@ export class AppHome {
         source.setData(headingLine)
       } else {
         console.log('Create position source and layer');
-        this.map.addSource("heading-line", {
+        this.map.addSource(layerAndSourceId, {
           "type": "geojson",
           "data": headingLine
         });
         this.map.addLayer({
-          "id": "heading-line",
-          "source": "heading-line",
+          "id": layerAndSourceId,
+          "source": layerAndSourceId,
           "type": "line",
           "paint": {
-            "line-color": "red",
+            "line-color": "#B42222",
             "line-width": 3
           }
         })
       }
+      return layerAndSourceId;
     }
   }
 
   addOrUpdateTraceHistory(positionsHistory) {
+    const layerAndSourceId = 'trace-history';
     if (positionsHistory.length > 1) {
-      let source = this.map.getSource('trace-history');
+      let source = this.map.getSource(layerAndSourceId);
       // TODO replace 10 by tool width
       // Could improve perfs of this by avoiding recomputing everything each new position, but just push the new ones...
       const linePositionHistory = lineString(positionsHistory);
@@ -261,13 +280,13 @@ export class AppHome {
         source.setData(traceAsPolygon)
       } else {
         console.log('Create position source and layer');
-        this.map.addSource("trace-history", {
+        this.map.addSource(layerAndSourceId, {
           "type": "geojson",
           "data": traceAsPolygon
         });
         this.map.addLayer({
-          "id": "trace-history",
-          "source": "trace-history",
+          "id": layerAndSourceId,
+          "source": layerAndSourceId,
           "type": "fill",
           "paint": {
             "fill-color": "blue",
@@ -275,26 +294,85 @@ export class AppHome {
           }
         })
       }
+      return layerAndSourceId;
+    }
+  }
+
+  addOrUpdateReferenceLine(referenceLine, position) {
+    const layerAndSourceId = 'reference-line';
+    if (referenceLine.length  === 1) {
+      let source = this.map.getSource(layerAndSourceId);
+      const referenceLineGeojson = lineString([
+        [referenceLine[0][0],referenceLine[0][1]],
+        [position.coords.longitude, position.coords.latitude]
+      ]);
+      if (source) {
+        console.log('Update position source');
+        source.setData(referenceLineGeojson);
+      } else {
+        console.log('Create position source and layer');
+        this.map.addSource(layerAndSourceId, {
+          "type": "geojson",
+          "data": referenceLineGeojson
+        });
+        this.map.addLayer({
+          "id": layerAndSourceId,
+          "source": layerAndSourceId,
+          "type": "line",
+          "paint": {
+            "line-color": "yellow",
+            "line-width": 3,
+            "line-dasharray": [2, 1]
+          }
+        })
+      }
+      return layerAndSourceId;
+    }
+  }
+
+  removeSourceAndLayerIfExists(id) {
+    if(this.map.getSource(id)) {
+      this.map.removeSource(id);
+      this.map.removeLayer(id);
     }
   }
 
   updatePosition(position) {
     if (position) {
       this.map.setCenter([position.coords.longitude, position.coords.latitude]);
-      this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, position);
-      this.addOrUpdateHeadingLine(position);
-      this.addOrUpdatePositionToMap(position);
-      this.addOrUpdateTraceHistory(this.positionsHistory);
+      // See moveLayer method to change z-index: https://docs.mapbox.com/mapbox-gl-js/api/#map#movelayer
+      // Guiding lines defined 
+      if(!this.isDefiningGuidingLines && !this.guidingLines) {
+        let layerPositionID = this.addOrUpdatePositionToMap(position);
+        let layerHeadingLineID = this.addOrUpdateHeadingLine(position);
+        this.removeSourceAndLayerIfExists("reference-line");
+        this.map.moveLayer(layerHeadingLineID);
+        this.map.moveLayer(layerPositionID);
+      }
+      // Is defining guiding lines
+      if(this.isDefiningGuidingLines) {
+        let layerPositionID = this.addOrUpdatePositionToMap(position);
+        let layerHeadingLineID = this.addOrUpdateHeadingLine(position);
+        let layerReferenceLineID = this.addOrUpdateReferenceLine(this.referenceLine, position); 
+        this.map.moveLayer(layerReferenceLineID);
+        this.map.moveLayer(layerHeadingLineID);
+        this.map.moveLayer(layerPositionID);
+      }
+      // Guiding lines defined
+      if(!this.isDefiningGuidingLines && this.guidingLines) {
+        this.removeSourceAndLayerIfExists("reference-line");
+        let layerPositionID = this.addOrUpdatePositionToMap(position);
+        let layerHeadingLineID = this.addOrUpdateHeadingLine(position);
+        let layerClosestGuidingLineID = this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, position);
+        let layerTraceHistoryID = this.addOrUpdateTraceHistory(this.positionsHistory);
+        
+        this.map.moveLayer(layerClosestGuidingLineID);
+        this.map.moveLayer(layerTraceHistoryID);
+        this.map.moveLayer(layerHeadingLineID);
+        this.map.moveLayer(layerPositionID);
+      }
+      
     }
-  }
-
-  refreshDataLayers() {
-    console.log('refreshDataLayers');
-    this.addOrUpdateGuidinglineToMap(this.guidingLines);
-    this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, this.position);
-    this.addOrUpdateHeadingLine(this.position);
-    this.addOrUpdatePositionToMap(this.position);
-    this.addOrUpdateTraceHistory(this.positionsHistory);
   }
 
   createGuidingLines() {
@@ -302,16 +380,7 @@ export class AppHome {
     // will do this after asking the reference line and the size on the thing behind the tractor
     let bbox = this.map.getBounds().toArray().flat()
     this.guidingLines = new GuidingLines(10,
-      [
-        [
-          1.7742168903350828,
-          46.30783954317925
-        ],
-        [
-          1.7760729789733887,
-          46.30626832444591
-        ]
-      ],
+      this.referenceLine,
       bbox
     );
     this.guidingLines.generate();
@@ -347,6 +416,9 @@ export class AppHome {
         </div>
         {this.isDefiningGuidingLines &&
           <guiding-setup onGuidingLinesDefined={() => this.createGuidingLines() } />
+        }
+        {!this.isDefiningGuidingLines && this.guidingLines &&
+          <guiding-interface />
         }
       </ion-content>
     ];

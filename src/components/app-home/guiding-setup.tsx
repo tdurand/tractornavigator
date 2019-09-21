@@ -47,7 +47,7 @@ export class GuidingSetup {
                         <ion-button
                             color="primary"
                             onClick={() => 
-                                this.setReferenceLine([this.position])
+                                this.setReferenceLine([[this.position.coords.longitude, this.position.coords.latitude]])
                             }
                         >
                             Confirm start point
@@ -60,7 +60,7 @@ export class GuidingSetup {
                         <ion-button
                             color="primary"
                             onClick={() => 
-                                this.setReferenceLine([this.referenceLine[0], this.position])
+                                this.setReferenceLine([this.referenceLine[0], [this.position.coords.longitude, this.position.coords.latitude]])
                             }
                         >
                             Confirm end point

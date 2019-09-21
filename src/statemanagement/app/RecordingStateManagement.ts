@@ -1,4 +1,4 @@
-enum RecordingStatus { Idle, Recording, Paused}
+export enum RecordingStatus { Idle, Recording, Paused}
 
 interface RecordingState {
     status: RecordingStatus

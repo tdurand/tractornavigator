@@ -13,13 +13,20 @@ export class GuidingInterface {
   @Prop({ context: "store" }) store: Store;
   setStatus: Action;
 
+
+  @State() distanceToClosestGuidingLine: number;
+  @State() isGuidingLineOnRightOrLeft: string;
+
   componentWillLoad() {
     this.store.mapStateToProps(this, state => {
       const {
         recording: { status },
+        guiding: { distanceToClosestGuidingLine, isGuidingLineOnRightOrLeft }
       } = state;
       return {
-        status
+        status,
+        distanceToClosestGuidingLine,
+        isGuidingLineOnRightOrLeft
       };
     });
 
@@ -30,11 +37,11 @@ export class GuidingInterface {
 
   render() {
     return (
-      <div class="content">
-        <div class="top">
-          
+      <div class="content flex flex-col flex-auto justify-between">
+        <div>
+          <div>{this.isGuidingLineOnRightOrLeft} {Math.round(this.distanceToClosestGuidingLine * 100) / 100}m</div>
         </div>
-        <div class="bottom">
+        <div class="flex flex-col items-center pb-2">
           {this.status === RecordingStatus.Idle &&
             <ion-button
               color="primary"
@@ -44,7 +51,7 @@ export class GuidingInterface {
               }}
             >
               Start recording
-          </ion-button>
+            </ion-button>
           }
           {this.status === RecordingStatus.Recording &&
             <div>

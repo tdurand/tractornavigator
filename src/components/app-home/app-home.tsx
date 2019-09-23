@@ -3,7 +3,7 @@ import { Plugins, GeolocationPosition } from '@capacitor/core';
 import { Store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
 import { getAndWatchPosition, simulateGeolocation } from '../../statemanagement/app/GeolocationStateManagement';
-import { setDistanceToClosestGuidingLine } from '../../statemanagement/app/GuidingStateManagement';
+import { setDistanceToClosestGuidingLine, setBearingToClosestGuidingLine } from '../../statemanagement/app/GuidingStateManagement';
 import { point, lineString } from '@turf/helpers';
 import destination from '@turf/destination';
 const { SplashScreen } = Plugins;
@@ -32,7 +32,7 @@ export class AppHome {
   @State() position: GeolocationPosition;
   @Watch('position')
   watchHandler(position: GeolocationPosition) {
-    console.log('Got a new position');
+    //console.log('Got a new position');
     this.position = position;
 
     if (!this.position) {
@@ -50,6 +50,7 @@ export class AppHome {
 
   getAndWatchPosition: Action;
   setDistanceToClosestGuidingLine: Action;
+  setBearingToClosestGuidingLine: Action;
 
   map: any;
   mapIsReady: boolean = false;
@@ -59,6 +60,7 @@ export class AppHome {
   @State() isDefiningGuidingLines: boolean = false;
   @State() referenceLine: Array<Array<number>>;
   guidingLines: any = null;
+  equipmentWidth: number;
 
   @Prop({ context: "store" }) store: Store;
 
@@ -66,18 +68,20 @@ export class AppHome {
     this.store.mapStateToProps(this, state => {
       const {
         geolocation: { position, positionsHistory },
-        guiding: { referenceLine }
+        guiding: { referenceLine, equipmentWidth }
       } = state;
       return {
         position,
         positionsHistory,
-        referenceLine
+        referenceLine,
+        equipmentWidth
       };
     });
 
     this.store.mapDispatchToProps(this, {
       getAndWatchPosition,
-      setDistanceToClosestGuidingLine
+      setDistanceToClosestGuidingLine,
+      setBearingToClosestGuidingLine
     });
   }
 
@@ -138,7 +142,6 @@ export class AppHome {
     const layerAndSourceId = 'position'
     let source = this.map.getSource(layerAndSourceId);
     if (source) {
-      console.log('Update position source');
       source.setData(point(coords))
     } else {
       console.log('Create position source and layer');
@@ -197,10 +200,9 @@ export class AppHome {
       const closestLine = guidingLines.getClosestLine([position.coords.longitude, position.coords.latitude]);
       const closestLineGeojson = closestLine.line;
       this.setDistanceToClosestGuidingLine(closestLine.distance);
-      console.log('Closest guiding line');
-      console.log(closestLineGeojson);
+      this.setBearingToClosestGuidingLine(closestLine.bearingToLine);
       if (sourceClosestLine) {
-        console.log('Update closest guiding lines')
+        //console.log('Update closest guiding lines')
         sourceClosestLine.setData(closestLineGeojson)
       } else {
         console.log('Create closest guiding lines source and layer')
@@ -242,7 +244,6 @@ export class AppHome {
       ]);
 
       if (source) {
-        console.log('Update position source');
         source.setData(headingLine)
       } else {
         console.log('Create position source and layer');
@@ -274,9 +275,8 @@ export class AppHome {
       // This doesn't work if line history contains duplicates
       // Using this because turf buffer funciton isn't working properly for some reason
       // Width in meters
-      const traceAsPolygon = lineToPolygon(linePositionHistory, 10);
+      const traceAsPolygon = lineToPolygon(linePositionHistory, this.equipmentWidth);
       if (source) {
-        console.log('Update position source');
         source.setData(traceAsPolygon)
       } else {
         console.log('Create position source and layer');
@@ -307,7 +307,6 @@ export class AppHome {
         [position.coords.longitude, position.coords.latitude]
       ]);
       if (source) {
-        console.log('Update position source');
         source.setData(referenceLineGeojson);
       } else {
         console.log('Create position source and layer');
@@ -379,7 +378,8 @@ export class AppHome {
     // Create guiding lines
     // will do this after asking the reference line and the size on the thing behind the tractor
     let bbox = this.map.getBounds().toArray().flat()
-    this.guidingLines = new GuidingLines(10,
+    this.guidingLines = new GuidingLines(
+      this.equipmentWidth,
       this.referenceLine,
       bbox
     );

@@ -349,3 +349,20 @@ export function lineToPolygon(line, width) {
   })
   return polygon([linePolygonCoordinates])
 }
+
+// TODO, this probably should go inside the guiding line library
+// Bearing of point is -180 - 180
+export function isPointOnLeftOfRight(currentHeading, bearingOfPoint) {
+  // Convert bearing to 0 - 360
+  var bearing = bearingOfPoint;
+  if(bearing < 0) {
+    bearing += 360;
+  }
+  if((currentHeading - bearing) > 180 ||
+     (currentHeading - bearing) < 0) {
+    return "right";
+  } else {
+    return "left";
+  }
+  
+}

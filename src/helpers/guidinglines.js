@@ -158,6 +158,7 @@ export default class GuidingLines {
         let intersectionWithBoundB = null;
         let closestDistance = this.bboxDiagonalLength;
         let closest = null;
+        let bearingToIntersection = null;
 
         while (!found) {
             //console.log(`boundA: ${boundA}, boundB: ${boundB}`)
@@ -186,6 +187,7 @@ export default class GuidingLines {
                 //console.log(`closest to boundB, move boundA to ${boundA}`)
                 if(boundA === boundB){
                     closestDistance = distanceToBoundB;
+                    bearingToIntersection = bearing(position, intersectionWithBoundB.features[0].geometry.coordinates)
                     found = true;
                 }
             } else {
@@ -198,6 +200,7 @@ export default class GuidingLines {
                 //console.log(`closest to boundA, move boundB to ${boundB}`)
                 if(boundA === boundB){
                     closestDistance = distanceToBoundA;
+                    bearingToIntersection = bearing(position, intersectionWithBoundA.features[0].geometry.coordinates)
                     found = true;
                 }
             }
@@ -207,6 +210,7 @@ export default class GuidingLines {
             index: boundA,
             distance: closestDistance,
             line: this.lines[boundA],
+            bearingToLine: bearingToIntersection,
             perpendicularLine: perpendicularLine
         }
 

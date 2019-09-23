@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
-import logger from "redux-logger";
+//import logger from "redux-logger";
 import rootReducer from "./reducers";
 import { composeWithDevTools } from "redux-devtools-extension/developmentOnly";
 
@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === `development`) {
 */
 
 middlewares.push(thunk);
-middlewares.push(logger);
+//middlewares.push(logger);
 
 export const configureStore = (preloadedState: any) =>
   createStore(

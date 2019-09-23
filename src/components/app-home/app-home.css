@@ -8,6 +8,7 @@
     height: 100%;
     position: absolute;
     top: 0;
+    z-index: 10;
 }
 
 .ctas-container {
@@ -40,6 +41,48 @@
     background-color: white;
     top: 110px;
 }
+
+.message-box {
+    padding: 10px;
+    background-color: rgba(255,255,255,1);
+    text-align: center;
+}
+
+/** Utility classes (from tailwind) **/
+
+.flex {
+    display: flex;
+}
+
+.flex-auto {
+    flex: 1 1 auto;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.pb-2 {
+    padding-bottom: 0.5rem;
+}
+
+/** End utility classes */
 
 
 .mapboxgl-map {

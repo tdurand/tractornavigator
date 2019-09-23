@@ -38,7 +38,7 @@ export class GuidingInterface {
   render() {
     return (
       <div class="content flex flex-col flex-auto justify-between">
-        <div>
+        <div class="flex message-box justify-center">
           <div>{this.isGuidingLineOnRightOrLeft} {Math.round(this.distanceToClosestGuidingLine * 100) / 100}m</div>
         </div>
         <div class="flex flex-col items-center pb-2">

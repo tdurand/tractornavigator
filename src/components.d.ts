@@ -92,15 +92,15 @@ declare global {
 }
 
 declare namespace LocalJSX {
-  interface AppAbout extends JSXBase.HTMLAttributes<HTMLAppAboutElement> {}
-  interface AppGpssettings extends JSXBase.HTMLAttributes<HTMLAppGpssettingsElement> {}
-  interface AppHistory extends JSXBase.HTMLAttributes<HTMLAppHistoryElement> {}
-  interface AppHome extends JSXBase.HTMLAttributes<HTMLAppHomeElement> {}
-  interface AppOffline extends JSXBase.HTMLAttributes<HTMLAppOfflineElement> {}
-  interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
-  interface AppTabs extends JSXBase.HTMLAttributes<HTMLAppTabsElement> {}
-  interface GuidingInterface extends JSXBase.HTMLAttributes<HTMLGuidingInterfaceElement> {}
-  interface GuidingSetup extends JSXBase.HTMLAttributes<HTMLGuidingSetupElement> {
+  interface AppAbout {}
+  interface AppGpssettings {}
+  interface AppHistory {}
+  interface AppHome {}
+  interface AppOffline {}
+  interface AppRoot {}
+  interface AppTabs {}
+  interface GuidingInterface {}
+  interface GuidingSetup {
     'onGuidingLinesDefined'?: Function;
   }
 
@@ -122,7 +122,17 @@ export { LocalJSX as JSX };
 
 declare module "@stencil/core" {
   export namespace JSX {
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+    interface IntrinsicElements {
+      'app-about': LocalJSX.AppAbout & JSXBase.HTMLAttributes<HTMLAppAboutElement>;
+      'app-gpssettings': LocalJSX.AppGpssettings & JSXBase.HTMLAttributes<HTMLAppGpssettingsElement>;
+      'app-history': LocalJSX.AppHistory & JSXBase.HTMLAttributes<HTMLAppHistoryElement>;
+      'app-home': LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
+      'app-offline': LocalJSX.AppOffline & JSXBase.HTMLAttributes<HTMLAppOfflineElement>;
+      'app-root': LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
+      'app-tabs': LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
+      'guiding-interface': LocalJSX.GuidingInterface & JSXBase.HTMLAttributes<HTMLGuidingInterfaceElement>;
+      'guiding-setup': LocalJSX.GuidingSetup & JSXBase.HTMLAttributes<HTMLGuidingSetupElement>;
+    }
   }
 }
 

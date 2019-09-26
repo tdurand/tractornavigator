@@ -336,6 +336,12 @@ export class AppHome {
     }
   }
 
+  moveLayerIfExists(id) {
+    if(this.map.getLayer(id)) {
+      this.map.moveLayer(id);
+    }
+  }
+
   updatePosition(position) {
     if (position) {
       this.map.setCenter([position.coords.longitude, position.coords.latitude]);
@@ -345,17 +351,17 @@ export class AppHome {
         let layerPositionID = this.addOrUpdatePositionToMap(position);
         let layerHeadingLineID = this.addOrUpdateHeadingLine(position);
         this.removeSourceAndLayerIfExists("reference-line");
-        this.map.moveLayer(layerHeadingLineID);
-        this.map.moveLayer(layerPositionID);
+        this.moveLayerIfExists(layerHeadingLineID);
+        this.moveLayerIfExists(layerPositionID);
       }
       // Is defining guiding lines
       if(this.isDefiningGuidingLines) {
         let layerPositionID = this.addOrUpdatePositionToMap(position);
         let layerHeadingLineID = this.addOrUpdateHeadingLine(position);
         let layerReferenceLineID = this.addOrUpdateReferenceLine(this.referenceLine, position); 
-        this.map.moveLayer(layerReferenceLineID);
-        this.map.moveLayer(layerHeadingLineID);
-        this.map.moveLayer(layerPositionID);
+        this.moveLayerIfExists(layerReferenceLineID);
+        this.moveLayerIfExists(layerHeadingLineID);
+        this.moveLayerIfExists(layerPositionID);
       }
       // Guiding lines defined
       if(!this.isDefiningGuidingLines && this.guidingLines) {
@@ -365,10 +371,10 @@ export class AppHome {
         let layerClosestGuidingLineID = this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, position);
         let layerTraceHistoryID = this.addOrUpdateTraceHistory(this.positionsHistory);
         
-        this.map.moveLayer(layerClosestGuidingLineID);
-        this.map.moveLayer(layerTraceHistoryID);
-        this.map.moveLayer(layerHeadingLineID);
-        this.map.moveLayer(layerPositionID);
+        this.moveLayerIfExists(layerClosestGuidingLineID);
+        this.moveLayerIfExists(layerTraceHistoryID);
+        this.moveLayerIfExists(layerHeadingLineID);
+        this.moveLayerIfExists(layerPositionID);
       }
       
     }

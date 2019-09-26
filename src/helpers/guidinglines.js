@@ -21,7 +21,7 @@ export default class GuidingLines {
         
         this.referenceLineGeojson = lineString(this.referenceLine);
         // bbox from reference line, scale by 10x
-        this.bbox = bbox(transformScale(bboxPolygon(square(bbox(this.referenceLineGeojson))), 100))
+        this.bbox = bbox(transformScale(bboxPolygon(square(bbox(this.referenceLineGeojson))), 10))
 
         this.bboxGeojson = bboxPolygon(this.bbox);
         

@@ -1,23 +1,30 @@
+import { saveRecording } from "./HistoryStateManagement";
+import { resetGuidingState } from "./GuidingStateManagement";
+
 export enum RecordingStatus { Idle, Recording, Paused}
 
 interface RecordingState {
     status: RecordingStatus
     recordedPositions: Array<Array<number>>
-    dateStartRecording: Date
+    equipmentWidth: number
+    dateStart: string
+
 }
 
 const getInitialState = (): RecordingState => {
     return {
         status: RecordingStatus.Idle,
         recordedPositions: [],
-        dateStartRecording: null
+        equipmentWidth: null,
+        dateStart: null
     };
 };
 
 
 const SET_STATUS = 'Recording/SET_STATUS';
 const ADD_RECORDED_POSITION = 'Recording/ADD_RECORDED_POSITION';
-const SET_DATE_START_RECORDING = 'Recording/SET_DATE_START_RECORDING';
+const INIT_RECORDING_METADATA = 'Recording/INIT_RECORDING_METADATA';
+const RESET = 'Recording/RESET';
 
 export function setStatus(status: RecordingStatus) {
     return {
@@ -33,22 +40,85 @@ export function addRecordedPosition(position) {
     }
 }
 
-export function setDateStartRecording(dateStartRecording: Date) {
+export function resetRecordingState() {
     return {
-        type: SET_DATE_START_RECORDING,
-        payload: dateStartRecording
+        type: RESET
     }
 }
+
+export function initRecordingMetadata(dateStart, equipmentWidth) {
+    return {
+        type: INIT_RECORDING_METADATA,
+        payload: {
+            dateStart: dateStart,
+            equipmentWidth: equipmentWidth
+        }
+    }
+}
+
+export function recordingOnNewPosition(newPosition) {
+    return (dispatch, getState) => {
+        // If is recording, add to history
+        if(getState().recording.status === RecordingStatus.Recording) {
+            dispatch(addRecordedPosition(newPosition));
+        }
+    }
+}
+
+export function startRecording() {
+    return (dispatch, getState) => {
+        // get equipmentWidth
+        const equipmentWidth = getState().guiding.equipmentWidth;
+        // set metadata
+        dispatch(initRecordingMetadata(new Date().toISOString(), equipmentWidth))
+        dispatch(setStatus(RecordingStatus.Recording))
+    }
+}
+
+export function pauseRecording() {
+    return (dispatch) => {
+        // set status
+        dispatch(setStatus(RecordingStatus.Paused))
+    }
+}
+
+export function resumeRecording() {
+    return (dispatch) => {
+        // set status
+        dispatch(setStatus(RecordingStatus.Recording))
+    }
+}
+
+export function stopRecording() {
+    return (dispatch, getState) => {
+        dispatch(setStatus(RecordingStatus.Idle))
+        // Save recording in history
+        dispatch(saveRecording({
+            dateStart: getState().recording.dateStart,
+            dateEnd: new Date().toISOString(),
+            trace: getState().recording.recordedPositions,
+            equipmentWidth: getState().recording.equipmentWidth
+        }))
+        // Reset state
+        dispatch(resetRecordingState());
+        // Reset guiding
+        dispatch(resetGuidingState());
+
+    }
+}
+
+
 
 const recordingStateReducer = (
     state = getInitialState(),
     action: any
 ): RecordingState => {
     switch (action.type) {
-        case SET_DATE_START_RECORDING: {
+        case INIT_RECORDING_METADATA: {
             return {
                 ...state,
-                dateStartRecording: action.payload
+                dateStart: action.payload.dateStart,
+                equipmentWidth: action.payload.equipmentWidth
             };
         }
         case ADD_RECORDED_POSITION: {
@@ -62,6 +132,9 @@ const recordingStateReducer = (
                 ...state,
                 status: action.payload
             };
+        }
+        case RESET: {
+            return getInitialState()
         }
     }
     return state;

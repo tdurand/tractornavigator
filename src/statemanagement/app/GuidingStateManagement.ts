@@ -1,4 +1,5 @@
 import { isPointOnLeftOfRight } from "../../helpers/utils";
+import GuidingLines from '../../helpers/guidinglines';
 
 interface GuidingState {
     referenceLine: Array<Array<number>>;
@@ -6,6 +7,8 @@ interface GuidingState {
     distanceToClosestGuidingLine: number;
     bearingToClosestGuidingLine: number;
     isGuidingLineOnRightOrLeft: string;
+    guidingLines: any;
+    isDefiningGuidingLines: boolean;
 }
 
 const getInitialState = (): GuidingState => {
@@ -14,7 +17,9 @@ const getInitialState = (): GuidingState => {
         equipmentWidth: 5,
         distanceToClosestGuidingLine: null,
         bearingToClosestGuidingLine: null,
-        isGuidingLineOnRightOrLeft: null
+        isGuidingLineOnRightOrLeft: null,
+        guidingLines: null,
+        isDefiningGuidingLines: false
     };
 };
 
@@ -24,6 +29,9 @@ const SET_EQUIPMENT_WIDTH = 'Guiding/SET_EQUIPMENT_WIDTH';
 const SET_DISTANCE_TO_CLOSEST_GUIDINGLINE = 'Guiding/SET_DISTANCE_TO_CLOSEST_GUIDINGLINE';
 const SET_BEARING_TO_CLOSEST_GUIDINGLINE = 'Guiding/SET_BEARING_TO_CLOSEST_GUIDINGLINE';
 const SET_GUIDING_LINE_LEFT_OR_RIGHT = 'Guiding/SET_GUIDING_LINE_LEFT_OR_RIGHT';
+const CREATE_OR_UPDATE_GUIDING_LINES = 'Guiding/CREATE_OR_UPDATE_GUIDING_LINES';
+const START_DEFINING_GUIDINGLINES = 'Guiding/START_DEFINING_GUIDINGLINES';
+const RESET = 'Guiding/RESET';
 
 
 export function setReferenceLine(referenceLine) {
@@ -47,6 +55,13 @@ export function setDistanceToClosestGuidingLine(distanceToClosestGuidingLine) {
     }
 }
 
+export function startDefiningGuidingLines() {
+    return {
+        type: START_DEFINING_GUIDINGLINES,
+        payload: true
+    }
+}
+
 export function setBearingToClosestGuidingLine(bearingToClosestGuidingLine) {
     return (dispatch, getState) => {
 
@@ -62,6 +77,31 @@ export function setBearingToClosestGuidingLine(bearingToClosestGuidingLine) {
             type: SET_BEARING_TO_CLOSEST_GUIDINGLINE,
             payload: bearingToClosestGuidingLine
         })
+    }
+}
+
+export function resetGuidingState() {
+    return {
+        type: RESET
+    }
+}
+
+export function createOrUpdateGuidingLines() {
+    return (dispatch, getState) => {
+
+        const equipmentWidth = getState().guiding.equipmentWidth;
+        const referenceLine = getState().guiding.referenceLine;
+
+        const guidingLines = new GuidingLines(
+            equipmentWidth,
+            referenceLine
+        );
+
+        dispatch({
+            type: CREATE_OR_UPDATE_GUIDING_LINES, 
+            payload: guidingLines
+        })
+
     }
 }
 
@@ -99,6 +139,22 @@ const guidingStateReducer = (
                 ...state,
                 isGuidingLineOnRightOrLeft: action.payload
             };
+        }
+        case START_DEFINING_GUIDINGLINES: {
+            return {
+                ...state,
+                isDefiningGuidingLines: true
+            };
+        }
+        case CREATE_OR_UPDATE_GUIDING_LINES: {
+            return {
+                ...state,
+                guidingLines: action.payload,
+                isDefiningGuidingLines: false
+            };
+        }
+        case RESET: {
+            return getInitialState();
         }
 
     }

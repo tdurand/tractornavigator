@@ -1,29 +1,30 @@
 import lineIntersect from '@turf/line-intersect';
 import lineOffset from '@turf/line-offset';
 import { lineString, featureCollection, point } from '@turf/helpers';
+import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 import booleanContains from '@turf/boolean-contains';
 import bearing from '@turf/bearing';
 import destination from '@turf/destination';
 import distance from '@turf/distance';
-import center from '@turf/center';
+import square from '@turf/square';
+import transformScale from '@turf/transform-scale';
 
 export default class GuidingLines {
 
     // Interval in meters
-    // Bbox : containing bbox of the grid
     // Reference line, strait [pointA, pointB] or curve [pointA, pointB, pointC, pointD]
-    constructor(interval = 5, referenceLine, bbox) {
+    constructor(interval = 5, referenceLine) {
         this.interval = interval;
-        this.bbox = bbox;
         this.referenceLine = referenceLine;
         this.lines = [];
-        this.computeDerivedParams();
-    }
-
-    computeDerivedParams() {
-        this.bboxGeojson = bboxPolygon(this.bbox);
+        
         this.referenceLineGeojson = lineString(this.referenceLine);
+        // bbox from reference line, scale by 10x
+        this.bbox = bbox(transformScale(bboxPolygon(square(bbox(this.referenceLineGeojson))), 100))
+
+        this.bboxGeojson = bboxPolygon(this.bbox);
+        
         // Bearing of reference line first and last point
         this.referenceLineBearing = bearing(point(this.referenceLine[0]), point(this.referenceLine[this.referenceLine.length - 1]));
         this.referenceLineBearingInverse = bearing(point(this.referenceLine[this.referenceLine.length - 1]), point(this.referenceLine[0]));
@@ -32,15 +33,7 @@ export default class GuidingLines {
         // Bbox diagonal length in meters
         this.bboxDiagonalLength = distance(point([this.bbox[0], this.bbox[1]]), point([this.bbox[2], this.bbox[3]]), {units: 'kilometers'}) * 1000;
         //console.log(`bboxDiagonalLength in meters: ${this.bboxDiagonalLength}m`);
-    }
-
-    isBiggerThan(newBbox) {
-        if(booleanContains(this.bboxGeojson, bboxPolygon(newBbox))) {
-            return true;
-        } else {
-            // Need to be resized
-            return false;
-        }
+        this.generate();
     }
 
     isLineInBbox(line) {
@@ -81,12 +74,6 @@ export default class GuidingLines {
     }
 
     generate() {
-        // If reference line isn't inside bbox, return error
-        if(!this.isLineInBbox(this.referenceLineGeojson)) {
-            console.log(`Error: reference line isn't inside bbox container`)
-            return;
-        }
-
         // Reset lines
         this.lines = [];
 
@@ -142,6 +129,7 @@ export default class GuidingLines {
     // IDEA: if not fast enough, could build also a memory of last position computation
     // and restrict even more the number of lines to loop trough because we would know 
     // distance between last position and new position and could know how many lines could potentialy be in between
+    // TODO implement getClosestLine(position, bbox) ?
     getClosestLine(position) {
         // Draw perpendicular line to bearing of reference line
         let perpendicularLine = this.computePerpendicularLine(position, this.referenceLineBearing, this.bboxDiagonalLength);
@@ -210,8 +198,7 @@ export default class GuidingLines {
             index: boundA,
             distance: closestDistance,
             line: this.lines[boundA],
-            bearingToLine: bearingToIntersection,
-            perpendicularLine: perpendicularLine
+            bearingToLine: bearingToIntersection
         }
 
         return closest;
@@ -220,30 +207,5 @@ export default class GuidingLines {
     // Get guiding lines in geojson to display on a map
     getGeojson() {
         return featureCollection(this.lines);
-    }
-
-    // Change Guiding parameters
-    update(bbox, interval) {
-        this.bbox = bbox;
-        this.interval = interval;
-        this.generate();
-        // NB: when changing interval / bbox size, the index will change for the lines, so user needs to call getClosestLineAgain
-    }
-
-    updateBbox(newBbox) {
-        // NB: when changing interval / bbox size, the index will change for the lines, so user needs to call getClosestLineAgain
-        // Set closest line to center of bbox as new reference line
-        let bboxCenter = center(bboxPolygon(newBbox));
-        let newReferenceLine = this.getClosestLine(bboxCenter.geometry.coordinates);
-        if(!newReferenceLine) {
-            console.log(`Can't update bbox, you moved too far away from previous bbox location, need to have some overlap to be able to compute it`)
-            return false;
-        } else {
-            console.log('Update Bbox and recompute everything')
-            this.referenceLine = newReferenceLine.line.geometry.coordinates;
-            this.bbox = newBbox;
-            this.computeDerivedParams();
-            return true;
-        }
     }
 }

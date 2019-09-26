@@ -2,6 +2,7 @@ import { GeolocationPosition, Plugins } from "@capacitor/core";
 import { geopositionToObject } from "../../helpers/utils";
 const { Geolocation } = Plugins;
 import Geosimulation from '../../helpers/geolocationsimulator';
+import { recordingOnNewPosition } from './RecordingStateManagement';
 
 interface GeolocationState {
     position: GeolocationPosition;
@@ -18,6 +19,7 @@ const getInitialState = (): GeolocationState => {
 
 const SET_POSITION = 'Geolocation/SET_POSITION';
 const ADD_POSITION_TO_HISTORY = 'Geolocation/ADD_POSITION_TO_HISTORY';
+const CLEAR_POSITION_HISTORY = 'Geolocation/CLEAR_POSITION_HISTORY';
 //const GET_POSITION = 'Geolocation/GET_POSITION';
 
 export function simulateGeolocation() {
@@ -46,6 +48,12 @@ export function addPositionToHistory(positionCoordinates) {
     }
 }
 
+export function clearPositionHistory() {
+    return {
+        type: CLEAR_POSITION_HISTORY
+    }
+}
+
 export function onNewPosition(position) {
     return (dispatch, getState) => {
 
@@ -57,9 +65,13 @@ export function onNewPosition(position) {
                 position.coords.latitude !== previousPosition[1]
             ) {
                 dispatch(addPositionToHistory([position.coords.longitude, position.coords.latitude]));
+                // notify RecordingStateManagement of a new position
+                dispatch(recordingOnNewPosition([position.coords.longitude, position.coords.latitude]))
             }
         } else {
             dispatch(addPositionToHistory([position.coords.longitude, position.coords.latitude]));
+            // notify RecordingStateManagement of a new position
+            dispatch(recordingOnNewPosition([position.coords.longitude, position.coords.latitude]))
         }
 
         dispatch(setPosition(position));
@@ -108,6 +120,12 @@ const geolocationReducer = (
             return {
                 ...state,
                 positionsHistory: state.positionsHistory.concat([action.payload])
+            }
+        }
+        case CLEAR_POSITION_HISTORY: {
+            return {
+                ...state,
+                positionsHistory: []
             }
         }
     }

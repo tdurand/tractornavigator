@@ -2,13 +2,12 @@ import { Component, h, State, Prop, Watch } from '@stencil/core';
 import { Plugins, GeolocationPosition } from '@capacitor/core';
 import { Store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
-import { getAndWatchPosition, simulateGeolocation } from '../../statemanagement/app/GeolocationStateManagement';
-import { setDistanceToClosestGuidingLine, setBearingToClosestGuidingLine } from '../../statemanagement/app/GuidingStateManagement';
+import { getAndWatchPosition, simulateGeolocation, clearPositionHistory } from '../../statemanagement/app/GeolocationStateManagement';
+import { setDistanceToClosestGuidingLine, setBearingToClosestGuidingLine, startDefiningGuidingLines } from '../../statemanagement/app/GuidingStateManagement';
 import { point, lineString } from '@turf/helpers';
 import destination from '@turf/destination';
 const { SplashScreen } = Plugins;
 import LoadingIndicator from '../../helpers/loadingIndicator';
-import GuidingLines from '../../helpers/guidinglines';
 import config from '../../config.json';
 
 import { lineToPolygon } from '../../helpers/utils';
@@ -31,36 +30,36 @@ export class AppHome {
   @State() positionsHistory: Array<Array<Number>>;
   @State() position: GeolocationPosition;
   @Watch('position')
-  watchHandler(position: GeolocationPosition) {
-    //console.log('Got a new position');
+  positionWatchHandler(position: GeolocationPosition) {
     this.position = position;
 
     if (!this.position) {
       this.isGettingPositionLoader.present();
     } else {
       this.isGettingPositionLoader.dismiss();
-      // Compute derived data from position change
-      // TODO compute this in the position change handler
-      // const closestLineGeojson = guidingLines.getClosestLine(position).line;
-      if (this.mapIsReady) {
-        this.updatePosition(position);
-      }
     }
+
+    this.updateMapDisplay();
   }
+  @State() referenceLine: Array<Array<number>>;
+  @State() isDefiningGuidingLines: boolean;
+  @State() guidingLines: any;
+  @Watch('guidingLines')
+  guidingLinesWatchHandler(guidingLines: any) {
+    this.addOrUpdateGuidinglineToMap(guidingLines);
+  }
+  @State() equipmentWidth: number;
 
   getAndWatchPosition: Action;
   setDistanceToClosestGuidingLine: Action;
   setBearingToClosestGuidingLine: Action;
+  clearPositionHistory: Action;
+  startDefiningGuidingLines: Action;
 
   map: any;
   mapIsReady: boolean = false;
   mapFirstRender: boolean = false;
   isGettingPositionLoader: LoadingIndicator = new LoadingIndicator("Getting your position...");
-
-  @State() isDefiningGuidingLines: boolean = false;
-  @State() referenceLine: Array<Array<number>>;
-  guidingLines: any = null;
-  equipmentWidth: number;
 
   @Prop({ context: "store" }) store: Store;
 
@@ -68,20 +67,24 @@ export class AppHome {
     this.store.mapStateToProps(this, state => {
       const {
         geolocation: { position, positionsHistory },
-        guiding: { referenceLine, equipmentWidth }
+        guiding: { referenceLine, equipmentWidth, isDefiningGuidingLines, guidingLines }
       } = state;
       return {
         position,
         positionsHistory,
         referenceLine,
-        equipmentWidth
+        equipmentWidth,
+        isDefiningGuidingLines,
+        guidingLines
       };
     });
 
     this.store.mapDispatchToProps(this, {
       getAndWatchPosition,
       setDistanceToClosestGuidingLine,
-      setBearingToClosestGuidingLine
+      setBearingToClosestGuidingLine,
+      clearPositionHistory,
+      startDefiningGuidingLines
     });
   }
 
@@ -107,9 +110,12 @@ export class AppHome {
     this.map = new mapboxgl.Map({
       container: 'map',
       style: mapStyle,
-      zoom: 17,
+      zoom: 16,
       minZoom: 16
     });
+
+    //const navControl = new mapboxgl.NavigationControl();
+    //this.map.addControl(navControl, 'top-right');
 
     this.map.on('render', () => {
       if (!this.mapFirstRender) {
@@ -120,7 +126,7 @@ export class AppHome {
 
     this.map.on('style.load', () => {
       // Triggered when `setStyle` is called.
-      this.updatePosition(this.position);
+      this.updateMapDisplay();
     });
 
     this.map.on('load', () => {
@@ -130,7 +136,7 @@ export class AppHome {
 
       // Init source
       // Position
-      this.updatePosition(this.position);
+      this.updateMapDisplay();
     });
   }
 
@@ -386,23 +392,29 @@ export class AppHome {
     }
   }
 
-  updatePosition(position) {
-    if (position) {
-      this.map.setCenter([position.coords.longitude, position.coords.latitude]);
+  updateMapDisplay() {
+    if(!this.mapIsReady) {
+      return;
+    }
+    if (this.position) {
+      this.map.setCenter([this.position.coords.longitude, this.position.coords.latitude]);
       // See moveLayer method to change z-index: https://docs.mapbox.com/mapbox-gl-js/api/#map#movelayer
       // Guiding lines defined 
       if(!this.isDefiningGuidingLines && !this.guidingLines) {
-        let layerPositionID = this.addOrUpdatePositionToMap(position);
-        let layerHeadingLineID = this.addOrUpdateHeadingLine(position);
+        let layerPositionID = this.addOrUpdatePositionToMap(this.position);
+        let layerHeadingLineID = this.addOrUpdateHeadingLine(this.position);
+        this.removeSourceAndLayerIfExists("guiding-lines");
         this.removeSourceAndLayerIfExists("reference-line");
+        this.removeSourceAndLayerIfExists("closest-guiding-line");
+        this.removeSourceAndLayerIfExists("trace-history");
         this.moveLayerIfExists(layerHeadingLineID);
         this.moveLayerIfExists(layerPositionID);
       }
       // Is defining guiding lines
       if(this.isDefiningGuidingLines) {
-        let layerPositionID = this.addOrUpdatePositionToMap(position);
-        let layerHeadingLineID = this.addOrUpdateHeadingLine(position);
-        let layerReferenceLineID = this.addOrUpdateReferenceLine(this.referenceLine, position); 
+        let layerPositionID = this.addOrUpdatePositionToMap(this.position);
+        let layerHeadingLineID = this.addOrUpdateHeadingLine(this.position);
+        let layerReferenceLineID = this.addOrUpdateReferenceLine(this.referenceLine, this.position); 
         this.moveLayerIfExists(layerHeadingLineID);
         this.moveLayerIfExists(layerPositionID);
         this.moveLayerIfExists(layerReferenceLineID);
@@ -410,9 +422,9 @@ export class AppHome {
       // Guiding lines defined
       if(!this.isDefiningGuidingLines && this.guidingLines) {
         this.removeSourceAndLayerIfExists("reference-line");
-        let layerPositionID = this.addOrUpdatePositionToMap(position);
-        let layerHeadingLineID = this.addOrUpdateHeadingLine(position);
-        let layerClosestGuidingLineID = this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, position);
+        let layerPositionID = this.addOrUpdatePositionToMap(this.position);
+        let layerHeadingLineID = this.addOrUpdateHeadingLine(this.position);
+        let layerClosestGuidingLineID = this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, this.position);
         let layerTraceHistoryID = this.addOrUpdateTraceHistory(this.positionsHistory);
         
         this.moveLayerIfExists(layerClosestGuidingLineID);
@@ -422,22 +434,6 @@ export class AppHome {
       }
       
     }
-  }
-
-  createGuidingLines() {
-    // Create guiding lines
-    // will do this after asking the reference line and the size on the thing behind the tractor
-    let bbox = this.map.getBounds().toArray().flat()
-    this.guidingLines = new GuidingLines(
-      this.equipmentWidth,
-      this.referenceLine,
-      bbox
-    );
-    this.guidingLines.generate();
-    this.addOrUpdateGuidinglineToMap(this.guidingLines);
-    
-
-    this.isDefiningGuidingLines = false;
   }
 
   render() {
@@ -457,7 +453,7 @@ export class AppHome {
             {!this.isDefiningGuidingLines && !this.guidingLines &&
               <ion-button
                 color="primary"
-                onClick={() => this.isDefiningGuidingLines = true}
+                onClick={() => this.startDefiningGuidingLines()}
               >
                 Start guiding
               </ion-button>
@@ -465,7 +461,7 @@ export class AppHome {
           </div>
         </div>
         {this.isDefiningGuidingLines &&
-          <guiding-setup onGuidingLinesDefined={() => this.createGuidingLines() } />
+          <guiding-setup />
         }
         {!this.isDefiningGuidingLines && this.guidingLines &&
           <guiding-interface />

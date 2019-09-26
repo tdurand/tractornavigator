@@ -300,19 +300,40 @@ export class AppHome {
 
   addOrUpdateReferenceLine(referenceLine, position) {
     const layerAndSourceId = 'reference-line';
-    if (referenceLine.length  === 1) {
+    if (referenceLine.length  >= 1) {
       let source = this.map.getSource(layerAndSourceId);
-      const referenceLineGeojson = lineString([
+      let referenceLineGeojson = lineString([
         [referenceLine[0][0],referenceLine[0][1]],
         [position.coords.longitude, position.coords.latitude]
       ]);
+
+      let data = {
+        "type": "FeatureCollection",
+        "features": [
+          referenceLineGeojson,
+          point([referenceLine[0][0],referenceLine[0][1]])
+        ]
+      }
+
+      if(referenceLine.length === 2) {
+        referenceLineGeojson = lineString(referenceLine);
+        data = {
+          "type": "FeatureCollection",
+          "features": [
+            referenceLineGeojson,
+            point([referenceLine[0][0],referenceLine[0][1]]),
+            point([referenceLine[1][0],referenceLine[1][1]])
+          ]
+        }
+      }
+      
       if (source) {
-        source.setData(referenceLineGeojson);
+        source.setData(data);
       } else {
         console.log('Create position source and layer');
         this.map.addSource(layerAndSourceId, {
           "type": "geojson",
-          "data": referenceLineGeojson
+          "data": data
         });
         this.map.addLayer({
           "id": layerAndSourceId,
@@ -322,23 +343,46 @@ export class AppHome {
             "line-color": "yellow",
             "line-width": 3,
             "line-dasharray": [2, 1]
-          }
+          },
+          "filter": ["==", "$type", "LineString"]
+        })
+
+        this.map.addLayer({
+          "id": `${layerAndSourceId}-point`,
+          "source": layerAndSourceId,
+          "type": "circle",
+          "paint": {
+            "circle-radius": 7,
+            "circle-color": "yellow"
+          },
+          "filter": ["==", "$type", "Point"]
         })
       }
+
       return layerAndSourceId;
     }
   }
 
   removeSourceAndLayerIfExists(id) {
     if(this.map.getSource(id)) {
-      this.map.removeSource(id);
       this.map.removeLayer(id);
+      // Special case for reference line, would need to build in
+      // support for multiple layer for unique source
+      if(id === "reference-line") {
+        this.map.removeLayer(`${id}-point`);
+      }
+      this.map.removeSource(id);
     }
   }
 
   moveLayerIfExists(id) {
     if(this.map.getLayer(id)) {
       this.map.moveLayer(id);
+      // Special case for reference line, would need to build in
+      // support for multiple layer for unique source
+      if(id === "reference-line") {
+        this.map.moveLayer(`${id}-point`);
+      }
     }
   }
 
@@ -359,9 +403,9 @@ export class AppHome {
         let layerPositionID = this.addOrUpdatePositionToMap(position);
         let layerHeadingLineID = this.addOrUpdateHeadingLine(position);
         let layerReferenceLineID = this.addOrUpdateReferenceLine(this.referenceLine, position); 
-        this.moveLayerIfExists(layerReferenceLineID);
         this.moveLayerIfExists(layerHeadingLineID);
         this.moveLayerIfExists(layerPositionID);
+        this.moveLayerIfExists(layerReferenceLineID);
       }
       // Guiding lines defined
       if(!this.isDefiningGuidingLines && this.guidingLines) {

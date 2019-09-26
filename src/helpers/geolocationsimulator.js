@@ -135,7 +135,7 @@ export default function Geosimulation(params) {
     navigator.geolocation.watchPosition = function (cb, error, options) {
         var sendPos = function () {
             cb(_current);
-            _watchTimer = setTimeout(sendPos, 1000);
+            _watchTimer = setTimeout(sendPos, 200);
         };
         sendPos();
     };

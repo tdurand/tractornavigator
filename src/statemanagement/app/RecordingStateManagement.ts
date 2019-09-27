@@ -90,7 +90,7 @@ export function resumeRecording() {
 }
 
 export function cancelRecording() {
-    return (dispatch, getState) => {
+    return (dispatch) => {
         dispatch(setStatus(RecordingStatus.Idle))
         // Reset state
         dispatch(resetRecordingState());

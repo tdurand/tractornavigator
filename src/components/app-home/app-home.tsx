@@ -2,7 +2,7 @@ import { Component, h, State, Prop, Watch } from '@stencil/core';
 import { Plugins, GeolocationPosition } from '@capacitor/core';
 import { Store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
-import { getAndWatchPosition, simulateGeolocation, clearPositionHistory } from '../../statemanagement/app/GeolocationStateManagement';
+import { getAndWatchPosition, simulateGeolocation } from '../../statemanagement/app/GeolocationStateManagement';
 import { 
   setDistanceToClosestGuidingLine, 
   setBearingToClosestGuidingLine, 
@@ -17,6 +17,7 @@ import LoadingIndicator from '../../helpers/loadingIndicator';
 import config from '../../config.json';
 
 import { lineToPolygon } from '../../helpers/utils';
+import { RecordingStatus } from '../../statemanagement/app/RecordingStateManagement';
 
 //import { styleMapboxOffline } from '../../helpers/utils';
 // import { blankMapStyle } from '../../helpers/utils';
@@ -33,7 +34,6 @@ Todo include styles via module import instead of copy paste in app-home.css , wh
 })
 export class AppHome {
 
-  @State() positionsHistory: Array<Array<Number>>;
   @State() position: GeolocationPosition;
   @Watch('position')
   positionWatchHandler(position: GeolocationPosition) {
@@ -53,8 +53,6 @@ export class AppHome {
   @Watch('bboxContainer')
   bboxContainerWatchHandler() {
     if(this.guidingLines) {
-      console.log('bboxContainer changed')
-      console.log(this.bboxContainer);
       // Bbox container updated, refresh guidinglines display
       this.addOrUpdateGuidinglineToMap(this.guidingLines)
     }
@@ -62,10 +60,12 @@ export class AppHome {
   @State() equipmentWidth: number;
   guidingLines: any;
 
+  @State() status: RecordingStatus;
+  recordedPositions: Array<Array<number>>;
+
   getAndWatchPosition: Action;
   setDistanceToClosestGuidingLine: Action;
   setBearingToClosestGuidingLine: Action;
-  clearPositionHistory: Action;
   startDefiningGuidingLines: Action;
   onBboxChanged: Action;
   createOrUpdateGuidingLines: Action;
@@ -80,17 +80,19 @@ export class AppHome {
   componentWillLoad() {
     this.store.mapStateToProps(this, state => {
       const {
-        geolocation: { position, positionsHistory },
+        recording: { status, recordedPositions },
+        geolocation: { position },
         guiding: { referenceLine, equipmentWidth, isDefiningGuidingLines, guidingLines, bboxContainer }
       } = state;
       return {
         position,
-        positionsHistory,
         referenceLine,
         equipmentWidth,
         isDefiningGuidingLines,
         guidingLines,
-        bboxContainer
+        bboxContainer,
+        status,
+        recordedPositions
       };
     });
 
@@ -98,7 +100,6 @@ export class AppHome {
       getAndWatchPosition,
       setDistanceToClosestGuidingLine,
       setBearingToClosestGuidingLine,
-      clearPositionHistory,
       startDefiningGuidingLines, 
       onBboxChanged,
       createOrUpdateGuidingLines
@@ -425,7 +426,7 @@ export class AppHome {
     if (this.position) {
       this.map.setCenter([this.position.coords.longitude, this.position.coords.latitude]);
       // See moveLayer method to change z-index: https://docs.mapbox.com/mapbox-gl-js/api/#map#movelayer
-      // Guiding lines defined 
+      // Initial UI
       if(!this.isDefiningGuidingLines && !this.guidingLines) {
         let layerPositionID = this.addOrUpdatePositionToMap(this.position);
         let layerHeadingLineID = this.addOrUpdateHeadingLine(this.position);
@@ -436,7 +437,7 @@ export class AppHome {
         this.moveLayerIfExists(layerHeadingLineID);
         this.moveLayerIfExists(layerPositionID);
       }
-      // Is defining guiding lines
+      // When defining guiding lines
       if(this.isDefiningGuidingLines) {
         let layerPositionID = this.addOrUpdatePositionToMap(this.position);
         let layerHeadingLineID = this.addOrUpdateHeadingLine(this.position);
@@ -445,20 +446,36 @@ export class AppHome {
         this.moveLayerIfExists(layerPositionID);
         this.moveLayerIfExists(layerReferenceLineID);
       }
-      // Guiding lines defined
-      if(!this.isDefiningGuidingLines && this.guidingLines) {
+      // When guiding lines defined but not recording
+      if(!this.isDefiningGuidingLines &&
+          this.guidingLines &&
+          this.status === RecordingStatus.Idle
+        ) {
+        this.removeSourceAndLayerIfExists("reference-line");
+        this.removeSourceAndLayerIfExists("trace-history");
+        let layerPositionID = this.addOrUpdatePositionToMap(this.position);
+        let layerHeadingLineID = this.addOrUpdateHeadingLine(this.position);
+        let layerClosestGuidingLineID = this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, this.position);
+        
+        this.moveLayerIfExists(layerClosestGuidingLineID);
+        this.moveLayerIfExists(layerHeadingLineID);
+        this.moveLayerIfExists(layerPositionID);
+      }
+      // When guiding lines defined and recording
+      if(!this.isDefiningGuidingLines && 
+          this.guidingLines &&
+          this.status !== RecordingStatus.Idle
+        ) {
         this.removeSourceAndLayerIfExists("reference-line");
         let layerPositionID = this.addOrUpdatePositionToMap(this.position);
         let layerHeadingLineID = this.addOrUpdateHeadingLine(this.position);
         let layerClosestGuidingLineID = this.addOrUpdateClosestGuidingLineToMap(this.guidingLines, this.position);
-        let layerTraceHistoryID = this.addOrUpdateTraceHistory(this.positionsHistory);
-        
+        let layerTraceHistoryID = this.addOrUpdateTraceHistory(this.recordedPositions);
         this.moveLayerIfExists(layerClosestGuidingLineID);
         this.moveLayerIfExists(layerTraceHistoryID);
         this.moveLayerIfExists(layerHeadingLineID);
         this.moveLayerIfExists(layerPositionID);
       }
-      
     }
   }
 

@@ -1,4 +1,4 @@
-import { isPointOnLeftOfRight } from "../../helpers/utils";
+import { isPointOnLeftOfRight, computeLargerBbox } from "../../helpers/utils";
 import GuidingLines from '../../helpers/guidinglines';
 
 interface GuidingState {
@@ -9,6 +9,7 @@ interface GuidingState {
     isGuidingLineOnRightOrLeft: string;
     guidingLines: any;
     isDefiningGuidingLines: boolean;
+    bboxContainer: any
 }
 
 const getInitialState = (): GuidingState => {
@@ -19,7 +20,8 @@ const getInitialState = (): GuidingState => {
         bearingToClosestGuidingLine: null,
         isGuidingLineOnRightOrLeft: null,
         guidingLines: null,
-        isDefiningGuidingLines: false
+        isDefiningGuidingLines: false,
+        bboxContainer: null
     };
 };
 
@@ -31,6 +33,7 @@ const SET_BEARING_TO_CLOSEST_GUIDINGLINE = 'Guiding/SET_BEARING_TO_CLOSEST_GUIDI
 const SET_GUIDING_LINE_LEFT_OR_RIGHT = 'Guiding/SET_GUIDING_LINE_LEFT_OR_RIGHT';
 const CREATE_OR_UPDATE_GUIDING_LINES = 'Guiding/CREATE_OR_UPDATE_GUIDING_LINES';
 const START_DEFINING_GUIDINGLINES = 'Guiding/START_DEFINING_GUIDINGLINES';
+const SET_BBOX_CONTAINER = 'Guiding/SET_BBOX_CONTAINER';
 const RESET = 'Guiding/RESET';
 
 
@@ -86,15 +89,19 @@ export function resetGuidingState() {
     }
 }
 
-export function createOrUpdateGuidingLines() {
+export function createOrUpdateGuidingLines(initialBbox) {
     return (dispatch, getState) => {
+
+        // Enlarge bbox twice as big so we don't update on every frame
+        let largerNewBbox = computeLargerBbox(initialBbox, 2);
 
         const equipmentWidth = getState().guiding.equipmentWidth;
         const referenceLine = getState().guiding.referenceLine;
 
         const guidingLines = new GuidingLines(
             equipmentWidth,
-            referenceLine
+            referenceLine,
+            largerNewBbox
         );
 
         dispatch({
@@ -102,8 +109,36 @@ export function createOrUpdateGuidingLines() {
             payload: guidingLines
         })
 
+        dispatch(setBboxContainer(largerNewBbox));
+
     }
 }
+
+export function onBboxChanged(newBbox) {
+    return (dispatch, getState) => {
+        const guidingLines = getState().guiding.guidingLines;
+        if(!guidingLines) {
+            return;
+        }
+        // Only update bbox if new bbox isn't contained on the previous one
+        if(guidingLines.needBboxUpdate(newBbox)) {
+            // Enlarge bbox twice as big so we don't update on every frame
+            let largerNewBbox = computeLargerBbox(newBbox, 2);
+            guidingLines.updateBbox(largerNewBbox);
+            dispatch(setBboxContainer(largerNewBbox));
+            // The watcher of bboxContainer on the frond-end will update the guidingLines
+            // Maybe update reference guiding line also...
+        }
+    }
+}
+
+export function setBboxContainer(bbox) {
+    return {
+        type: SET_BBOX_CONTAINER,
+        payload: bbox
+    }
+}
+
 
 const guidingStateReducer = (
     state = getInitialState(),
@@ -152,6 +187,12 @@ const guidingStateReducer = (
                 guidingLines: action.payload,
                 isDefiningGuidingLines: false
             };
+        }
+        case SET_BBOX_CONTAINER: {
+            return {
+                ...state,
+                bboxContainer: action.payload
+            }
         }
         case RESET: {
             return getInitialState();

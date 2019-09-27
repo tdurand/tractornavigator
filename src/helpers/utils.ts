@@ -1,5 +1,8 @@
 import lineOffset from '@turf/line-offset';
 import { polygon } from '@turf/helpers';
+import transformScale from '@turf/transform-scale';
+import bboxFromGeojson from '@turf/bbox'
+import bboxPolygon from '@turf/bbox-polygon';
 
 export function sayHello() {
   return Math.random() < 0.5 ? 'Hello' : 'Hola';
@@ -365,4 +368,10 @@ export function isPointOnLeftOfRight(currentHeading, bearingOfPoint) {
     return "left";
   }
   
+}
+
+export function computeLargerBbox(bbox, scaleFactor) {
+  const bboxAsPolygon = bboxPolygon(bbox);
+  const scaledBboxPolygon = transformScale(bboxAsPolygon, scaleFactor);
+  return bboxFromGeojson(scaledBboxPolygon);
 }

@@ -1,6 +1,6 @@
 import { Component, h, Prop, State } from '@stencil/core';
 import { Store, Action } from "@stencil/redux";
-import { setReferenceLine, setEquipmentWidth, createOrUpdateGuidingLines } from '../../statemanagement/app/GuidingStateManagement';
+import { setReferenceLine, setEquipmentWidth } from '../../statemanagement/app/GuidingStateManagement';
 import { GeolocationPosition } from '@capacitor/core';
 
 @Component({
@@ -18,7 +18,6 @@ export class GuidingSetup {
     @Prop({ context: "store" }) store: Store;
     setReferenceLine: Action;
     setEquipmentWidth: Action;
-    createOrUpdateGuidingLines: Action;
 
     componentWillLoad() {
         this.store.mapStateToProps(this, state => {
@@ -35,8 +34,7 @@ export class GuidingSetup {
 
         this.store.mapDispatchToProps(this, {
             setReferenceLine,
-            setEquipmentWidth,
-            createOrUpdateGuidingLines
+            setEquipmentWidth
         });
     }
 
@@ -94,7 +92,7 @@ export class GuidingSetup {
                             <div>
                                 <ion-button
                                     color="primary"
-                                    onClick={() => this.createOrUpdateGuidingLines()}
+                                    onClick={() => this.onGuidingLinesDefined()}
                                 >
                                     Confirm
                                 </ion-button>

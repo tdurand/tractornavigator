@@ -3,7 +3,13 @@ import { Plugins, GeolocationPosition } from '@capacitor/core';
 import { Store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
 import { getAndWatchPosition, simulateGeolocation, clearPositionHistory } from '../../statemanagement/app/GeolocationStateManagement';
-import { setDistanceToClosestGuidingLine, setBearingToClosestGuidingLine, startDefiningGuidingLines } from '../../statemanagement/app/GuidingStateManagement';
+import { 
+  setDistanceToClosestGuidingLine, 
+  setBearingToClosestGuidingLine, 
+  startDefiningGuidingLines,
+  onBboxChanged,
+  createOrUpdateGuidingLines
+} from '../../statemanagement/app/GuidingStateManagement';
 import { point, lineString } from '@turf/helpers';
 import destination from '@turf/destination';
 const { SplashScreen } = Plugins;
@@ -43,18 +49,26 @@ export class AppHome {
   }
   @State() referenceLine: Array<Array<number>>;
   @State() isDefiningGuidingLines: boolean;
-  @State() guidingLines: any;
-  @Watch('guidingLines')
-  guidingLinesWatchHandler(guidingLines: any) {
-    this.addOrUpdateGuidinglineToMap(guidingLines);
+  @State() bboxContainer: any
+  @Watch('bboxContainer')
+  bboxContainerWatchHandler() {
+    if(this.guidingLines) {
+      console.log('bboxContainer changed')
+      console.log(this.bboxContainer);
+      // Bbox container updated, refresh guidinglines display
+      this.addOrUpdateGuidinglineToMap(this.guidingLines)
+    }
   }
   @State() equipmentWidth: number;
+  guidingLines: any;
 
   getAndWatchPosition: Action;
   setDistanceToClosestGuidingLine: Action;
   setBearingToClosestGuidingLine: Action;
   clearPositionHistory: Action;
   startDefiningGuidingLines: Action;
+  onBboxChanged: Action;
+  createOrUpdateGuidingLines: Action;
 
   map: any;
   mapIsReady: boolean = false;
@@ -67,7 +81,7 @@ export class AppHome {
     this.store.mapStateToProps(this, state => {
       const {
         geolocation: { position, positionsHistory },
-        guiding: { referenceLine, equipmentWidth, isDefiningGuidingLines, guidingLines }
+        guiding: { referenceLine, equipmentWidth, isDefiningGuidingLines, guidingLines, bboxContainer }
       } = state;
       return {
         position,
@@ -75,7 +89,8 @@ export class AppHome {
         referenceLine,
         equipmentWidth,
         isDefiningGuidingLines,
-        guidingLines
+        guidingLines,
+        bboxContainer
       };
     });
 
@@ -84,7 +99,9 @@ export class AppHome {
       setDistanceToClosestGuidingLine,
       setBearingToClosestGuidingLine,
       clearPositionHistory,
-      startDefiningGuidingLines
+      startDefiningGuidingLines, 
+      onBboxChanged,
+      createOrUpdateGuidingLines
     });
   }
 
@@ -138,6 +155,15 @@ export class AppHome {
       // Position
       this.updateMapDisplay();
     });
+
+    this.map.on('moveend', () => {
+      // Could debounce this
+      this.onBboxChanged(this.getBbox())
+    })
+  }
+
+  getBbox() {
+    return this.map.getBounds().toArray().flat();
   }
 
   addOrUpdatePositionToMap(position) {
@@ -461,7 +487,9 @@ export class AppHome {
           </div>
         </div>
         {this.isDefiningGuidingLines &&
-          <guiding-setup />
+          <guiding-setup onGuidingLinesDefined={() => {
+            this.createOrUpdateGuidingLines(this.getBbox());
+          }} />
         }
         {!this.isDefiningGuidingLines && this.guidingLines &&
           <guiding-interface />

@@ -439,9 +439,14 @@ export class AppHome {
       }
       // When defining guiding lines
       if(this.isDefiningGuidingLines) {
+        this.removeSourceAndLayerIfExists("guiding-lines");
+        this.removeSourceAndLayerIfExists("closest-guiding-line");
         let layerPositionID = this.addOrUpdatePositionToMap(this.position);
         let layerHeadingLineID = this.addOrUpdateHeadingLine(this.position);
         let layerReferenceLineID = this.addOrUpdateReferenceLine(this.referenceLine, this.position); 
+        if(this.referenceLine.length === 0) {
+          this.removeSourceAndLayerIfExists("reference-line");
+        }
         this.moveLayerIfExists(layerHeadingLineID);
         this.moveLayerIfExists(layerPositionID);
         this.moveLayerIfExists(layerReferenceLineID);

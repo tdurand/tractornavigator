@@ -1,6 +1,7 @@
 import { Component, h, State, Prop } from '@stencil/core';
 import { Store, Action } from "@stencil/redux";
-import { startRecording, resumeRecording, stopRecording, pauseRecording, RecordingStatus } from '../../statemanagement/app/RecordingStateManagement';
+import { startRecording, resumeRecording, stopRecordingAndSave, cancelRecording, pauseRecording, RecordingStatus } from '../../statemanagement/app/RecordingStateManagement';
+import { startDefiningGuidingLines } from '../../statemanagement/app/GuidingStateManagement';
 
 @Component({
   tag: 'guiding-interface',
@@ -14,7 +15,9 @@ export class GuidingInterface {
   startRecording: Action;
   resumeRecording: Action;
   pauseRecording: Action;
-  stopRecording: Action;
+  stopRecordingAndSave: Action;
+  startDefiningGuidingLines: Action;
+  cancelRecording: Action;
 
 
   @State() distanceToClosestGuidingLine: number;
@@ -39,7 +42,9 @@ export class GuidingInterface {
       startRecording, 
       resumeRecording,
       pauseRecording,
-      stopRecording
+      stopRecordingAndSave,
+      startDefiningGuidingLines,
+      cancelRecording
     });
   }
 
@@ -55,27 +60,41 @@ export class GuidingInterface {
         </div>
         <div class="flex flex-col items-center pb-2">
           {this.status === RecordingStatus.Idle &&
-            <ion-button
-              color="primary"
-              onClick={() => {
-                this.startRecording()
-              }}
-            >
-              Start recording
-            </ion-button>
-          }
-          {this.status === RecordingStatus.Recording &&
             <div>
               <ion-button
-                color="secondary"
-                onClick={() => this.pauseRecording() }
+                color="medium"
+                onClick={() => this.startDefiningGuidingLines() }
               >
-                Pause
-            </ion-button>
+                Settings
+              </ion-button>
               <ion-button
                 color="primary"
                 onClick={() => {
-                  this.stopRecording()
+                  this.startRecording()
+                }}
+              >
+                Start recording
+              </ion-button>
+            </div>
+          }
+          {this.status === RecordingStatus.Recording &&
+            <div>
+              {/* <ion-button
+                color="medium"
+                onClick={() => this.pauseRecording() }
+              >
+                Pause
+              </ion-button> */}
+              <ion-button
+                color="medium"
+                onClick={() => this.cancelRecording() }
+              >
+                Cancel
+              </ion-button>
+              <ion-button
+                color="primary"
+                onClick={() => {
+                  this.stopRecordingAndSave()
                   this.goToHistory()
                 }}
               >
@@ -90,11 +109,11 @@ export class GuidingInterface {
                 onClick={() => this.resumeRecording()}
               >
                 Resume
-            </ion-button>
+              </ion-button>
               <ion-button
                 color="primary"
                 onClick={() => {
-                  this.stopRecording()
+                  this.stopRecordingAndSave()
                   this.goToHistory()
                 }}
               >

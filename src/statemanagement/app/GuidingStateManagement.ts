@@ -60,8 +60,7 @@ export function setDistanceToClosestGuidingLine(distanceToClosestGuidingLine) {
 
 export function startDefiningGuidingLines() {
     return {
-        type: START_DEFINING_GUIDINGLINES,
-        payload: true
+        type: START_DEFINING_GUIDINGLINES
     }
 }
 

@@ -44,7 +44,7 @@ export class GuidingSetup {
                 {this.referenceLine.length === 0 &&
                     <div class="flex flex-col flex-auto justify-between">
                         <div class="message-box">
-                            Defining guiding reference line, go to starting point (Point A) and confirm
+                            Defining guiding reference line, go to starting point and confirm
                         </div>
                         <div class="flex justify-center pb-2">
                             <ion-button
@@ -53,7 +53,7 @@ export class GuidingSetup {
                                     this.setReferenceLine([[this.position.coords.longitude, this.position.coords.latitude]])
                                 }
                             >
-                                Confirm starting point
+                                Set Reference start
                             </ion-button>
                         </div>
                     </div>
@@ -65,12 +65,18 @@ export class GuidingSetup {
                         </div>
                         <div class="flex justify-center pb-2">
                             <ion-button
+                                color="medium"
+                                onClick={() => this.setReferenceLine([]) }
+                            >
+                                Cancel
+                            </ion-button>
+                            <ion-button
                                 color="primary"
                                 onClick={() =>
                                     this.setReferenceLine([this.referenceLine[0], [this.position.coords.longitude, this.position.coords.latitude]])
                                 }
                             >
-                                Confirm end point
+                                Confirm
                             </ion-button>
                         </div>
                     </div>
@@ -90,6 +96,12 @@ export class GuidingSetup {
                                 ></ion-input>
                             </ion-item>
                             <div>
+                                <ion-button
+                                    color="medium"
+                                    onClick={() => this.setReferenceLine([this.referenceLine[0]]) }
+                                >
+                                    Cancel
+                                </ion-button>
                                 <ion-button
                                     color="primary"
                                     onClick={() => this.onGuidingLinesDefined()}

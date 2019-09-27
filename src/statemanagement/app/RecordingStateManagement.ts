@@ -89,7 +89,15 @@ export function resumeRecording() {
     }
 }
 
-export function stopRecording() {
+export function cancelRecording() {
+    return (dispatch, getState) => {
+        dispatch(setStatus(RecordingStatus.Idle))
+        // Reset state
+        dispatch(resetRecordingState());
+    }
+}
+
+export function stopRecordingAndSave() {
     return (dispatch, getState) => {
         dispatch(setStatus(RecordingStatus.Idle))
         // Save recording in history

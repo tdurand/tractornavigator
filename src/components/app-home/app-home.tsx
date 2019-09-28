@@ -511,6 +511,7 @@ export class AppHome {
         {this.isDefiningGuidingLines &&
           <guiding-setup onGuidingLinesDefined={() => {
             this.createOrUpdateGuidingLines(this.getBbox());
+            this.map.resize();
           }} />
         }
         {!this.isDefiningGuidingLines && this.guidingLines &&

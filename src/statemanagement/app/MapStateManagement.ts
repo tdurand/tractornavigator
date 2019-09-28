@@ -3,6 +3,8 @@ import { point } from '@turf/helpers';
 import computeBearing from '@turf/bearing';
 
 const MIN_DISTANCE_TO_MOVE_VIEW = 5;
+const ZOOM_OUT = 18;
+const ZOOM_IN = 19;
 
 interface MapState {
     mapView: any
@@ -34,7 +36,7 @@ export function handleNewPosition(newPosition, forceRefresh = false) {
                 center: [newPosition.coords.longitude, newPosition.coords.latitude],
                 bearing: 0,
                 pitch: 0,
-                zoom: 17
+                zoom: ZOOM_OUT
             }))
         } else {
             // Check if newPosition distance to lastPosition
@@ -69,7 +71,7 @@ export function handleNewPosition(newPosition, forceRefresh = false) {
 
                         // Zoom and pitch
                         pitch = 60;
-                        zoom = 19;
+                        zoom = ZOOM_IN;
 
                     } else {
                         // Update bearing in view only if bearing changed 
@@ -81,7 +83,7 @@ export function handleNewPosition(newPosition, forceRefresh = false) {
                         }
 
                         pitch = 0;
-                        zoom = 17;
+                        zoom = ZOOM_OUT;
                     }
                 } else {
                     newBearing = currentBearing;

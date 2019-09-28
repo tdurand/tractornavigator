@@ -155,6 +155,7 @@ export function simulateGeolocation() {
         }
     })
     var simulation = Geosimulation({ coords: coordinates, speed: 15 });
+    console.log('start simulation');
     simulation.start();
 }
 
@@ -204,7 +205,6 @@ export function onNewPosition(position) {
             // notify RecordingStateManagement of a new position
             dispatch(recordingOnNewPosition([position.coords.longitude, position.coords.latitude]))
         }
-        console.log('newPosition');
 
         dispatch(setPosition(position));
         dispatch(handleNewPosition(position));
@@ -219,21 +219,29 @@ export function getAndWatchPosition() {
             // TODO handle error ?
             // Need to transform geoposition DOM element to normal object otherwise redux can't parse it reducer:
             dispatch(onNewPosition(geopositionToObject(position)));
+        }, (error) => {
+          console.log(error);
         })
 
-        Geolocation.watchPosition({
+        setTimeout(() => {
+          Geolocation.watchPosition({
             enableHighAccuracy: true,
             timeout: 15000
-        }, (position) => {
-            // TODO dispatch watcher enabled
-            if (position) {
-                //console.log('Dispatch watch position')
-                dispatch(onNewPosition(geopositionToObject(position)));
-            } else {
-                console.log('position null when watchPosition, todo need to dispatch onLocationError');
-                // TODO do something
-            }
-        })
+          }, (position, err) => {
+              if(err) {
+                console.log(err);
+              }
+              // TODO dispatch watcher enabled
+              if (position) {
+                  //console.log('Dispatch watch position')
+                  dispatch(onNewPosition(geopositionToObject(position)));
+              } else {
+                  console.log('position null when watchPosition, todo need to dispatch onLocationError');
+                  // TODO do something
+              }
+          })
+
+        }, 200)   
     }
 }
 

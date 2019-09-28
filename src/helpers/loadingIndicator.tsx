@@ -13,6 +13,9 @@ export default class LoadingIndicator {
   }
 
   async present() {
+    if(this.isLoading) {
+      return;
+    }
     this.isLoading = true;
     this.isDismissed = false;
     return await loadingController.create({
@@ -22,7 +25,7 @@ export default class LoadingIndicator {
         //console.log('presented');
         if (!this.isLoading) {
           a.dismiss().then(() => {
-          //console.log('abort presenting')
+            //console.log('abort presenting')
           });
         }
       });

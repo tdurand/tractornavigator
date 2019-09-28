@@ -3,8 +3,7 @@ import { Plugins, GeolocationPosition } from '@capacitor/core';
 import { Store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
 import { 
-  getAndWatchPosition, 
-  simulateGeolocation 
+  getAndWatchPosition
 } from '../../statemanagement/app/GeolocationStateManagement';
 import { 
   setDistanceToClosestGuidingLine, 
@@ -14,6 +13,7 @@ import {
   createOrUpdateGuidingLines
 } from '../../statemanagement/app/GuidingStateManagement';
 import { handleNewPosition } from '../../statemanagement/app/MapStateManagement';
+import { getDeviceInfo } from '../../statemanagement/app/DeviceStateManagement';
 import { point, lineString } from '@turf/helpers';
 import destination from '@turf/destination';
 const { SplashScreen } = Plugins;
@@ -84,6 +84,7 @@ export class AppHome {
   onBboxChanged: Action;
   createOrUpdateGuidingLines: Action;
   handleNewPosition: Action;
+  getDeviceInfo: Action;
 
   map: any;
   mapIsReady: boolean = false;
@@ -127,15 +128,15 @@ export class AppHome {
       startDefiningGuidingLines, 
       onBboxChanged,
       createOrUpdateGuidingLines,
-      handleNewPosition
+      handleNewPosition,
+      getDeviceInfo
     });
   }
 
   componentDidLoad() {
     SplashScreen.hide();
 
-    // Todo only simulate if Device.platform = web or "dev mode"
-    simulateGeolocation();
+    this.getDeviceInfo();
 
     this.isGettingPositionLoader.present()
 
@@ -154,8 +155,7 @@ export class AppHome {
     this.map = new mapboxgl.Map({
       container: 'map',
       style: mapStyle,
-      zoom: 17,
-      minZoom: 16
+      zoom: 18
     });
 
     //const navControl = new mapboxgl.NavigationControl();
@@ -196,7 +196,6 @@ export class AppHome {
 
   changeMapView(mapView) {
     if(this.mapIsReady && mapView) {
-      console.log('changeMapView')
       this.map.easeTo(mapView);
     }
   }

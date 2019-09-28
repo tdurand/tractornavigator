@@ -1,8 +1,9 @@
 import lineOffset from '@turf/line-offset';
-import { polygon } from '@turf/helpers';
+import { polygon, point } from '@turf/helpers';
 import transformScale from '@turf/transform-scale';
-import bboxFromGeojson from '@turf/bbox'
+import bboxFromGeojson from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
+import computeBearing from '@turf/bearing'
 
 export function sayHello() {
   return Math.random() < 0.5 ? 'Hello' : 'Hola';
@@ -368,6 +369,16 @@ export function isPointOnLeftOfRight(currentHeading, bearingOfPoint) {
     return "left";
   }
   
+}
+
+export function computeHeading(pointA, pointB) {
+  // bearing in -180 <-> 180
+  let heading = computeBearing(point(pointA), point(pointB));
+  // Convert bearing to 0 - 360
+  if(heading < 0) {
+    heading += 360;
+  }
+  return heading;
 }
 
 export function computeLargerBbox(bbox, scaleFactor) {

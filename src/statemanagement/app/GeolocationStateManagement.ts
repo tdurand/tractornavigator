@@ -1,8 +1,9 @@
 import { GeolocationPosition, Plugins } from "@capacitor/core";
-import { geopositionToObject } from "../../helpers/utils";
+import { geopositionToObject, computeHeading } from "../../helpers/utils";
 const { Geolocation } = Plugins;
 import Geosimulation from '../../helpers/geolocationsimulator';
 import { recordingOnNewPosition } from './RecordingStateManagement';
+import { handleNewPosition } from "./MapStateManagement";
 
 interface GeolocationState {
     position: GeolocationPosition;
@@ -23,13 +24,136 @@ const CLEAR_POSITION_HISTORY = 'Geolocation/CLEAR_POSITION_HISTORY';
 //const GET_POSITION = 'Geolocation/GET_POSITION';
 
 export function simulateGeolocation() {
-    var coordinates = [
-        { latitude: 46.30785436578275, longitude: 1.7742705345153809 },
-        { latitude: 46.30727628127203, longitude: 1.7754185199737547 },
-        { latitude: 46.30691312249563, longitude: 1.7756867408752441 },
-        { latitude: 46.30700205956158, longitude: 1.776491403579712 },
-        { latitude: 46.30722440159435, longitude: 1.7767703533172605 }
-    ]
+
+    var rawData = [
+        [
+          1.7735248804092407,
+          46.308006297237185
+        ],
+        [
+          1.7736053466796873,
+          46.30798035775042
+        ],
+        [
+          1.7736482620239258,
+          46.30794330131944
+        ],
+        [
+          1.7737555503845215,
+          46.30792847874004
+        ],
+        [
+          1.7738038301467896,
+          46.30788771662593
+        ],
+        [
+          1.773895025253296,
+          46.307869188382234
+        ],
+        [
+          1.7739540338516235,
+          46.30782472057173
+        ],
+        [
+          1.7740345001220703,
+          46.30781730926646
+        ],
+        [
+          1.7740988731384275,
+          46.30778395838037
+        ],
+        [
+          1.7741954326629639,
+          46.30778395838037
+        ],
+        [
+          1.7742490768432617,
+          46.307732079183836
+        ],
+        [
+          1.7743724584579468,
+          46.307706139567124
+        ],
+        [
+          1.7744046449661255,
+          46.30766167162418
+        ],
+        [
+          1.7744958400726318,
+          46.30766167162418
+        ],
+        [
+          1.7745280265808105,
+          46.30769872824583
+        ],
+        [
+          1.774469017982483,
+          46.307732079183836
+        ],
+        [
+          1.774415373802185,
+          46.30778025272512
+        ],
+        [
+          1.774367094039917,
+          46.30778395838037
+        ],
+        [
+          1.7742544412612915,
+          46.307832131876
+        ],
+        [
+          1.7741042375564575,
+          46.30788030532921
+        ],
+        [
+          1.774066686630249,
+          46.307924773094555
+        ],
+        [
+          1.7739325761795044,
+          46.30793589003024
+        ],
+        [
+          1.7738467454910276,
+          46.3079988859565
+        ],
+        [
+          1.7737770080566406,
+          46.30803594234984
+        ],
+        [
+          1.7737233638763426,
+          46.30803594234984
+        ],
+        [
+          1.7736214399337769,
+          46.30809523252704
+        ],
+        [
+          1.773519515991211,
+          46.30812117195936
+        ],
+        [
+          1.7733746767044067,
+          46.30818046204421
+        ],
+        [
+          1.773170828819275,
+          46.30824345768902
+        ],
+        [
+          1.7730849981307983,
+          46.30827680829515
+        ]
+      ]
+
+    var coordinates = rawData.map((point) => {
+        return {
+            latitude: point[1],
+            longitude: point[0]
+        }
+    })
     var simulation = Geosimulation({ coords: coordinates, speed: 15 });
     simulation.start();
 }
@@ -60,21 +184,30 @@ export function onNewPosition(position) {
         const positionsHistory = getState().geolocation.positionsHistory;
         if(positionsHistory.length > 0) {
             const previousPosition = positionsHistory[positionsHistory.length - 1];
+            // On new position
             if (
                 position.coords.longitude !== previousPosition[0] ||
                 position.coords.latitude !== previousPosition[1]
             ) {
+                // If no heading defined
+                if(position.coords.heading === undefined) {
+                    position.coords.heading = computeHeading(previousPosition, [position.coords.longitude, position.coords.latitude])
+                }
                 dispatch(addPositionToHistory([position.coords.longitude, position.coords.latitude]));
                 // notify RecordingStateManagement of a new position
                 dispatch(recordingOnNewPosition([position.coords.longitude, position.coords.latitude]))
+            } else {
+                //console.log('same position');
             }
         } else {
             dispatch(addPositionToHistory([position.coords.longitude, position.coords.latitude]));
             // notify RecordingStateManagement of a new position
             dispatch(recordingOnNewPosition([position.coords.longitude, position.coords.latitude]))
         }
+        console.log('newPosition');
 
         dispatch(setPosition(position));
+        dispatch(handleNewPosition(position));
     }
 }
 

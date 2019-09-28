@@ -73,6 +73,13 @@ export class AppHome {
   map: any;
   mapIsReady: boolean = false;
   mapFirstRender: boolean = false;
+
+  @State() mapView: any;
+  @Watch('mapView')
+  mapViewHandler(mapView) {
+    this.changeMapView(mapView);
+  }
+
   isGettingPositionLoader: LoadingIndicator = new LoadingIndicator("Getting your position...");
 
   @Prop({ context: "store" }) store: Store;
@@ -82,7 +89,8 @@ export class AppHome {
       const {
         recording: { status, recordedPositions },
         geolocation: { position },
-        guiding: { referenceLine, equipmentWidth, isDefiningGuidingLines, guidingLines, bboxContainer }
+        guiding: { referenceLine, equipmentWidth, isDefiningGuidingLines, guidingLines, bboxContainer },
+        map: { mapView }
       } = state;
       return {
         position,
@@ -92,7 +100,8 @@ export class AppHome {
         guidingLines,
         bboxContainer,
         status,
-        recordedPositions
+        recordedPositions,
+        mapView
       };
     });
 
@@ -128,7 +137,7 @@ export class AppHome {
     this.map = new mapboxgl.Map({
       container: 'map',
       style: mapStyle,
-      zoom: 16,
+      zoom: 17,
       minZoom: 16
     });
 
@@ -151,6 +160,7 @@ export class AppHome {
       this.mapIsReady = true;
       this.map.resize();
       console.log('Map loaded');
+      this.changeMapView(this.mapView);
 
       // Init source
       // Position
@@ -165,6 +175,13 @@ export class AppHome {
 
   getBbox() {
     return this.map.getBounds().toArray().flat();
+  }
+
+  changeMapView(mapView) {
+    if(this.mapIsReady && mapView) {
+      console.log('changeMapView')
+      this.map.easeTo(mapView);
+    }
   }
 
   addOrUpdatePositionToMap(position) {
@@ -187,7 +204,7 @@ export class AppHome {
         "source": layerAndSourceId,
         "type": "circle",
         "paint": {
-          "circle-radius": 10,
+          "circle-radius": 5,
           "circle-color": "#B42222"
         }
       })
@@ -265,12 +282,12 @@ export class AppHome {
       // Create heading line from position 
       let pointA = point([position.coords.longitude, position.coords.latitude]);
       let heading = position.coords.heading;
-      this.map.setBearing(heading);
+      //this.map.setBearing(heading);
       // Convert heading to -180 180
       if (heading > 180) {
         heading -= 360;
       }
-      let pointB = destination(pointA, 1, heading);
+      let pointB = destination(pointA, (this.equipmentWidth * 3) / 1000, heading);
       let headingLine = lineString([
         pointA.geometry.coordinates,
         pointB.geometry.coordinates
@@ -295,6 +312,8 @@ export class AppHome {
         })
       }
       return layerAndSourceId;
+    } else {
+      this.removeSourceAndLayerIfExists('heading-line')
     }
   }
 
@@ -424,7 +443,7 @@ export class AppHome {
       return;
     }
     if (this.position) {
-      this.map.setCenter([this.position.coords.longitude, this.position.coords.latitude]);
+      // this.map.setCenter([this.position.coords.longitude, this.position.coords.latitude]);
       // See moveLayer method to change z-index: https://docs.mapbox.com/mapbox-gl-js/api/#map#movelayer
       // Initial UI
       if(!this.isDefiningGuidingLines && !this.guidingLines) {

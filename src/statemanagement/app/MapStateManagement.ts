@@ -40,6 +40,7 @@ export function handleNewPosition(newPosition, forceRefresh = false) {
             // Check if newPosition distance to lastPosition
             let lastViewPosition = point(currentMapView.center)
             let distanceFromLastView = distance(lastViewPosition, [newPosition.coords.longitude, newPosition.coords.latitude]) * 1000;
+            // In case of guidingLines status defined / undefined, need to forceRefresh
             if(distanceFromLastView > MIN_DISTANCE_TO_MOVE_VIEW || forceRefresh) {
                 // Define bearing (maybe reason on average 2-3 last positions...)
                 let currentBearing = currentMapView.bearing;

@@ -176,7 +176,8 @@ const guidingStateReducer = (
         case START_DEFINING_GUIDINGLINES: {
             return {
                 ...state,
-                isDefiningGuidingLines: true
+                isDefiningGuidingLines: true,
+                guidingLines: null
             };
         }
         case CREATE_OR_UPDATE_GUIDING_LINES: {

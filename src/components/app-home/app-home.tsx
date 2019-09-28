@@ -4,7 +4,7 @@ import { Store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
 import { 
   getAndWatchPosition, 
-  //simulateGeolocation 
+  simulateGeolocation 
 } from '../../statemanagement/app/GeolocationStateManagement';
 import { 
   setDistanceToClosestGuidingLine, 
@@ -62,7 +62,17 @@ export class AppHome {
     }
   }
   @State() equipmentWidth: number;
-  guidingLines: any;
+
+  @State() guidingLines: any;
+  @Watch('guidingLines')
+  guidingLinesChangeHandler() {
+    // Force mapViewRefresh, todo handle this better
+    // we need to trigger it when guidingLines change from null > something or something > null
+    console.log('GUIDING LINE CHANGE')
+    if(this.position) {
+      this.handleNewPosition(this.position, true);
+    }
+  }
 
   @State() status: RecordingStatus;
   recordedPositions: Array<Array<number>>;
@@ -125,7 +135,7 @@ export class AppHome {
     SplashScreen.hide();
 
     // Todo only simulate if Device.platform = web or "dev mode"
-    //simulateGeolocation();
+    simulateGeolocation();
 
     this.isGettingPositionLoader.present()
 
@@ -538,8 +548,6 @@ export class AppHome {
           <guiding-setup onGuidingLinesDefined={() => {
             this.createOrUpdateGuidingLines(this.getBbox());
             this.map.resize();
-            // Force mapViewRefresh
-            this.handleNewPosition(this.position, true);
           }} />
         }
         {!this.isDefiningGuidingLines && this.guidingLines &&

@@ -2,7 +2,7 @@ import distance from '@turf/distance';
 import { point } from '@turf/helpers';
 import computeBearing from '@turf/bearing';
 
-const MIN_DISTANCE_TO_MOVE_VIEW= 10;
+const MIN_DISTANCE_TO_MOVE_VIEW = 5;
 
 interface MapState {
     mapView: any
@@ -23,7 +23,7 @@ export function setMapView(mapView) {
     }
 }
 
-export function handleNewPosition(newPosition) {
+export function handleNewPosition(newPosition, forceRefresh = false) {
     return (dispatch, getState) => {
         let currentMapView = getState().map.mapView;
         let guidingLines = getState().guiding.guidingLines;
@@ -40,12 +40,13 @@ export function handleNewPosition(newPosition) {
             // Check if newPosition distance to lastPosition
             let lastViewPosition = point(currentMapView.center)
             let distanceFromLastView = distance(lastViewPosition, [newPosition.coords.longitude, newPosition.coords.latitude]) * 1000;
-            if(distanceFromLastView > MIN_DISTANCE_TO_MOVE_VIEW) {
+            if(distanceFromLastView > MIN_DISTANCE_TO_MOVE_VIEW || forceRefresh) {
                 // Define bearing (maybe reason on average 2-3 last positions...)
                 let currentBearing = currentMapView.bearing;
                 let newBearing = newPosition.coords.heading;
                 let pitch = currentMapView.pitch;
                 let zoom = currentMapView.zoom;
+                let center = [newPosition.coords.longitude, newPosition.coords.latitude];
                 if(newBearing) {
                     if(guidingLines) {
                         let bearingGuidingLines = computeBearing(point(guidingLines.referenceLine[0]), point(guidingLines.referenceLine[1]))
@@ -86,10 +87,11 @@ export function handleNewPosition(newPosition) {
                 }
 
                 dispatch(setMapView({
-                    center: [newPosition.coords.longitude, newPosition.coords.latitude],
+                    center: center,
                     bearing: newBearing,
                     pitch: pitch,
-                    zoom: zoom
+                    zoom: zoom,
+                    offset: [0, 50] // TODO set offset depending on map size on screen
                 }))
             }
         }

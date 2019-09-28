@@ -15,7 +15,7 @@ interface GuidingState {
 const getInitialState = (): GuidingState => {
     return {
         referenceLine: [],
-        equipmentWidth: 5,
+        equipmentWidth: 8,
         distanceToClosestGuidingLine: null,
         bearingToClosestGuidingLine: null,
         isGuidingLineOnRightOrLeft: null,
@@ -109,7 +109,6 @@ export function createOrUpdateGuidingLines(initialBbox) {
         })
 
         dispatch(setBboxContainer(largerNewBbox));
-
     }
 }
 

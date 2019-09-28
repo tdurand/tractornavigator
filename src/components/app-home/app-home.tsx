@@ -2,7 +2,10 @@ import { Component, h, State, Prop, Watch } from '@stencil/core';
 import { Plugins, GeolocationPosition } from '@capacitor/core';
 import { Store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
-import { getAndWatchPosition, simulateGeolocation } from '../../statemanagement/app/GeolocationStateManagement';
+import { 
+  getAndWatchPosition, 
+  //simulateGeolocation 
+} from '../../statemanagement/app/GeolocationStateManagement';
 import { 
   setDistanceToClosestGuidingLine, 
   setBearingToClosestGuidingLine, 
@@ -10,6 +13,7 @@ import {
   onBboxChanged,
   createOrUpdateGuidingLines
 } from '../../statemanagement/app/GuidingStateManagement';
+import { handleNewPosition } from '../../statemanagement/app/MapStateManagement';
 import { point, lineString } from '@turf/helpers';
 import destination from '@turf/destination';
 const { SplashScreen } = Plugins;
@@ -69,6 +73,7 @@ export class AppHome {
   startDefiningGuidingLines: Action;
   onBboxChanged: Action;
   createOrUpdateGuidingLines: Action;
+  handleNewPosition: Action;
 
   map: any;
   mapIsReady: boolean = false;
@@ -111,14 +116,16 @@ export class AppHome {
       setBearingToClosestGuidingLine,
       startDefiningGuidingLines, 
       onBboxChanged,
-      createOrUpdateGuidingLines
+      createOrUpdateGuidingLines,
+      handleNewPosition
     });
   }
 
   componentDidLoad() {
     SplashScreen.hide();
 
-    simulateGeolocation();
+    // Todo only simulate if Device.platform = web or "dev mode"
+    //simulateGeolocation();
 
     this.isGettingPositionLoader.present()
 
@@ -531,6 +538,8 @@ export class AppHome {
           <guiding-setup onGuidingLinesDefined={() => {
             this.createOrUpdateGuidingLines(this.getBbox());
             this.map.resize();
+            // Force mapViewRefresh
+            this.handleNewPosition(this.position, true);
           }} />
         }
         {!this.isDefiningGuidingLines && this.guidingLines &&

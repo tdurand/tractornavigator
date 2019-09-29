@@ -23,6 +23,7 @@
     "@turf/bearing": "^6.0.1",
     "@turf/boolean-contains": "^6.0.1",
     "@turf/center": "^6.0.1",
+    "@turf/circle": "^6.0.1",
     "@turf/destination": "^6.0.1",
     "@turf/distance": "^6.0.1",
     "@turf/helpers": "^6.1.4",

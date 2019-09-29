@@ -16,6 +16,7 @@ import { handleNewPosition } from '../../statemanagement/app/MapStateManagement'
 import { getDeviceInfo } from '../../statemanagement/app/DeviceStateManagement';
 import { point, lineString } from '@turf/helpers';
 import destination from '@turf/destination';
+import generateCircle from '@turf/circle';
 const { SplashScreen } = Plugins;
 import LoadingIndicator from '../../helpers/loadingIndicator';
 import config from '../../config.json';
@@ -207,13 +208,24 @@ export class AppHome {
     }
     const layerAndSourceId = 'position'
     let source = this.map.getSource(layerAndSourceId);
+
+    let accuracyCircle = generateCircle(coords, position.coords.accuracy / 1000);
+
+    let data = {
+      "type": "FeatureCollection",
+      "features": [
+        point(coords),
+        accuracyCircle
+      ]
+    }
+
     if (source) {
-      source.setData(point(coords))
+      source.setData(data)
     } else {
       console.log('Create position source and layer');
       this.map.addSource(layerAndSourceId, {
         "type": "geojson",
-        "data": point(coords)
+        "data": data
       });
       this.map.addLayer({
         "id": layerAndSourceId,
@@ -221,8 +233,23 @@ export class AppHome {
         "type": "circle",
         "paint": {
           "circle-radius": 5,
-          "circle-color": "#B42222"
-        }
+          "circle-color": "#B42222",
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "white"
+        },
+        "filter": ["==", "$type", "Point"]
+      })
+
+      this.map.addLayer({
+        "id": `${layerAndSourceId}-accuracy`,
+        "source": layerAndSourceId,
+        "type": "fill",
+        "paint": {
+          "fill-color": "rgba(255, 100, 100, 1)",
+          "fill-opacity": 0.4,
+          "fill-outline-color": "white"
+        },
+        "filter": ["==", "$type", "Polygon"]
       })
     }
     return layerAndSourceId;
@@ -529,6 +556,13 @@ export class AppHome {
 
       <ion-content>
         <div id="map"></div>
+        <div class="container-top">
+          {this.position &&
+            <div class="message-box">
+              Accuracy : {this.position.coords.accuracy}m
+            </div>
+          }
+        </div>
         <div class="ctas-container">
           <div class="ctas-help">
           </div>

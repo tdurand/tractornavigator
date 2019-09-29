@@ -29,6 +29,12 @@
     align-items: center;
 }
 
+.container-top {
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
 .btn-geolocate {
     position: absolute;
     right: 10px;

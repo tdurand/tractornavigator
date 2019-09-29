@@ -17,6 +17,7 @@ import { getDeviceInfo } from '../../statemanagement/app/DeviceStateManagement';
 import { point, lineString } from '@turf/helpers';
 import destination from '@turf/destination';
 import generateCircle from '@turf/circle';
+import generateSector from '@turf/sector';
 const { SplashScreen } = Plugins;
 import LoadingIndicator from '../../helpers/loadingIndicator';
 import config from '../../config.json';
@@ -235,7 +236,9 @@ export class AppHome {
           "circle-radius": 5,
           "circle-color": "#B42222",
           "circle-stroke-width": 1,
-          "circle-stroke-color": "white"
+          "circle-stroke-color": "white",
+          "circle-pitch-alignment": "map",
+          "circle-pitch-scale": "map"
         },
         "filter": ["==", "$type", "Point"]
       })
@@ -246,7 +249,7 @@ export class AppHome {
         "type": "fill",
         "paint": {
           "fill-color": "rgba(255, 100, 100, 1)",
-          "fill-opacity": 0.4,
+          "fill-opacity": 0.3,
           "fill-outline-color": "white"
         },
         "filter": ["==", "$type", "Polygon"]
@@ -336,21 +339,32 @@ export class AppHome {
         pointB.geometry.coordinates
       ]);
 
+      let sectorHeadingA = position.coords.heading - 30 
+      if(sectorHeadingA < 0) {
+        sectorHeadingA += 360;
+      }
+      let sectorHeadingB = position.coords.heading + 30 
+      if(sectorHeadingB < 0) {
+        sectorHeadingB -= 360;
+      }
+
+      let headingSector = generateSector(pointA, (position.coords.accuracy / 3) / 1000, sectorHeadingA, sectorHeadingB)
+
       if (source) {
-        source.setData(headingLine)
+        source.setData(headingSector)
       } else {
         console.log('Create position source and layer');
         this.map.addSource(layerAndSourceId, {
           "type": "geojson",
-          "data": headingLine
+          "data": headingSector
         });
         this.map.addLayer({
           "id": layerAndSourceId,
           "source": layerAndSourceId,
-          "type": "line",
+          "type": "fill",
           "paint": {
-            "line-color": "#B42222",
-            "line-width": 3
+            "fill-color": "#B42222",
+            "fill-opacity": 0.8
           }
         })
       }

@@ -311,7 +311,7 @@ export class AppHome {
           "type": "line",
           "source": layerAndSourceId,
           "paint": {
-            "line-color": "green",
+            "line-color": "blue",
             "line-width": 10
           }
         });

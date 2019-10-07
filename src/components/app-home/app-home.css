@@ -59,8 +59,15 @@
     align-items: center;
 }
 
-.guiding-icons {
+.guiding-helper_icons {
     display: flex;
+}
+
+.guiding-helper_label {
+    text-align: center;
+    width: 100px;
+    font-weight: bold;
+    font-size: 1.2rem;
 }
 
 /** Utility classes (from tailwind) **/

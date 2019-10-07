@@ -12,17 +12,24 @@ export class GuidingHelper {
   render() {
     return (
       <div class="guiding-helper">
-        <div class="guiding-icons">
+        <div class="guiding-helper_icons">
           <IconArrow 
             direction="left" 
-            fillColor={this.isGuidingLineOnRightOrLeft === "left" ? "blue" : "#DADADA"}
+            fillColor={this.isGuidingLineOnRightOrLeft === "left" && this.distanceToClosestGuidingLine > 1 ? "blue" : "#DADADA"}
           />
         </div>
-        <div>{Math.round(this.distanceToClosestGuidingLine * 100) / 100}m</div>
-        <div class="guiding-icons">
+        <div class="guiding-helper_label">
+          {this.distanceToClosestGuidingLine < 1 &&
+            <div>OK</div>
+          } 
+          {this.distanceToClosestGuidingLine > 1 &&
+            <div>{Math.ceil(this.distanceToClosestGuidingLine)} m</div>
+          }
+        </div>
+        <div class="guiding-helper_icons">
           <IconArrow 
             direction="right" 
-            fillColor={this.isGuidingLineOnRightOrLeft === "right" ? "blue" : "#DADADA"}
+            fillColor={this.isGuidingLineOnRightOrLeft === "right" && this.distanceToClosestGuidingLine > 1 ? "blue" : "#DADADA"}
           />
         </div>
       </div>

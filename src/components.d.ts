@@ -16,7 +16,10 @@ export namespace Components {
   interface AppOffline {}
   interface AppRoot {}
   interface AppTabs {}
-  interface GuidingInterface {}
+  interface GuidingHelper {
+    'distanceToClosestGuidingLine': number;
+    'isGuidingLineOnRightOrLeft': string;
+  }
   interface GuidingInterface {}
   interface GuidingSetup {
     'onGuidingLinesDefined': Function;
@@ -68,10 +71,10 @@ declare global {
     new (): HTMLAppTabsElement;
   };
 
-  interface HTMLGuidingInterfaceElement extends Components.GuidingInterface, HTMLStencilElement {}
-  var HTMLGuidingInterfaceElement: {
-    prototype: HTMLGuidingInterfaceElement;
-    new (): HTMLGuidingInterfaceElement;
+  interface HTMLGuidingHelperElement extends Components.GuidingHelper, HTMLStencilElement {}
+  var HTMLGuidingHelperElement: {
+    prototype: HTMLGuidingHelperElement;
+    new (): HTMLGuidingHelperElement;
   };
 
   interface HTMLGuidingInterfaceElement extends Components.GuidingInterface, HTMLStencilElement {}
@@ -93,7 +96,7 @@ declare global {
     'app-offline': HTMLAppOfflineElement;
     'app-root': HTMLAppRootElement;
     'app-tabs': HTMLAppTabsElement;
-    'guiding-interface': HTMLGuidingInterfaceElement;
+    'guiding-helper': HTMLGuidingHelperElement;
     'guiding-interface': HTMLGuidingInterfaceElement;
     'guiding-setup': HTMLGuidingSetupElement;
   }
@@ -107,7 +110,10 @@ declare namespace LocalJSX {
   interface AppOffline {}
   interface AppRoot {}
   interface AppTabs {}
-  interface GuidingInterface {}
+  interface GuidingHelper {
+    'distanceToClosestGuidingLine'?: number;
+    'isGuidingLineOnRightOrLeft'?: string;
+  }
   interface GuidingInterface {}
   interface GuidingSetup {
     'onGuidingLinesDefined'?: Function;
@@ -121,7 +127,7 @@ declare namespace LocalJSX {
     'app-offline': AppOffline;
     'app-root': AppRoot;
     'app-tabs': AppTabs;
-    'guiding-interface': GuidingInterface;
+    'guiding-helper': GuidingHelper;
     'guiding-interface': GuidingInterface;
     'guiding-setup': GuidingSetup;
   }
@@ -140,7 +146,7 @@ declare module "@stencil/core" {
       'app-offline': LocalJSX.AppOffline & JSXBase.HTMLAttributes<HTMLAppOfflineElement>;
       'app-root': LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
       'app-tabs': LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
-      'guiding-interface': LocalJSX.GuidingInterface & JSXBase.HTMLAttributes<HTMLGuidingInterfaceElement>;
+      'guiding-helper': LocalJSX.GuidingHelper & JSXBase.HTMLAttributes<HTMLGuidingHelperElement>;
       'guiding-interface': LocalJSX.GuidingInterface & JSXBase.HTMLAttributes<HTMLGuidingInterfaceElement>;
       'guiding-setup': LocalJSX.GuidingSetup & JSXBase.HTMLAttributes<HTMLGuidingSetupElement>;
     }

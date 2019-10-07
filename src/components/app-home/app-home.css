@@ -54,6 +54,11 @@
     text-align: center;
 }
 
+.guiding-helper {
+    display: flex;
+    align-items: center;
+}
+
 .guiding-icons {
     display: flex;
 }

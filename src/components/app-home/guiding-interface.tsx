@@ -2,8 +2,6 @@ import { Component, h, State, Prop } from '@stencil/core';
 import { Store, Action } from "@stencil/redux";
 import { startRecording, resumeRecording, stopRecordingAndSave, cancelRecording, pauseRecording, RecordingStatus } from '../../statemanagement/app/RecordingStateManagement';
 import { startDefiningGuidingLines } from '../../statemanagement/app/GuidingStateManagement';
-import IconLeft from './icon-arrow-left';
-import IconRight from './icon-arrow-right';
 
 @Component({
   tag: 'guiding-interface',
@@ -58,23 +56,10 @@ export class GuidingInterface {
     return (
       <div class="content flex flex-col flex-auto justify-between">
         <div class="flex message-box justify-center items-center">
-          <div class="guiding-icons">
-            {this.isGuidingLineOnRightOrLeft === "right" &&
-              <IconLeft fillColor="grey" />
-            }
-            {this.isGuidingLineOnRightOrLeft === "left" &&
-              <IconLeft fillColor="blue" />
-            }
-          </div>
-          <div>{Math.round(this.distanceToClosestGuidingLine * 100) / 100}m</div>
-          <div class="guiding-icons">
-            {this.isGuidingLineOnRightOrLeft === "left" &&
-              <IconRight fillColor="grey" />
-            }
-            {this.isGuidingLineOnRightOrLeft === "right" &&
-              <IconRight fillColor="blue" />
-            }
-          </div>
+          <guiding-helper 
+            distanceToClosestGuidingLine={this.distanceToClosestGuidingLine}
+            isGuidingLineOnRightOrLeft={this.isGuidingLineOnRightOrLeft}
+          />
         </div>
         <div class="flex flex-col items-center pb-2">
           {this.status === RecordingStatus.Idle &&

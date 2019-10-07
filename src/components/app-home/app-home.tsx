@@ -15,7 +15,6 @@ import {
 import { handleNewPosition } from '../../statemanagement/app/MapStateManagement';
 import { getDeviceInfo } from '../../statemanagement/app/DeviceStateManagement';
 import { point, lineString } from '@turf/helpers';
-import destination from '@turf/destination';
 import generateCircle from '@turf/circle';
 import generateSector from '@turf/sector';
 const { SplashScreen } = Plugins;
@@ -333,11 +332,11 @@ export class AppHome {
       if (heading > 180) {
         heading -= 360;
       }
-      let pointB = destination(pointA, (this.equipmentWidth * 3) / 1000, heading);
-      let headingLine = lineString([
-        pointA.geometry.coordinates,
-        pointB.geometry.coordinates
-      ]);
+      //let pointB = destination(pointA, (this.equipmentWidth * 3) / 1000, heading);
+      // let headingLine = lineString([
+      //   pointA.geometry.coordinates,
+      //   pointB.geometry.coordinates
+      // ]);
 
       let sectorHeadingA = position.coords.heading - 30 
       if(sectorHeadingA < 0) {

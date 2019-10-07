@@ -17,6 +17,7 @@ export namespace Components {
   interface AppRoot {}
   interface AppTabs {}
   interface GuidingInterface {}
+  interface GuidingInterface {}
   interface GuidingSetup {
     'onGuidingLinesDefined': Function;
   }
@@ -73,6 +74,12 @@ declare global {
     new (): HTMLGuidingInterfaceElement;
   };
 
+  interface HTMLGuidingInterfaceElement extends Components.GuidingInterface, HTMLStencilElement {}
+  var HTMLGuidingInterfaceElement: {
+    prototype: HTMLGuidingInterfaceElement;
+    new (): HTMLGuidingInterfaceElement;
+  };
+
   interface HTMLGuidingSetupElement extends Components.GuidingSetup, HTMLStencilElement {}
   var HTMLGuidingSetupElement: {
     prototype: HTMLGuidingSetupElement;
@@ -87,6 +94,7 @@ declare global {
     'app-root': HTMLAppRootElement;
     'app-tabs': HTMLAppTabsElement;
     'guiding-interface': HTMLGuidingInterfaceElement;
+    'guiding-interface': HTMLGuidingInterfaceElement;
     'guiding-setup': HTMLGuidingSetupElement;
   }
 }
@@ -100,6 +108,7 @@ declare namespace LocalJSX {
   interface AppRoot {}
   interface AppTabs {}
   interface GuidingInterface {}
+  interface GuidingInterface {}
   interface GuidingSetup {
     'onGuidingLinesDefined'?: Function;
   }
@@ -112,6 +121,7 @@ declare namespace LocalJSX {
     'app-offline': AppOffline;
     'app-root': AppRoot;
     'app-tabs': AppTabs;
+    'guiding-interface': GuidingInterface;
     'guiding-interface': GuidingInterface;
     'guiding-setup': GuidingSetup;
   }
@@ -130,6 +140,7 @@ declare module "@stencil/core" {
       'app-offline': LocalJSX.AppOffline & JSXBase.HTMLAttributes<HTMLAppOfflineElement>;
       'app-root': LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
       'app-tabs': LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
+      'guiding-interface': LocalJSX.GuidingInterface & JSXBase.HTMLAttributes<HTMLGuidingInterfaceElement>;
       'guiding-interface': LocalJSX.GuidingInterface & JSXBase.HTMLAttributes<HTMLGuidingInterfaceElement>;
       'guiding-setup': LocalJSX.GuidingSetup & JSXBase.HTMLAttributes<HTMLGuidingSetupElement>;
     }

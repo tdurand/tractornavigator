@@ -54,6 +54,10 @@
     text-align: center;
 }
 
+.guiding-icons {
+    display: flex;
+}
+
 /** Utility classes (from tailwind) **/
 
 .flex {

@@ -27,6 +27,10 @@ export function getDeviceInfo() {
                 //Simulate geolocation
                 console.log('simulateGeolocation')
                 simulateGeolocation();
+            } else {
+                // enable do not sleep 
+                // @ts-ignore
+                window.plugins.insomnia.keepAwake();
             }
         });
     }

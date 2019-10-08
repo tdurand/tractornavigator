@@ -347,7 +347,7 @@ export class AppHome {
         sectorHeadingB -= 360;
       }
 
-      let headingSector = generateSector(pointA, (position.coords.accuracy / 3) / 1000, sectorHeadingA, sectorHeadingB)
+      let headingSector = generateSector(pointA, Math.max((position.coords.accuracy / 1.2) / 1000, 3 / 1000), sectorHeadingA, sectorHeadingB)
 
       if (source) {
         source.setData(headingSector)

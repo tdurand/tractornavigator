@@ -88,6 +88,10 @@
     justify-content: center;
 }
 
+.justify-around {
+    justify-content: space-around;
+}
+
 .justify-end {
     justify-content: flex-end;
 }
@@ -102,6 +106,14 @@
 
 .pb-2 {
     padding-bottom: 0.5rem;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.ml-1 {
+    margin-left: 0.25rem;
 }
 
 /** End utility classes */

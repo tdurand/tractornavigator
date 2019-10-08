@@ -2,6 +2,7 @@ import { Component, h, State, Prop } from '@stencil/core';
 import { Store, Action } from "@stencil/redux";
 import { startRecording, resumeRecording, stopRecordingAndSave, cancelRecording, pauseRecording, RecordingStatus } from '../../statemanagement/app/RecordingStateManagement';
 import { startDefiningGuidingLines } from '../../statemanagement/app/GuidingStateManagement';
+import { GeolocationPosition } from '@capacitor/core';
 
 @Component({
   tag: 'guiding-interface',
@@ -19,6 +20,12 @@ export class GuidingInterface {
   startDefiningGuidingLines: Action;
   cancelRecording: Action;
 
+  dateStart: string;
+  area: number;
+
+
+  @Prop() position: GeolocationPosition;
+
 
   @State() distanceToClosestGuidingLine: number;
   @State() isGuidingLineOnRightOrLeft: string;
@@ -28,13 +35,15 @@ export class GuidingInterface {
   componentWillLoad() {
     this.store.mapStateToProps(this, state => {
       const {
-        recording: { status },
+        recording: { status, dateStart, area },
         guiding: { distanceToClosestGuidingLine, isGuidingLineOnRightOrLeft }
       } = state;
       return {
         status,
         distanceToClosestGuidingLine,
-        isGuidingLineOnRightOrLeft
+        isGuidingLineOnRightOrLeft,
+        dateStart,
+        area
       };
     });
 
@@ -53,13 +62,34 @@ export class GuidingInterface {
   }
 
   render() {
+
+    if(this.status === RecordingStatus.Recording) {
+      var diff = Math.abs(new Date(this.dateStart).getTime() - new Date().getTime());
+      var seconds = Math.floor(diff/1000) % 60;
+      var minutes = Math.floor((diff/1000)/60);
+    }
+
     return (
       <div class="content flex flex-col flex-auto justify-between">
-        <div class="flex message-box justify-center items-center">
-          <guiding-helper 
-            distanceToClosestGuidingLine={this.distanceToClosestGuidingLine}
-            isGuidingLineOnRightOrLeft={this.isGuidingLineOnRightOrLeft}
-          />
+        <div>
+          {this.status === RecordingStatus.Recording &&
+            <div class="flex message-box justify-around">
+              <div class="flex items-center">
+                <ion-icon name="time"></ion-icon>
+                <div class="ml-1">{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}</div>
+              </div>
+              <div class="flex items-center">
+                <ion-icon name="map"></ion-icon>
+                <div class="ml-1">{this.area} ha</div>
+              </div>
+            </div>
+          }
+          <div class="flex message-box justify-center items-center">
+            <guiding-helper 
+              distanceToClosestGuidingLine={this.distanceToClosestGuidingLine}
+              isGuidingLineOnRightOrLeft={this.isGuidingLineOnRightOrLeft}
+            />
+          </div>
         </div>
         <div class="flex flex-col items-center pb-2">
           {this.status === RecordingStatus.Idle &&

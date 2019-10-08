@@ -6,7 +6,9 @@
 
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-
+import {
+  GeolocationPosition,
+} from '@capacitor/core';
 
 export namespace Components {
   interface AppAbout {}
@@ -20,7 +22,9 @@ export namespace Components {
     'distanceToClosestGuidingLine': number;
     'isGuidingLineOnRightOrLeft': string;
   }
-  interface GuidingInterface {}
+  interface GuidingInterface {
+    'position': GeolocationPosition;
+  }
   interface GuidingSetup {
     'onGuidingLinesDefined': Function;
   }
@@ -114,7 +118,9 @@ declare namespace LocalJSX {
     'distanceToClosestGuidingLine'?: number;
     'isGuidingLineOnRightOrLeft'?: string;
   }
-  interface GuidingInterface {}
+  interface GuidingInterface {
+    'position'?: GeolocationPosition;
+  }
   interface GuidingSetup {
     'onGuidingLinesDefined'?: Function;
   }

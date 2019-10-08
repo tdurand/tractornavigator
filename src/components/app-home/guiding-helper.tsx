@@ -19,11 +19,11 @@ export class GuidingHelper {
           />
         </div>
         <div class="guiding-helper_label">
-          {this.distanceToClosestGuidingLine < 1 &&
+          {this.distanceToClosestGuidingLine <= 1 &&
             <div>OK</div>
           } 
           {this.distanceToClosestGuidingLine > 1 &&
-            <div>{Math.ceil(this.distanceToClosestGuidingLine)} m</div>
+            <div>{Math.round(this.distanceToClosestGuidingLine)} m</div>
           }
         </div>
         <div class="guiding-helper_icons">

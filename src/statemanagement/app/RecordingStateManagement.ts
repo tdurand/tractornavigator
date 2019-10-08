@@ -1,11 +1,15 @@
 import { saveRecording } from "./HistoryStateManagement";
 import { resetGuidingState } from "./GuidingStateManagement";
+import { lineToPolygon } from "../../helpers/utils";
+import { lineString } from '@turf/helpers';
+import computeArea from "@turf/area";
 
 export enum RecordingStatus { Idle, Recording, Paused}
 
 interface RecordingState {
     status: RecordingStatus
     recordedPositions: Array<Array<number>>
+    area: number
     equipmentWidth: number
     dateStart: string
 
@@ -15,6 +19,7 @@ const getInitialState = (): RecordingState => {
     return {
         status: RecordingStatus.Idle,
         recordedPositions: [],
+        area: 0.00,
         equipmentWidth: null,
         dateStart: null
     };
@@ -23,6 +28,7 @@ const getInitialState = (): RecordingState => {
 
 const SET_STATUS = 'Recording/SET_STATUS';
 const ADD_RECORDED_POSITION = 'Recording/ADD_RECORDED_POSITION';
+const SET_AREA = 'Recording/SET_AREA';
 const INIT_RECORDING_METADATA = 'Recording/INIT_RECORDING_METADATA';
 const RESET = 'Recording/RESET';
 
@@ -30,6 +36,13 @@ export function setStatus(status: RecordingStatus) {
     return {
         type: SET_STATUS,
         payload: status
+    }
+}
+
+export function setArea(area) {
+    return {
+        type: SET_AREA,
+        payload: area
     }
 }
 
@@ -61,6 +74,13 @@ export function recordingOnNewPosition(newPosition) {
         // If is recording, add to history
         if(getState().recording.status === RecordingStatus.Recording) {
             dispatch(addRecordedPosition(newPosition));
+
+            if(getState().recording.recordedPositions.length > 2) {
+                const traceAsPolygon = lineToPolygon(lineString(getState().recording.recordedPositions), getState().recording.equipmentWidth);
+                // Area in ha
+                const area = Math.round((computeArea(traceAsPolygon) / 10000) * 100) / 100;
+                dispatch(setArea(area));
+            }
         }
     }
 }
@@ -139,6 +159,12 @@ const recordingStateReducer = (
             return {
                 ...state,
                 status: action.payload
+            };
+        }
+        case SET_AREA: {
+            return {
+                ...state,
+                area: action.payload
             };
         }
         case RESET: {

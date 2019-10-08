@@ -15,7 +15,7 @@ public class MainActivity extends BridgeActivity {
     // Initializes the Bridge
     this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
       // Additional plugins you've installed go here
-      //add(GnssPlugin.class);
+      add(Gnss.class);
     }});
   }
 }

@@ -1,6 +1,6 @@
 import { GeolocationPosition, Plugins } from "@capacitor/core";
 import { geopositionToObject, computeHeading } from "../../helpers/utils";
-const { Geolocation } = Plugins;
+const { Geolocation, Gnss } = Plugins;
 import Geosimulation from '../../helpers/geolocationsimulator';
 import { recordingOnNewPosition } from './RecordingStateManagement';
 import { handleNewPosition } from "./MapStateManagement";
@@ -222,6 +222,11 @@ export function getAndWatchPosition() {
         }, (error) => {
           console.log(error);
         })
+
+        // TODO if android
+        console.log('TEST GNSS PLUGIN')
+        console.log(Gnss.getStatus());
+        console.log('TEST GNSS PLUGIN')
 
         setTimeout(() => {
           Geolocation.watchPosition({

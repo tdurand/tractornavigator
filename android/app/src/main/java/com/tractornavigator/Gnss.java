@@ -38,7 +38,9 @@ public class Gnss extends Plugin {
 
     if (isGnssStatusListenerSupported()) {
       Log.d(TAG, "Init GnssEventListener");
+      // This permits to know wether raw measurements are supported
       addGnssMeasurementsListener();
+
     }
   }
 
@@ -67,16 +69,6 @@ public class Gnss extends Plugin {
       call.resolve(ret);
       //sendLocation(call);
     }
-  }
-
-  // TODO HERE IMPLEMENT
-  @PluginMethod()
-  public void customCall(PluginCall call) {
-    String message = call.getString("value");
-    JSObject ret = new JSObject();
-    //GnssMeasurement status = new GnssMeasurement();
-    ret.put("value", message);
-    call.success(ret);
   }
 
   public static boolean isGnssStatusListenerSupported() {
@@ -137,6 +129,7 @@ public class Gnss extends Plugin {
       }
     }
 
+    // When permission are given, call the methods that what calling
     if (savedCall.getMethodName().equals("getCurrentPosition")) {
       //sendLocation(savedCall);
     } else if (savedCall.getMethodName().equals("watchPosition")) {

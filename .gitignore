@@ -28,3 +28,6 @@ UserInterfaceState.xcuserstate
 src/config.json
 src/assets/font
 src/assets/countries
+
+android/*/.*
+android/.*

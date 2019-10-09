@@ -1,9 +1,10 @@
 import { GeolocationPosition, Plugins } from "@capacitor/core";
 import { geopositionToObject, computeHeading } from "../../helpers/utils";
-const { Geolocation, Gnss } = Plugins;
+const { Geolocation } = Plugins;
 import Geosimulation from '../../helpers/geolocationsimulator';
 import { recordingOnNewPosition } from './RecordingStateManagement';
 import { handleNewPosition } from "./MapStateManagement";
+import { initGnssMeasurements } from "./GnssMeasurementsStateManagement";
 
 interface GeolocationState {
     position: GeolocationPosition;
@@ -212,21 +213,20 @@ export function onNewPosition(position) {
 }
 
 export function getAndWatchPosition() {
-    return (dispatch) => {
+    return (dispatch, getState) => {
         Geolocation.getCurrentPosition({
             timeout: 15000
         }).then((position) => {
             // TODO handle error ?
             // Need to transform geoposition DOM element to normal object otherwise redux can't parse it reducer:
             dispatch(onNewPosition(geopositionToObject(position)));
+
+            if(getState().device.deviceInfo.platform) {
+              dispatch(initGnssMeasurements(getState().device.deviceInfo.platform))
+            }
         }, (error) => {
           console.log(error);
         })
-
-        // TODO if android
-        console.log('TEST GNSS PLUGIN')
-        console.log(Gnss.getStatus());
-        console.log('TEST GNSS PLUGIN')
 
         setTimeout(() => {
           Geolocation.watchPosition({

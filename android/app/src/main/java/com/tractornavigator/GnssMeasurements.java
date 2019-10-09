@@ -41,6 +41,7 @@ public class GnssMeasurements extends Plugin {
   private boolean gnssMeasurementsSupported;
   private static final String TAG = "GnssMeasurements";
   private PluginCall watchSatelliteCall = null;
+  final float TOLERANCE_MHZ = 1f;
 
   Map<String, PluginCall> watchingCalls = new HashMap<>();
 
@@ -51,6 +52,10 @@ public class GnssMeasurements extends Plugin {
 
   public static boolean areGnssMeasurementsSupported() {
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
+  }
+
+  public static boolean isGnssCarrierFrequenciesSupported() {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
   }
 
   @PluginMethod(returnType=PluginMethod.RETURN_CALLBACK)
@@ -65,11 +70,11 @@ public class GnssMeasurements extends Plugin {
       if (areGnssMeasurementsSupported()) {
         Log.d(TAG, "GnssMeasurements permission OK + SDK version supported");
         if(gnssStatusCode == -1) {
+          // Save call until addGnssMeasurementsListener is calling onStatusChanged
+          saveCall(call);
           Log.d(TAG, "GnssMeasurements not init , init GnssEventListener");
           addGnssMeasurementsListener();
           addGnssStatusListener();
-          // Save call until addGnssMeasurementsListener is calling onStatusChanged
-          saveCall(call);
         } else {
           Log.d(TAG, "GnssMeasurements initialized return status");
           JSObject ret = new JSObject();
@@ -109,7 +114,7 @@ public class GnssMeasurements extends Plugin {
   @RequiresApi(api = Build.VERSION_CODES.N)
   public void compileSatelliteData(GnssStatus status, PluginCall call) {
     Log.d(TAG,"compileSatelliteData() called");
-    // TODO HERE compile all data necessary for knowing
+    // Compile all data necessary for knowing
     // - total satellite count
     // - isGalileoInRange:: getConstellationType
     // - is DualFrequencyInRange , if supports Carrier frequency + infer label from frequency https://github.com/barbeau/gpstest/blob/d4e670d9aba4a19ee2571d077191317a0d0b5550/GPSTest/src/main/java/com/android/gpstest/util/CarrierFreqUtils.java
@@ -117,24 +122,48 @@ public class GnssMeasurements extends Plugin {
     // - Nb of satellite in fix
 
     int nbSatellitesInRange = status.getSatelliteCount();
+    boolean dualFreqSupported = false;
     int nbGalileoSatelliteInRange = 0;
-    boolean isDualFrequencySatelliteInRange = false;
+    int nbGalileoE5SatelliteInRange = 0;
     int nbSatelliteInFix = 0;
     int nbGalileoSatelliteInFix = 0;
+    int nbGalileoE5SatelliteInFix = 0;
 
     int currentSatelliteIndex = 0;
     // Iterate over all satellite in range
     while (currentSatelliteIndex < nbSatellitesInRange) {
 
-      if(status.usedInFix(currentSatelliteIndex)) {
+      boolean usedInFix = status.usedInFix(currentSatelliteIndex);
+
+      if(usedInFix) {
         nbSatelliteInFix++;
-        if(status.getConstellationType(currentSatelliteIndex) == GnssStatus.CONSTELLATION_GALILEO) {
-          nbGalileoSatelliteInFix++;
-        }
       }
 
       if(status.getConstellationType(currentSatelliteIndex) == GnssStatus.CONSTELLATION_GALILEO) {
         nbGalileoSatelliteInRange++;
+        if(usedInFix) {
+          nbGalileoSatelliteInFix++;
+        }
+      }
+
+      // Check if dual frequency
+      if (isGnssCarrierFrequenciesSupported()) {
+        if (status.hasCarrierFrequencyHz(currentSatelliteIndex)) {
+          float carrierMhz = MathUtils.toMhz(status.getCarrierFrequencyHz(currentSatelliteIndex));
+
+          if (MathUtils.fuzzyEquals(carrierMhz, 1176.45f, TOLERANCE_MHZ)) {
+            dualFreqSupported = true;
+
+            if(status.getConstellationType(currentSatelliteIndex) == GnssStatus.CONSTELLATION_GALILEO) {
+              // E5a
+              nbGalileoE5SatelliteInRange++;
+              if(usedInFix) {
+                nbGalileoE5SatelliteInFix++;
+              }
+            }
+
+          }
+        }
       }
 
       currentSatelliteIndex++;
@@ -142,24 +171,15 @@ public class GnssMeasurements extends Plugin {
 
     JSObject result = new JSObject();
 
-          /*
-          {
-            nbSatellitesInRange,
-            nbGalileoSatelliteInRange,
-            isGalileoInRange,
-            isDualFrequencySatelliteInRange,
-            nbSatelliteInFix
-            nbGalileoSatelliteInFix,
-          }
-          */
-
     result.put("nbSatellitesInRange", nbSatellitesInRange);
+    result.put("dualFreqSupported", dualFreqSupported);
     result.put("nbGalileoSatelliteInRange", nbGalileoSatelliteInRange);
-    result.put("isDualFrequencySatelliteInRange", isDualFrequencySatelliteInRange);
+    result.put("nbGalileoE5SatelliteInRange", nbGalileoE5SatelliteInRange);
     result.put("nbSatelliteInFix", nbSatelliteInFix);
     result.put("nbGalileoSatelliteInFix", nbGalileoSatelliteInFix);
+    result.put("nbGalileoE5SatelliteInFix", nbGalileoE5SatelliteInFix);
 
-    Log.d(TAG, "nbSatellitesInRange " + nbSatellitesInRange + "nbGalileoSatelliteInRange" + nbGalileoSatelliteInRange + "nbSatelliteInFix " + nbSatelliteInFix + "nbGalileoSatelliteInFix " +  nbGalileoSatelliteInFix);
+    Log.d(TAG, "nbSatellitesInRange " + nbSatellitesInRange + " nbGalileoSatelliteInRange " + nbGalileoSatelliteInRange + " nbSatelliteInFix " + nbSatelliteInFix + " nbGalileoSatelliteInFix " +  nbGalileoSatelliteInFix + " nbGalileoE5SatelliteInRange " + nbGalileoE5SatelliteInRange + " nbGalileoE5SatelliteInFix " + nbGalileoE5SatelliteInFix);
 
     call.success(result);
   }

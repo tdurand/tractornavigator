@@ -1,0 +1,7 @@
+{
+  "appId": "com.tractornavigator",
+  "appName": "TractorNavigator",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www"
+}

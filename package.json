@@ -15,6 +15,7 @@
     "@capacitor/android": "^1.2.1",
     "@capacitor/cli": "^1.2.1",
     "@capacitor/core": "^1.2.1",
+    "@capacitor/ios": "^1.2.1",
     "@ionic/core": "4.9.1",
     "@mapbox/mapbox-gl-draw": "^1.1.2",
     "@stencil/redux": "^0.1.1",

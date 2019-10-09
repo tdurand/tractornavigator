@@ -4,6 +4,7 @@ import recording from "./app/RecordingStateManagement";
 import history from "./app/HistoryStateManagement";
 import map from "./app/MapStateManagement";
 import device from "./app/DeviceStateManagement";
+import gnssmeasurements from "./app/GnssMeasurementsStateManagement";
 
 import { combineReducers } from "redux";
 
@@ -13,7 +14,8 @@ export const rootReducer = combineReducers({
   recording,
   history,
   map,
-  device
+  device,
+  gnssmeasurements
 });
 
 export default rootReducer;

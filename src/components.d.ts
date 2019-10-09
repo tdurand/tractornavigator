@@ -12,7 +12,7 @@ import {
 
 export namespace Components {
   interface AppAbout {}
-  interface AppGpssettings {}
+  interface AppGpsstatus {}
   interface AppHistory {}
   interface AppHome {}
   interface AppOffline {}
@@ -39,10 +39,10 @@ declare global {
     new (): HTMLAppAboutElement;
   };
 
-  interface HTMLAppGpssettingsElement extends Components.AppGpssettings, HTMLStencilElement {}
-  var HTMLAppGpssettingsElement: {
-    prototype: HTMLAppGpssettingsElement;
-    new (): HTMLAppGpssettingsElement;
+  interface HTMLAppGpsstatusElement extends Components.AppGpsstatus, HTMLStencilElement {}
+  var HTMLAppGpsstatusElement: {
+    prototype: HTMLAppGpsstatusElement;
+    new (): HTMLAppGpsstatusElement;
   };
 
   interface HTMLAppHistoryElement extends Components.AppHistory, HTMLStencilElement {}
@@ -94,7 +94,7 @@ declare global {
   };
   interface HTMLElementTagNameMap {
     'app-about': HTMLAppAboutElement;
-    'app-gpssettings': HTMLAppGpssettingsElement;
+    'app-gpsstatus': HTMLAppGpsstatusElement;
     'app-history': HTMLAppHistoryElement;
     'app-home': HTMLAppHomeElement;
     'app-offline': HTMLAppOfflineElement;
@@ -108,7 +108,7 @@ declare global {
 
 declare namespace LocalJSX {
   interface AppAbout {}
-  interface AppGpssettings {}
+  interface AppGpsstatus {}
   interface AppHistory {}
   interface AppHome {}
   interface AppOffline {}
@@ -127,7 +127,7 @@ declare namespace LocalJSX {
 
   interface IntrinsicElements {
     'app-about': AppAbout;
-    'app-gpssettings': AppGpssettings;
+    'app-gpsstatus': AppGpsstatus;
     'app-history': AppHistory;
     'app-home': AppHome;
     'app-offline': AppOffline;
@@ -146,7 +146,7 @@ declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
       'app-about': LocalJSX.AppAbout & JSXBase.HTMLAttributes<HTMLAppAboutElement>;
-      'app-gpssettings': LocalJSX.AppGpssettings & JSXBase.HTMLAttributes<HTMLAppGpssettingsElement>;
+      'app-gpsstatus': LocalJSX.AppGpsstatus & JSXBase.HTMLAttributes<HTMLAppGpsstatusElement>;
       'app-history': LocalJSX.AppHistory & JSXBase.HTMLAttributes<HTMLAppHistoryElement>;
       'app-home': LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
       'app-offline': LocalJSX.AppOffline & JSXBase.HTMLAttributes<HTMLAppOfflineElement>;

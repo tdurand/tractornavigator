@@ -69,6 +69,7 @@ public class GnssMeasurements extends Plugin {
     } else {
       if (areGnssMeasurementsSupported()) {
         Log.d(TAG, "GnssMeasurements permission OK + SDK version supported");
+        gnssMeasurementsSupported = true;
         if(gnssStatusCode == -1) {
           // Save call until addGnssMeasurementsListener is calling onStatusChanged
           saveCall(call);
@@ -78,6 +79,7 @@ public class GnssMeasurements extends Plugin {
         } else {
           Log.d(TAG, "GnssMeasurements initialized return status");
           JSObject ret = new JSObject();
+          ret.put("gnssMeasurementsSupported", gnssMeasurementsSupported);
           ret.put("gnssStatusCode", gnssStatusCode);
           call.resolve(ret);
         }
@@ -85,7 +87,7 @@ public class GnssMeasurements extends Plugin {
         Log.d(TAG, "GnssMeasurements permission OK but SDK version not supported");
         gnssMeasurementsSupported = false;
         JSObject ret = new JSObject();
-        ret.put("gnssMeasurements", gnssMeasurementsSupported);
+        ret.put("gnssMeasurementsSupported", gnssMeasurementsSupported);
         ret.put("gnssStatusCode", -1);
         call.resolve(ret);
       }

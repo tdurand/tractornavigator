@@ -87,6 +87,7 @@ public class GnssMeasurements extends Plugin {
     }
   }
 
+  @RequiresApi(api = Build.VERSION_CODES.N)
   @PluginMethod(returnType=PluginMethod.RETURN_CALLBACK)
   public void watchSatellite(PluginCall call) {
     call.save();
@@ -95,10 +96,72 @@ public class GnssMeasurements extends Plugin {
     if (gnssStatusCode > -1) {
       Log.d(TAG, "watchSatellite() record call");
       watchSatelliteCall = call;
+      if(mGnssStatus != null) {
+        Log.d(TAG,"call compileSatelliteData()");
+        compileSatelliteData(mGnssStatus, call);
+      }
     } else {
       Log.d(TAG, "watchSatellite() failed You must call init() first");
       call.reject("You must call init() first");
     }
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.N)
+  public void compileSatelliteData(GnssStatus status, PluginCall call) {
+    Log.d(TAG,"compileSatelliteData() called");
+    // TODO HERE compile all data necessary for knowing
+    // - total satellite count
+    // - isGalileoInRange:: getConstellationType
+    // - is DualFrequencyInRange , if supports Carrier frequency + infer label from frequency https://github.com/barbeau/gpstest/blob/d4e670d9aba4a19ee2571d077191317a0d0b5550/GPSTest/src/main/java/com/android/gpstest/util/CarrierFreqUtils.java
+    // - Nb Galileo satellite in fix getConstellationType
+    // - Nb of satellite in fix
+
+    int nbSatellitesInRange = status.getSatelliteCount();
+    int nbGalileoSatelliteInRange = 0;
+    boolean isDualFrequencySatelliteInRange = false;
+    int nbSatelliteInFix = 0;
+    int nbGalileoSatelliteInFix = 0;
+
+    int currentSatelliteIndex = 0;
+    // Iterate over all satellite in range
+    while (currentSatelliteIndex < nbSatellitesInRange) {
+
+      if(status.usedInFix(currentSatelliteIndex)) {
+        nbSatelliteInFix++;
+        if(status.getConstellationType(currentSatelliteIndex) == GnssStatus.CONSTELLATION_GALILEO) {
+          nbGalileoSatelliteInFix++;
+        }
+      }
+
+      if(status.getConstellationType(currentSatelliteIndex) == GnssStatus.CONSTELLATION_GALILEO) {
+        nbGalileoSatelliteInRange++;
+      }
+
+      currentSatelliteIndex++;
+    }
+
+    JSObject result = new JSObject();
+
+          /*
+          {
+            nbSatellitesInRange,
+            nbGalileoSatelliteInRange,
+            isGalileoInRange,
+            isDualFrequencySatelliteInRange,
+            nbSatelliteInFix
+            nbGalileoSatelliteInFix,
+          }
+          */
+
+    result.put("nbSatellitesInRange", nbSatellitesInRange);
+    result.put("nbGalileoSatelliteInRange", nbGalileoSatelliteInRange);
+    result.put("isDualFrequencySatelliteInRange", isDualFrequencySatelliteInRange);
+    result.put("nbSatelliteInFix", nbSatelliteInFix);
+    result.put("nbGalileoSatelliteInFix", nbGalileoSatelliteInFix);
+
+    Log.d(TAG, "nbSatellitesInRange " + nbSatellitesInRange + "nbGalileoSatelliteInRange" + nbGalileoSatelliteInRange + "nbSatelliteInFix " + nbSatelliteInFix + "nbGalileoSatelliteInFix " +  nbGalileoSatelliteInFix);
+
+    call.success(result);
   }
 
   @SuppressLint("MissingPermission")
@@ -120,15 +183,18 @@ public class GnssMeasurements extends Plugin {
            STATUS_READY
            STATUS_NOT_ALLOWED
         */
-        Log.d(TAG,"GnssMeasurementsEvent.Callback.onStatusChanged() - " + status);
+        Log.d(TAG,"GnssMeasurementsEvent.Callback.onStatusChanged()" + status);
         gnssStatusCode = status;
         // Get the previously saved call
         PluginCall savedCall = getSavedCall();
+
         if (savedCall == null) {
+          Log.d(TAG,"GnssMeasurementsEvent.Callback.onStatusChanged() savedCall null");
           return;
         }
 
         if (savedCall.getMethodName().equals("init")) {
+          Log.d(TAG,"GnssMeasurementsEvent.Callback.onStatusChanged() call savedCall init");
           init(savedCall);
         }
       }
@@ -161,16 +227,8 @@ public class GnssMeasurements extends Plugin {
         mGnssStatus = status;
 
         if(watchSatelliteCall != null) {
-          // TODO HERE compile all data necessary for knowing
-          // - total satellite count
-          // - isGalileoInRange
-          // - is DualFrequencyInRange
-          // - Nb Galileo satellite in fix
-          // - Nb of satellite in fix
-          JSObject ret = new JSObject();
-          Log.d(TAG,"GnssStatus.Callback.getSatelliteCount()" + status.getSatelliteCount());
-          ret.put("satelliteCount", status.getSatelliteCount());
-          watchSatelliteCall.success(ret);
+          Log.d(TAG,"call compileSatelliteData()");
+          compileSatelliteData(status, watchSatelliteCall);
         }
       }
     };

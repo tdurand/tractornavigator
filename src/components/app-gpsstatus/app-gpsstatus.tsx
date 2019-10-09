@@ -10,16 +10,18 @@ export class AppGPSStatus {
   @State() rawMeasurements: any
   @State() satelliteData: any
   @State() isGalileoSupported: any
+  @State() dualFreqSupported: any
 
   @Prop({ context: "store" }) store: Store;
 
   componentWillLoad() {
     this.store.mapStateToProps(this, state => {
       const {
-        gnssmeasurements: { isGalileoSupported, satelliteData, rawMeasurements }
+        gnssmeasurements: { isGalileoSupported, satelliteData, rawMeasurements, dualFreqSupported }
       } = state;
       return {
         isGalileoSupported,
+        dualFreqSupported,
         satelliteData,
         rawMeasurements
       };
@@ -37,6 +39,7 @@ export class AppGPSStatus {
         </ion-toolbar>
       </ion-header>,
       <ion-content class="ion-padding">
+        <img src="/assets/usegalileo.png" alt="Use galileo" />
         {this.rawMeasurements === null &&
           <p>Loading ...</p>
         }
@@ -46,20 +49,22 @@ export class AppGPSStatus {
         {this.rawMeasurements === false && this.isGalileoSupported === true &&
           <p>Good positioning performance, consider upgrading to dual frequency offered by Galileo</p>
         }
-        {this.rawMeasurements === true && this.satelliteData &&
+        {this.rawMeasurements === true &&
           <div>
-            {this.satelliteData.dualFreqSupported &&
+            {this.dualFreqSupported === true &&
               <p>You have the best positioning performance thanks to Galileo</p>
             }
-            {this.satelliteData.dualFreqSupported === false &&
+            {this.dualFreqSupported === false &&
               <p>Good positioning performance, consider upgrading to dual frequency offered by Galileo</p>
             }
-            <ul>
-              <li>Number of Satellites in range: {this.satelliteData.nbSatellitesInRange}</li>
-              <li>Number of <strong>Galileo</strong> satellites in range: {this.satelliteData.nbGalileoSatelliteInRange}</li>
-              <li>Number of Satellites in fix: {this.satelliteData.nbSatelliteInFix}</li>
-              <li>Number of <strong>Galileo</strong> satellites in fix: {this.satelliteData.nbGalileoSatelliteInFix}</li>
-            </ul>
+            {this.satelliteData &&
+              <ul>
+                <li>Number of Satellites in range: {this.satelliteData.nbSatellitesInRange}</li>
+                <li>Number of <strong>Galileo</strong> satellites in range: {this.satelliteData.nbGalileoSatelliteInRange}</li>
+                <li>Number of Satellites in fix: {this.satelliteData.nbSatelliteInFix}</li>
+                <li>Number of <strong>Galileo</strong> satellites in fix: {this.satelliteData.nbGalileoSatelliteInFix}</li>
+              </ul>
+            }
           </div>
         }
         

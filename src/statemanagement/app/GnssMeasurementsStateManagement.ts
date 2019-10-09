@@ -4,7 +4,8 @@ const { GnssMeasurements } = Plugins;
 interface GnssMeasurementsState {
     rawMeasurements: any,
     satelliteData: any,
-    isGalileoSupported: any
+    isGalileoSupported: any,
+    dualFreqSupported: any
 }
 
 /*
@@ -23,7 +24,8 @@ const getInitialState = (): GnssMeasurementsState => {
     return {
         rawMeasurements: null,
         satelliteData: null,
-        isGalileoSupported: null
+        isGalileoSupported: null,
+        dualFreqSupported: null
     };
 };
 
@@ -31,6 +33,7 @@ const getInitialState = (): GnssMeasurementsState => {
 const SET_GNSSMEASUREMENTS_SUPPORTED = 'GnssMeasurements/SET_GNSSMEASUREMENTS_SUPPORTED';
 const UPDATE_SATELLITE_DATA = 'GnssMeasurements/UPDATE_SATELLITE_DATA';
 const SET_GALILEO_SUPPORT = 'GnssMeasurements/SET_GALILEO_SUPPORT';
+const SET_DUALFREQ_SUPPORT = 'GnssMeasurements/SET_DUALFREQ_SUPPORT';
 
 export function initGnssMeasurements(platform) {
     return (dispatch) => {
@@ -48,6 +51,10 @@ export function initGnssMeasurements(platform) {
                             dispatch(setGalileoSupport(true));
                         }
 
+                        if(satelliteData.dualFreqSupported) {
+                            dispatch(setDualFreqSupport(satelliteData.dualFreqSupported));
+                        } 
+
                         // new satellite update
                         dispatch({
                             type: UPDATE_SATELLITE_DATA,
@@ -61,8 +68,8 @@ export function initGnssMeasurements(platform) {
         } else if(platform === "web") {
             // simulate raw measurements to work on API
             dispatch(setGnssMeasurementsSupported(true))
-            dispatch(setGalileoSupport(true))
-
+            dispatch(setGalileoSupport(false))
+            dispatch(setDualFreqSupport(false))
         } else {
             dispatch(setGnssMeasurementsSupported(false))
             dispatch(setGalileoSupport(false))
@@ -77,6 +84,14 @@ export function setGalileoSupport(isSupported) {
         payload: isSupported
     }
 }
+
+export function setDualFreqSupport(isSupported) {
+    return {
+        type: SET_DUALFREQ_SUPPORT,
+        payload: isSupported
+    }
+}
+
 
 export function setGnssMeasurementsSupported(areSupported) {
     return {
@@ -106,6 +121,12 @@ const GnssMeasurementsStateStateReducer = (
             return {
                 ...state,
                 isGalileoSupported: action.payload
+            }
+        }
+        case SET_DUALFREQ_SUPPORT: {
+            return {
+                ...state,
+                dualFreqSupported: action.payload
             }
         }
     }

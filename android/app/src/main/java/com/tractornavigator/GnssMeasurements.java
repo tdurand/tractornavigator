@@ -35,10 +35,9 @@ import java.util.Map;
 public class GnssMeasurements extends Plugin {
   private LocationManager locationManager;
   private GnssStatus mGnssStatus = null;
-  private GnssMeasurementsEvent.Callback mGnssMeasurementsListener;
   private GnssStatus.Callback mGnssStatusListener;
-  private int gnssStatusCode = -1;
   private boolean gnssMeasurementsSupported;
+  private boolean gnssStatusListenerInitialized = false;
   private static final String TAG = "GnssMeasurements";
   private PluginCall watchSatelliteCall = null;
   final float TOLERANCE_MHZ = 1f;
@@ -60,35 +59,33 @@ public class GnssMeasurements extends Plugin {
 
   @PluginMethod(returnType=PluginMethod.RETURN_CALLBACK)
   public void init(PluginCall call) {
-    Log.d(TAG, "GnssMeasurements init()");
+    Log.d(TAG, "GnssStatusListener init()");
     call.save();
     if (!hasRequiredPermissions()) {
-      Log.d(TAG, "GnssMeasurements permission not required, require them");
+      Log.d(TAG, "GnssStatusListener permission not required, require them");
       saveCall(call);
       pluginRequestAllPermissions();
     } else {
       if (areGnssMeasurementsSupported()) {
-        Log.d(TAG, "GnssMeasurements permission OK + SDK version supported");
-        gnssMeasurementsSupported = true;
-        if(gnssStatusCode == -1) {
-          // Save call until addGnssMeasurementsListener is calling onStatusChanged
+        Log.d(TAG, "GnssStatusListener permission OK + SDK version supported");
+        if(!gnssStatusListenerInitialized) {
+          // Save call until GnssStatus is calling onSatelliteStatusChanged
           saveCall(call);
-          Log.d(TAG, "GnssMeasurements not init , init GnssEventListener");
-          addGnssMeasurementsListener();
+          Log.d(TAG, "GnssStatusListener not init , init GnssStatusListener");
           addGnssStatusListener();
+          gnssStatusListenerInitialized = true;
         } else {
-          Log.d(TAG, "GnssMeasurements initialized return status");
+          Log.d(TAG, "GnssStatusListener initialized returned satellite data");
           JSObject ret = new JSObject();
+          gnssMeasurementsSupported = true;
           ret.put("gnssMeasurementsSupported", gnssMeasurementsSupported);
-          ret.put("gnssStatusCode", gnssStatusCode);
           call.resolve(ret);
         }
       } else {
-        Log.d(TAG, "GnssMeasurements permission OK but SDK version not supported");
+        Log.d(TAG, "GnssStatusListener permission OK but SDK version not supported");
         gnssMeasurementsSupported = false;
         JSObject ret = new JSObject();
         ret.put("gnssMeasurementsSupported", gnssMeasurementsSupported);
-        ret.put("gnssStatusCode", -1);
         call.resolve(ret);
       }
     }
@@ -100,13 +97,11 @@ public class GnssMeasurements extends Plugin {
     call.save();
     // If GnssMeasurements initialized
     Log.d(TAG, "watchSatellite() called");
-    if (gnssStatusCode > -1) {
+    if (mGnssStatus != null) {
       Log.d(TAG, "watchSatellite() record call");
       watchSatelliteCall = call;
-      if(mGnssStatus != null) {
-        Log.d(TAG,"call compileSatelliteData()");
-        compileSatelliteData(mGnssStatus, call);
-      }
+      Log.d(TAG,"call compileSatelliteData()");
+      compileSatelliteData(mGnssStatus, call);
     } else {
       Log.d(TAG, "watchSatellite() failed You must call init() first");
       call.reject("You must call init() first");
@@ -187,44 +182,6 @@ public class GnssMeasurements extends Plugin {
   }
 
   @SuppressLint("MissingPermission")
-  @RequiresApi(api = Build.VERSION_CODES.N)
-  private void addGnssMeasurementsListener() {
-    mGnssMeasurementsListener = new GnssMeasurementsEvent.Callback() {
-      @Override
-      public void onGnssMeasurementsReceived(GnssMeasurementsEvent event) {
-        // Log.d(TAG,"GnssMeasurementsEvent.onGnssMeasurementsReceived() - ");
-        // this won't be used as we have all data from GnssStatus we need
-        // If we want more data here we can get the full GnssMeasurement data for
-        // each satellite in view with: event.getMeasurements()
-      }
-
-      @Override
-      public void onStatusChanged(int status) {
-        /* STATUS_LOCATION_DISABLED
-           STATUS_NOT_SUPPORTED:
-           STATUS_READY
-           STATUS_NOT_ALLOWED
-        */
-        Log.d(TAG,"GnssMeasurementsEvent.Callback.onStatusChanged()" + status);
-        gnssStatusCode = status;
-        // Get the previously saved call
-        PluginCall savedCall = getSavedCall();
-
-        if (savedCall == null) {
-          Log.d(TAG,"GnssMeasurementsEvent.Callback.onStatusChanged() savedCall null");
-          return;
-        }
-
-        if (savedCall.getMethodName().equals("init")) {
-          Log.d(TAG,"GnssMeasurementsEvent.Callback.onStatusChanged() call savedCall init");
-          init(savedCall);
-        }
-      }
-    };
-    locationManager.registerGnssMeasurementsCallback(mGnssMeasurementsListener);
-  }
-
-  @SuppressLint("MissingPermission")
   @RequiresApi(Build.VERSION_CODES.N)
   private void addGnssStatusListener() {
     mGnssStatusListener = new GnssStatus.Callback() {
@@ -245,8 +202,21 @@ public class GnssMeasurements extends Plugin {
 
       @Override
       public void onSatelliteStatusChanged(GnssStatus status) {
-        Log.d(TAG,"GnssStatus.Callback.onSatelliteStatusChanged()");
+        Log.d(TAG,"GnssStatus.Callback.onSatelliteStatusChanged() - " + status.getSatelliteCount());
         mGnssStatus = status;
+
+        // Get the previously saved call
+        PluginCall savedCall = getSavedCall();
+
+        if (savedCall == null) {
+          Log.d(TAG,"GnssMeasurementsEvent.Callback.onStatusChanged() savedCall null");
+          return;
+        }
+
+        if (savedCall.getMethodName().equals("init")) {
+          Log.d(TAG,"GnssMeasurementsEvent.Callback.onStatusChanged() call savedCall init");
+          init(savedCall);
+        }
 
         if(watchSatelliteCall != null) {
           Log.d(TAG,"call compileSatelliteData()");

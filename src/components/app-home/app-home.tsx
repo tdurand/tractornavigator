@@ -14,6 +14,7 @@ import {
 } from '../../statemanagement/app/GuidingStateManagement';
 import { handleNewPosition } from '../../statemanagement/app/MapStateManagement';
 import { getDeviceInfo } from '../../statemanagement/app/DeviceStateManagement';
+import { restoreHistory } from '../../statemanagement/app/HistoryStateManagement';
 import { point, lineString } from '@turf/helpers';
 import generateCircle from '@turf/circle';
 import generateSector from '@turf/sector';
@@ -86,6 +87,7 @@ export class AppHome {
   createOrUpdateGuidingLines: Action;
   handleNewPosition: Action;
   getDeviceInfo: Action;
+  restoreHistory: Action;
 
   map: any;
   mapIsReady: boolean = false;
@@ -130,8 +132,11 @@ export class AppHome {
       onBboxChanged,
       createOrUpdateGuidingLines,
       handleNewPosition,
-      getDeviceInfo
+      getDeviceInfo,
+      restoreHistory
     });
+
+
   }
 
   componentDidLoad() {
@@ -142,6 +147,8 @@ export class AppHome {
     this.isGettingPositionLoader.present()
 
     this.getAndWatchPosition();
+
+    this.restoreHistory();
 
     // if online
     let mapStyle = 'mapbox://styles/mapbox/satellite-v9';

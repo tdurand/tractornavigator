@@ -97,7 +97,11 @@ export class AppHistoryDetails {
       const traceAsPolygon = lineToPolygon(linePositionHistory, equipmentWidth);
       const bboxOfTrace = bbox(traceAsPolygon);
       // Fit map to bbox
-      this.map.fitBounds(bboxOfTrace);
+      this.map.fitBounds(bboxOfTrace, {
+        padding: {top: 50, bottom:50, left: 50, right: 50},
+        duration: 1,
+        maxZoom: 18
+      });
       if (source) {
         source.setData(traceAsPolygon)
       } else {
@@ -139,6 +143,9 @@ export class AppHistoryDetails {
     return [
       <ion-header>
         <ion-toolbar color="primary">
+          <ion-buttons slot="start">
+            <ion-back-button defaultHref="/" />
+          </ion-buttons>
           <ion-title>Map</ion-title>
         </ion-toolbar>
       </ion-header>,
@@ -149,12 +156,12 @@ export class AppHistoryDetails {
           <div class="ctas-help">
           </div>
           <div class="ctas-buttons">
-            <ion-button
+            {/* <ion-button
               color="primary"
               onClick={() => console.log('todo')}
             >
               Continue guiding
-            </ion-button>
+            </ion-button> */}
           </div>
         </div>
       </ion-content>

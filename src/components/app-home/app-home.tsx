@@ -15,6 +15,7 @@ import {
 import { handleNewPosition } from '../../statemanagement/app/MapStateManagement';
 import { getDeviceInfo } from '../../statemanagement/app/DeviceStateManagement';
 import { restoreHistory } from '../../statemanagement/app/HistoryStateManagement';
+import { restoreAppState } from '../../statemanagement/app/AppStateManagement';
 import { point, lineString } from '@turf/helpers';
 import generateCircle from '@turf/circle';
 import generateSector from '@turf/sector';
@@ -46,9 +47,16 @@ export class AppHome {
     this.position = position;
 
     if (!this.position) {
-      this.isGettingPositionLoader.present();
+      this.loadingModal.present();
+      this.loadingModal.setMessage("Getting your position...");
     } else {
-      this.isGettingPositionLoader.dismiss();
+      if (this.mapIsReady) {
+        this.loadingModal.dismiss();
+        // Galileo alert
+      } else {
+        this.loadingModal.setMessage("Loading map...")
+      }
+      
     }
 
     this.updateMapDisplay();
@@ -79,6 +87,9 @@ export class AppHome {
   @State() status: RecordingStatus;
   recordedPositions: Array<Array<number>>;
 
+  isFirstStart: boolean;
+  nbOpeningBeforeDisplayingGalileoNotificationAgain: number;
+
   getAndWatchPosition: Action;
   setDistanceToClosestGuidingLine: Action;
   setBearingToClosestGuidingLine: Action;
@@ -88,6 +99,7 @@ export class AppHome {
   handleNewPosition: Action;
   getDeviceInfo: Action;
   restoreHistory: Action;
+  restoreAppState: Action;
 
   map: any;
   mapIsReady: boolean = false;
@@ -99,17 +111,19 @@ export class AppHome {
     this.changeMapView(mapView);
   }
 
-  isGettingPositionLoader: LoadingIndicator = new LoadingIndicator("Getting your position...");
+  loadingModal: LoadingIndicator = new LoadingIndicator("Getting your position...");
 
   @Prop({ context: "store" }) store: Store;
 
   componentWillLoad() {
+
     this.store.mapStateToProps(this, state => {
       const {
         recording: { status, recordedPositions },
         geolocation: { position },
         guiding: { referenceLine, equipmentWidth, isDefiningGuidingLines, guidingLines, bboxContainer },
-        map: { mapView }
+        map: { mapView },
+        app: { isFirstStart, nbOpeningBeforeDisplayingGalileoNotificationAgain }
       } = state;
       return {
         position,
@@ -120,7 +134,9 @@ export class AppHome {
         bboxContainer,
         status,
         recordedPositions,
-        mapView
+        mapView,
+        isFirstStart,
+        nbOpeningBeforeDisplayingGalileoNotificationAgain
       };
     });
 
@@ -133,7 +149,8 @@ export class AppHome {
       createOrUpdateGuidingLines,
       handleNewPosition,
       getDeviceInfo,
-      restoreHistory
+      restoreHistory,
+      restoreAppState
     });
 
 
@@ -144,11 +161,12 @@ export class AppHome {
 
     this.getDeviceInfo();
 
-    this.isGettingPositionLoader.present()
+    this.loadingModal.present()
 
     this.getAndWatchPosition();
 
     this.restoreHistory();
+    this.restoreAppState();
 
     // if online
     let mapStyle = 'mapbox://styles/mapbox/satellite-v9';

@@ -1,6 +1,6 @@
-export const loadHistoryState = () => {
+export const loadState = (key) => {
   try {
-    const serializedState = localStorage.getItem('history');
+    const serializedState = localStorage.getItem(key);
     if (serializedState === null) {
       return undefined;
     }
@@ -11,10 +11,10 @@ export const loadHistoryState = () => {
 }; 
 
 // localStorage.js
-export const persistHistoryState = (state) => {
+export const persistState = (state, key) => {
     try {
       const serializedState = JSON.stringify(state);
-      localStorage.setItem('history', serializedState);
+      localStorage.setItem(key, serializedState);
     } catch {
       // ignore write errors
     }

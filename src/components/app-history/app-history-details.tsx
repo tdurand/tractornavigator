@@ -1,5 +1,5 @@
 import { Component, h, State, Prop, Watch } from '@stencil/core';
-import { Store, Action } from "@stencil/redux";
+import { Store } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
 import { lineString } from '@turf/helpers';
 import bbox from '@turf/bbox';

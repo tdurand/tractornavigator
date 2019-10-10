@@ -6,10 +6,16 @@ export default class LoadingIndicator {
   isDismissed: boolean
   message: string
 
+  modal: any
+
   constructor(message) {
     this.isLoading = false;
     this.isDismissed = true;
     this.message = message;
+  }
+
+  setMessage(message) {
+    this.modal.message = message;
   }
 
   async present() {
@@ -20,11 +26,12 @@ export default class LoadingIndicator {
     this.isDismissed = false;
     return await loadingController.create({
       message: this.message
-    }).then(a => {
-      a.present().then(() => {
+    }).then(modal => {
+      this.modal = modal;
+      modal.present().then(() => {
         //console.log('presented');
         if (!this.isLoading) {
-          a.dismiss().then(() => {
+          modal.dismiss().then(() => {
             //console.log('abort presenting')
           });
         }

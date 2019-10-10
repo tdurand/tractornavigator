@@ -1,5 +1,5 @@
 // TODO create an object <Recording>, and probably store as a Map for O(1) read
-import { loadHistoryState, persistHistoryState } from '../../statemanagement/localStorage';
+import { loadState, persistState } from '../../statemanagement/localStorage';
 
 
 interface HistoryState {
@@ -8,7 +8,8 @@ interface HistoryState {
 
 const getInitialState = (): HistoryState => {
     return {
-        recordings: []
+        recordings: [],
+
     };
 };
 
@@ -29,7 +30,7 @@ export function saveRecording(recording) {
 
 export function restoreHistory() {
     return (dispatch) => {
-        const savedState = loadHistoryState();
+        const savedState = loadState('history');
         if(savedState) {
             dispatch({
                 type: RESTORE_ALL_RECORDINGS,
@@ -40,8 +41,9 @@ export function restoreHistory() {
 }
 
 export function persistHistory() {
+    // @ts-ignore
     return (dispatch, getState) => {
-        persistHistoryState(getState().history);
+        persistState(getState().history, 'history');
     }
 }
 

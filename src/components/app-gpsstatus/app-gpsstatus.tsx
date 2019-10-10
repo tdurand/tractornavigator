@@ -67,7 +67,6 @@ export class AppGPSStatus {
             }
           </div>
         }
-        
       </ion-content>
     ];
   }

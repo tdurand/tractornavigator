@@ -70,6 +70,13 @@ export class AppHistory {
                 <ion-icon name="play" slot="end"></ion-icon>
                 Continue
               </ion-button>
+              <ion-button 
+                slot="end"
+                onClick={() => console.log('todo')}
+              >
+                <ion-icon name="play" slot="end"></ion-icon>
+                Delete
+              </ion-button>
             </ion-item>
           )}
           {/* <ion-item-divider>

@@ -124,6 +124,7 @@ export function stopRecordingAndSave() {
         dispatch(saveRecording({
             dateStart: getState().recording.dateStart,
             dateEnd: new Date().toISOString(),
+            area: getState().recording.area,
             trace: getState().recording.recordedPositions,
             equipmentWidth: getState().recording.equipmentWidth
         }))

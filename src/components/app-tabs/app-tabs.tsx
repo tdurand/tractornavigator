@@ -10,7 +10,9 @@ export class AppTabs {
       <ion-tabs>
         <ion-tab tab="tab-home" component="app-home" />
         <ion-tab tab="tab-gpsstatus" component="app-gpsstatus" />
-        <ion-tab tab="tab-history" component="app-history" />
+        <ion-tab tab="tab-history">
+          <ion-nav></ion-nav>
+        </ion-tab>
         <ion-tab tab="tab-offline" component="app-offline" />
         <ion-tab tab="tab-about" component="app-about" />
         <ion-tab-bar slot="bottom">
@@ -26,10 +28,6 @@ export class AppTabs {
             <ion-icon name="list"></ion-icon>
             <ion-label>History</ion-label>
           </ion-tab-button>
-          {/* <ion-tab-button tab="tab-offline">
-            <ion-icon name="airplane"></ion-icon>
-            <ion-label>Use offline</ion-label>
-          </ion-tab-button> */}
           <ion-tab-button tab="tab-about">
             <ion-icon name="information-circle"></ion-icon>
             <ion-label>About</ion-label>

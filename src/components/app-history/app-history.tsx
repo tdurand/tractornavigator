@@ -65,17 +65,10 @@ export class AppHistory {
               </ion-label>
               <ion-button 
                 slot="end"
-                onClick={() => console.log('todo')}
+                href={`/history/${index}`}
               >
                 <ion-icon name="play" slot="end"></ion-icon>
-                Continue
-              </ion-button>
-              <ion-button 
-                slot="end"
-                onClick={() => console.log('todo')}
-              >
-                <ion-icon name="play" slot="end"></ion-icon>
-                Delete
+                Details
               </ion-button>
             </ion-item>
           )}

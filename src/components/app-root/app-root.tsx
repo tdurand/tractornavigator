@@ -25,7 +25,10 @@ export class AppRoot {
           <ion-route component="app-tabs">
             <ion-route url="/" component="tab-home" />
             <ion-route url="/gpsstatus" component="tab-gpsstatus" />
-            <ion-route url="/history" component="tab-history" />
+            <ion-route url="/history" component="tab-history">
+              <ion-route component="app-history" />
+              <ion-route url="/:indexOfRecording" component="app-history-details" />
+            </ion-route>
             <ion-route url="/offline" component="tab-offline" />
             <ion-route url="/about" component="tab-about" />
           </ion-route>

@@ -41,7 +41,10 @@ export class AppGPSStatus {
       <ion-content class="ion-padding">
         <img src="/assets/usegalileo.png" alt="Use galileo" />
         {this.rawMeasurements === null &&
-          <p>Loading ...</p>
+          <div class="flex items-center justify-center mt-2">
+            <div>Fetching Galileo status...</div>
+            <ion-spinner class="ml-2"></ion-spinner>
+          </div>
         }
         {this.rawMeasurements === false && this.isGalileoSupported === false &&
           <p>Limited positioning performance, consider upgrading to Galileo for an optimal experience</p>

@@ -601,9 +601,8 @@ export class AppHome {
     this.galileoModal = await modalController.create({
       component: 'galileo-modal',
       cssClass: 'inset-modal',
-      componentProps: {
-        test: [] // TODO here pass Gnss data
-      }
+      backdropDismiss: false,
+      keyboardClose: false
     });
     await this.galileoModal.present();
   }

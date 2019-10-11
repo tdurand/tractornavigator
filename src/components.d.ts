@@ -21,9 +21,7 @@ export namespace Components {
   interface AppOffline {}
   interface AppRoot {}
   interface AppTabs {}
-  interface GalileoModal {
-    'test': any;
-  }
+  interface GalileoModal {}
   interface GuidingHelper {
     'distanceToClosestGuidingLine': number;
     'isGuidingLineOnRightOrLeft': string;
@@ -137,9 +135,7 @@ declare namespace LocalJSX {
   interface AppOffline {}
   interface AppRoot {}
   interface AppTabs {}
-  interface GalileoModal {
-    'test'?: any;
-  }
+  interface GalileoModal {}
   interface GuidingHelper {
     'distanceToClosestGuidingLine'?: number;
     'isGuidingLineOnRightOrLeft'?: string;

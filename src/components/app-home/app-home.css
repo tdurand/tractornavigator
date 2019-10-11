@@ -8,11 +8,18 @@
     max-width: 90% !important;
  }
 
+ .container {
+    position: absolute;
+    top: 50px;
+    bottom: 0;
+    right: 0;
+    left: 0;
+ }
+
 .content {
     width: 100%;
     height: 100%;
     position: absolute;
-    top: 0;
     z-index: 10;
 }
 
@@ -22,7 +29,7 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    position: fixed;
+    position: absolute;
     right: 0;
     left: 0;
     bottom: 15px;
@@ -32,12 +39,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.container-top {
-    position: absolute;
-    top: 0;
-    width: 100%;
 }
 
 .btn-geolocate {
@@ -73,6 +74,28 @@
     width: 100px;
     font-weight: bold;
     font-size: 1.2rem;
+}
+
+.accuracy-helper {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    height: 50px;
+}
+
+.accuracy-helper.bad {
+    background-color: red;
+}
+
+.accuracy-helper.medium {
+    background-color: orange;
+}
+
+.accuracy-helper.good {
+    background-color: green;
 }
 
 /** Utility classes (from tailwind) **/

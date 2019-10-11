@@ -11,6 +11,7 @@ import {
 } from '@capacitor/core';
 
 export namespace Components {
+  interface AccuracyHelper {}
   interface AppAbout {}
   interface AppGpsstatus {}
   interface AppHistory {}
@@ -36,6 +37,12 @@ export namespace Components {
 
 declare global {
 
+
+  interface HTMLAccuracyHelperElement extends Components.AccuracyHelper, HTMLStencilElement {}
+  var HTMLAccuracyHelperElement: {
+    prototype: HTMLAccuracyHelperElement;
+    new (): HTMLAccuracyHelperElement;
+  };
 
   interface HTMLAppAboutElement extends Components.AppAbout, HTMLStencilElement {}
   var HTMLAppAboutElement: {
@@ -109,6 +116,7 @@ declare global {
     new (): HTMLGuidingSetupElement;
   };
   interface HTMLElementTagNameMap {
+    'accuracy-helper': HTMLAccuracyHelperElement;
     'app-about': HTMLAppAboutElement;
     'app-gpsstatus': HTMLAppGpsstatusElement;
     'app-history': HTMLAppHistoryElement;
@@ -125,6 +133,7 @@ declare global {
 }
 
 declare namespace LocalJSX {
+  interface AccuracyHelper {}
   interface AppAbout {}
   interface AppGpsstatus {}
   interface AppHistory {}
@@ -148,6 +157,7 @@ declare namespace LocalJSX {
   }
 
   interface IntrinsicElements {
+    'accuracy-helper': AccuracyHelper;
     'app-about': AppAbout;
     'app-gpsstatus': AppGpsstatus;
     'app-history': AppHistory;
@@ -169,6 +179,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
+      'accuracy-helper': LocalJSX.AccuracyHelper & JSXBase.HTMLAttributes<HTMLAccuracyHelperElement>;
       'app-about': LocalJSX.AppAbout & JSXBase.HTMLAttributes<HTMLAppAboutElement>;
       'app-gpsstatus': LocalJSX.AppGpsstatus & JSXBase.HTMLAttributes<HTMLAppGpsstatusElement>;
       'app-history': LocalJSX.AppHistory & JSXBase.HTMLAttributes<HTMLAppHistoryElement>;

@@ -615,38 +615,34 @@ export class AppHome {
         </ion-toolbar>
       </ion-header>,
 
-      <ion-content>
+      <ion-content style={{ "position": "relative"}}>
         <div id="map"></div>
-        <div class="container-top">
-          {this.position &&
-            <div class="message-box">
-              Accuracy : {this.position.coords.accuracy}m
+        <accuracy-helper />
+        <div class="container">
+          <div class="ctas-container">
+            <div class="ctas-help">
             </div>
+            <div class="ctas-buttons">
+              {!this.isDefiningGuidingLines && !this.guidingLines &&
+                <ion-button
+                  color="primary"
+                  onClick={() => this.startDefiningGuidingLines()}
+                >
+                  Start guiding
+                </ion-button>
+              }
+            </div>
+          </div>
+          {this.isDefiningGuidingLines &&
+            <guiding-setup onGuidingLinesDefined={() => {
+              this.createOrUpdateGuidingLines(this.getBbox());
+              this.map.resize();
+            }} />
+          }
+          {!this.isDefiningGuidingLines && this.guidingLines &&
+            <guiding-interface />
           }
         </div>
-        <div class="ctas-container">
-          <div class="ctas-help">
-          </div>
-          <div class="ctas-buttons">
-            {!this.isDefiningGuidingLines && !this.guidingLines &&
-              <ion-button
-                color="primary"
-                onClick={() => this.startDefiningGuidingLines()}
-              >
-                Start guiding
-              </ion-button>
-            }
-          </div>
-        </div>
-        {this.isDefiningGuidingLines &&
-          <guiding-setup onGuidingLinesDefined={() => {
-            this.createOrUpdateGuidingLines(this.getBbox());
-            this.map.resize();
-          }} />
-        }
-        {!this.isDefiningGuidingLines && this.guidingLines &&
-          <guiding-interface />
-        }
       </ion-content>
     ];
   }

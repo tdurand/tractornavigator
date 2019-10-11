@@ -16,7 +16,7 @@ import {
 import { handleNewPosition } from '../../statemanagement/app/MapStateManagement';
 import { getDeviceInfo } from '../../statemanagement/app/DeviceStateManagement';
 import { restoreHistory } from '../../statemanagement/app/HistoryStateManagement';
-import { restoreAppState } from '../../statemanagement/app/AppStateManagement';
+import { restoreAppState, registerAppOpening } from '../../statemanagement/app/AppStateManagement';
 import { point, lineString } from '@turf/helpers';
 import generateCircle from '@turf/circle';
 import generateSector from '@turf/sector';
@@ -53,9 +53,13 @@ export class AppHome {
     } else {
       if (this.mapIsReady) {
         this.loadingModal.dismiss();
-        // Galileo alert
-        if(!this.galileoModal) {
-          this.presentGalileoModal();
+
+        if(this.isFirstStart || this.nbOpeningBeforeDisplayingGalileoNotificationAgain === 0) {
+          // Present galileo modal if not already presented
+          if(!this.galileoModalPresentedThisSession) {
+            this.galileoModalPresentedThisSession = true;
+            this.presentGalileoModal();
+          }
         }
       } else {
         this.loadingModal.setMessage("Loading map...")
@@ -93,6 +97,7 @@ export class AppHome {
 
   isFirstStart: boolean;
   nbOpeningBeforeDisplayingGalileoNotificationAgain: number;
+  galileoModalPresentedThisSession: boolean = false;
 
   getAndWatchPosition: Action;
   setDistanceToClosestGuidingLine: Action;
@@ -104,6 +109,7 @@ export class AppHome {
   getDeviceInfo: Action;
   restoreHistory: Action;
   restoreAppState: Action;
+  registerAppOpening: Action;
 
   map: any;
   mapIsReady: boolean = false;
@@ -155,7 +161,8 @@ export class AppHome {
       handleNewPosition,
       getDeviceInfo,
       restoreHistory,
-      restoreAppState
+      restoreAppState,
+      registerAppOpening
     });
 
 
@@ -172,6 +179,7 @@ export class AppHome {
 
     this.restoreHistory();
     this.restoreAppState();
+    this.registerAppOpening();
 
     // if online
     let mapStyle = 'mapbox://styles/mapbox/satellite-v9';

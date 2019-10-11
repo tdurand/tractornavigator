@@ -57,8 +57,8 @@ const appStateReducer = (
         case REGISTER_APP_OPENING: {
             return {
                 ...state,
-                isFirstStart: false,
-                nbOpeningBeforeDisplayingGalileoNotificationAgain: state.nbOpeningBeforeDisplayingGalileoNotificationAgain--
+                isFirstStart: getInitialState().nbOpeningBeforeDisplayingGalileoNotificationAgain === state.nbOpeningBeforeDisplayingGalileoNotificationAgain && state.isFirstStart,
+                nbOpeningBeforeDisplayingGalileoNotificationAgain: state.nbOpeningBeforeDisplayingGalileoNotificationAgain - 1
             };
         }
         case RESET_NB_OPENING: {

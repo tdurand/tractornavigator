@@ -71,7 +71,7 @@ export class GuidingInterface {
 
     return (
       <div class="content flex flex-col flex-auto justify-between">
-        <div>
+        <div class="shadow">
           {this.status === RecordingStatus.Recording &&
             <div class="flex message-box justify-around">
               <div class="flex items-center">
@@ -96,12 +96,14 @@ export class GuidingInterface {
             <div>
               <ion-button
                 color="medium"
+                size="large"
                 onClick={() => this.startDefiningGuidingLines() }
               >
-                Settings
+                <ion-icon slot="icon-only" name="settings"></ion-icon>
               </ion-button>
               <ion-button
                 color="primary"
+                size="large"
                 onClick={() => {
                   this.startRecording()
                 }}

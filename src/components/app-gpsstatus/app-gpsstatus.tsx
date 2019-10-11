@@ -39,7 +39,9 @@ export class AppGPSStatus {
         </ion-toolbar>
       </ion-header>,
       <ion-content class="ion-padding">
-        <img src="/assets/usegalileo.png" alt="Use galileo" />
+        <div class="text-center">
+          <img class="img-use-galileo" src="/assets/usegalileo.png" alt="Use galileo" />
+        </div>
         {this.rawMeasurements === null &&
           <div class="flex items-center justify-center mt-2">
             <div>Fetching Galileo status...</div>

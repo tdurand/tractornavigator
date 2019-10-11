@@ -45,7 +45,7 @@ export class GuidingSetup {
             <div class="content flex">
                 {this.referenceLine.length === 0 &&
                     <div class="flex flex-col flex-auto justify-between">
-                        <div class="message-box">
+                        <div class="message-box shadow">
                             Defining guiding reference line, go to starting point and confirm
                         </div>
                         <div class="flex justify-center pb-2">

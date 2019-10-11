@@ -220,10 +220,6 @@ export function getAndWatchPosition() {
             // TODO handle error ?
             // Need to transform geoposition DOM element to normal object otherwise redux can't parse it reducer:
             dispatch(onNewPosition(geopositionToObject(position)));
-
-            if(getState().device.deviceInfo.platform) {
-              dispatch(initGnssMeasurements(getState().device.deviceInfo.platform))
-            }
         }, (error) => {
           console.log(error);
         })
@@ -238,6 +234,13 @@ export function getAndWatchPosition() {
               }
               // TODO dispatch watcher enabled
               if (position) {
+                  // If GNSS measurements not initialized
+                  if(!getState().gnssmeasurements.isInitializing && 
+                    getState().gnssmeasurements.rawMeasurements === null) {
+                    if(getState().device.deviceInfo.platform) {
+                      dispatch(initGnssMeasurements(getState().device.deviceInfo.platform))
+                    }
+                  }
                   //console.log('Dispatch watch position')
                   dispatch(onNewPosition(geopositionToObject(position)));
               } else {

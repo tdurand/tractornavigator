@@ -22,7 +22,7 @@ export class AccuracyHelper {
     if(position) {
         if(position.coords.accuracy <= 4 && this.dualFreqSupported) {
             this.accuracyType = "good"
-        } else if(position.coords.accuracy <= 4 && this.isGalileoSupported) {
+        } else if(position.coords.accuracy <= 6 && this.isGalileoSupported) {
             this.accuracyType = "medium"
         } else {
             this.accuracyType = "bad"
@@ -51,17 +51,19 @@ export class AccuracyHelper {
 
   render() {
     return (
-      <div class={`accuracy-helper ${this.accuracyType}`}>
-          {this.accuracyType === "bad" &&
-            <p>GPS Accuracy bad</p>
-          }
-          {this.accuracyType === "medium" &&
-            <p>GPS Accuracy medium</p>
-          }
-          {this.accuracyType === "medium" &&
-            <p>GPS Accuracy good</p>
-          }
-      </div>
+      <ion-router-link href="/gpsstatus">
+        <div class={`accuracy-helper ${this.accuracyType}`}>
+            {this.accuracyType === "bad" &&
+              <p>Poor GPS Accuracy</p>
+            }
+            {this.accuracyType === "medium" &&
+              <p>Medium GPS Accuracy</p>
+            }
+            {this.accuracyType === "good" &&
+              <p>Good GPS Accuracy</p>
+            }
+        </div>
+      </ion-router-link>
     );
   }
 }

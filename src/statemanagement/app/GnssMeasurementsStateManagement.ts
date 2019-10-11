@@ -2,6 +2,7 @@ import { Plugins } from '@capacitor/core';
 const { GnssMeasurements } = Plugins;
 
 interface GnssMeasurementsState {
+    isInitializing: boolean
     rawMeasurements: any,
     satelliteData: any,
     isGalileoSupported: any,
@@ -22,6 +23,7 @@ interface GnssMeasurementsState {
 
 const getInitialState = (): GnssMeasurementsState => {
     return {
+        isInitializing: false,
         rawMeasurements: null,
         satelliteData: null,
         isGalileoSupported: null,
@@ -34,12 +36,18 @@ const SET_GNSSMEASUREMENTS_SUPPORTED = 'GnssMeasurements/SET_GNSSMEASUREMENTS_SU
 const UPDATE_SATELLITE_DATA = 'GnssMeasurements/UPDATE_SATELLITE_DATA';
 const SET_GALILEO_SUPPORT = 'GnssMeasurements/SET_GALILEO_SUPPORT';
 const SET_DUALFREQ_SUPPORT = 'GnssMeasurements/SET_DUALFREQ_SUPPORT';
+const SET_INITIALIZING = 'GnssMeasurements/SET_INITIALIZING';
 
 export function initGnssMeasurements(platform) {
     return (dispatch) => {
         if(platform === "android") {
             // dispatch(GnssMeasurements.areGnssMeasurementsSupported())
             GnssMeasurements.init((data) => {
+
+                dispatch({
+                    type: SET_INITIALIZING,
+                    payload: true
+                })
 
                 if(data.gnssMeasurementsSupported) {
 
@@ -64,6 +72,11 @@ export function initGnssMeasurements(platform) {
                 } else {
                     dispatch(setGnssMeasurementsSupported(false))
                 }
+
+                dispatch({
+                    type: SET_INITIALIZING,
+                    payload: false
+                })
             })
         } else if(platform === "web") {
             // simulate raw measurements to work on API
@@ -127,6 +140,12 @@ const GnssMeasurementsStateStateReducer = (
             return {
                 ...state,
                 dualFreqSupported: action.payload
+            }
+        }
+        case SET_INITIALIZING: {
+            return {
+                ...state,
+                isInitializing: action.payload
             }
         }
     }

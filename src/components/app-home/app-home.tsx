@@ -617,7 +617,9 @@ export class AppHome {
 
       <ion-content style={{ "position": "relative"}}>
         <div id="map"></div>
-        <accuracy-helper />
+        {this.position &&
+          <accuracy-helper />
+        }
         <div class="container">
           <div class="ctas-container">
             <div class="ctas-help">
@@ -626,6 +628,7 @@ export class AppHome {
               {!this.isDefiningGuidingLines && !this.guidingLines &&
                 <ion-button
                   color="primary"
+                  size="large"
                   onClick={() => this.startDefiningGuidingLines()}
                 >
                   Start guiding

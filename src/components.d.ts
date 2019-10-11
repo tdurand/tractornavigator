@@ -21,6 +21,9 @@ export namespace Components {
   interface AppOffline {}
   interface AppRoot {}
   interface AppTabs {}
+  interface GalileoModal {
+    'test': any;
+  }
   interface GuidingHelper {
     'distanceToClosestGuidingLine': number;
     'isGuidingLineOnRightOrLeft': string;
@@ -84,6 +87,12 @@ declare global {
     new (): HTMLAppTabsElement;
   };
 
+  interface HTMLGalileoModalElement extends Components.GalileoModal, HTMLStencilElement {}
+  var HTMLGalileoModalElement: {
+    prototype: HTMLGalileoModalElement;
+    new (): HTMLGalileoModalElement;
+  };
+
   interface HTMLGuidingHelperElement extends Components.GuidingHelper, HTMLStencilElement {}
   var HTMLGuidingHelperElement: {
     prototype: HTMLGuidingHelperElement;
@@ -110,6 +119,7 @@ declare global {
     'app-offline': HTMLAppOfflineElement;
     'app-root': HTMLAppRootElement;
     'app-tabs': HTMLAppTabsElement;
+    'galileo-modal': HTMLGalileoModalElement;
     'guiding-helper': HTMLGuidingHelperElement;
     'guiding-interface': HTMLGuidingInterfaceElement;
     'guiding-setup': HTMLGuidingSetupElement;
@@ -127,6 +137,9 @@ declare namespace LocalJSX {
   interface AppOffline {}
   interface AppRoot {}
   interface AppTabs {}
+  interface GalileoModal {
+    'test'?: any;
+  }
   interface GuidingHelper {
     'distanceToClosestGuidingLine'?: number;
     'isGuidingLineOnRightOrLeft'?: string;
@@ -147,6 +160,7 @@ declare namespace LocalJSX {
     'app-offline': AppOffline;
     'app-root': AppRoot;
     'app-tabs': AppTabs;
+    'galileo-modal': GalileoModal;
     'guiding-helper': GuidingHelper;
     'guiding-interface': GuidingInterface;
     'guiding-setup': GuidingSetup;
@@ -167,6 +181,7 @@ declare module "@stencil/core" {
       'app-offline': LocalJSX.AppOffline & JSXBase.HTMLAttributes<HTMLAppOfflineElement>;
       'app-root': LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
       'app-tabs': LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
+      'galileo-modal': LocalJSX.GalileoModal & JSXBase.HTMLAttributes<HTMLGalileoModalElement>;
       'guiding-helper': LocalJSX.GuidingHelper & JSXBase.HTMLAttributes<HTMLGuidingHelperElement>;
       'guiding-interface': LocalJSX.GuidingInterface & JSXBase.HTMLAttributes<HTMLGuidingInterfaceElement>;
       'guiding-setup': LocalJSX.GuidingSetup & JSXBase.HTMLAttributes<HTMLGuidingSetupElement>;

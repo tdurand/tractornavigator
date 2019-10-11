@@ -1,4 +1,5 @@
 import { Component, h, State, Prop, Watch } from '@stencil/core';
+import { modalController } from '@ionic/core';
 import { Plugins, GeolocationPosition } from '@capacitor/core';
 import { Store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
@@ -53,6 +54,9 @@ export class AppHome {
       if (this.mapIsReady) {
         this.loadingModal.dismiss();
         // Galileo alert
+        if(!this.galileoModal) {
+          this.presentGalileoModal();
+        }
       } else {
         this.loadingModal.setMessage("Loading map...")
       }
@@ -112,6 +116,7 @@ export class AppHome {
   }
 
   loadingModal: LoadingIndicator = new LoadingIndicator("Getting your position...");
+  galileoModal: HTMLIonModalElement;
 
   @Prop({ context: "store" }) store: Store;
 
@@ -582,6 +587,17 @@ export class AppHome {
         this.moveLayerIfExists(layerPositionID);
       }
     }
+  }
+
+  async presentGalileoModal() {
+    this.galileoModal = await modalController.create({
+      component: 'galileo-modal',
+      cssClass: 'inset-modal',
+      componentProps: {
+        test: [] // TODO here pass Gnss data
+      }
+    });
+    await this.galileoModal.present();
   }
 
   render() {

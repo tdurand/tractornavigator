@@ -15,7 +15,9 @@ export default class LoadingIndicator {
   }
 
   setMessage(message) {
-    this.modal.message = message;
+    if(this.modal) {
+      this.modal.message = message;
+    }
   }
 
   async present() {

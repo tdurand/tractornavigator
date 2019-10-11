@@ -3,6 +3,11 @@
     height: 100%;
 }
 
+.inset-modal .modal-wrapper {
+    max-height: 400px !important;
+    max-width: 90% !important;
+ }
+
 .content {
     width: 100%;
     height: 100%;

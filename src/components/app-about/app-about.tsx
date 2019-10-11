@@ -20,7 +20,7 @@ export class AppAbout {
       <ion-content class="ion-padding">
         <img src="/assets/logo_gsa.svg" />
         <p>This app is developed as part of the <a href="https://www.gsa.europa.eu/mygalileoapp">MyGalileoApp Challenge 2019</a></p>
-        <p>It is an Opensource project (license MIT)</p>
+        <p>It is an Open Source project (license MIT)</p>
         <p><a href="https://github.com/tdurand/tractornavigator">https://github.com/tdurand/tractornavigator</a></p>
         <h3>Team</h3>
         <ul>

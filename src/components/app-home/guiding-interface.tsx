@@ -96,14 +96,12 @@ export class GuidingInterface {
             <div>
               <ion-button
                 color="medium"
-                size="large"
                 onClick={() => this.startDefiningGuidingLines() }
               >
                 <ion-icon slot="icon-only" name="settings"></ion-icon>
               </ion-button>
               <ion-button
                 color="primary"
-                size="large"
                 onClick={() => {
                   this.startRecording()
                 }}

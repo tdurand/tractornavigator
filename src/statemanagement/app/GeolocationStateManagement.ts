@@ -6,15 +6,19 @@ import { recordingOnNewPosition } from './RecordingStateManagement';
 import { handleNewPosition } from "./MapStateManagement";
 import { initGnssMeasurements } from "./GnssMeasurementsStateManagement";
 
+export enum AccuracyStatus { Poor, Medium, Good}
+
 interface GeolocationState {
     position: GeolocationPosition;
-    positionsHistory: Array<Array<Number>>
+    positionsHistory: Array<Array<Number>>;
+    accuracyStatus: AccuracyStatus
 }
 
 const getInitialState = (): GeolocationState => {
     return {
         position: null,
-        positionsHistory: []
+        positionsHistory: [],
+        accuracyStatus: AccuracyStatus.Poor
     };
 };
 
@@ -22,7 +26,7 @@ const getInitialState = (): GeolocationState => {
 const SET_POSITION = 'Geolocation/SET_POSITION';
 const ADD_POSITION_TO_HISTORY = 'Geolocation/ADD_POSITION_TO_HISTORY';
 const CLEAR_POSITION_HISTORY = 'Geolocation/CLEAR_POSITION_HISTORY';
-//const GET_POSITION = 'Geolocation/GET_POSITION';
+const SET_ACCURACY_STATUS = 'Geolocation/SET_ACCURACY_STATUS';
 
 export function simulateGeolocation() {
 
@@ -180,6 +184,13 @@ export function clearPositionHistory() {
     }
 }
 
+export function setAccuracyStatus(accuracyStatus: AccuracyStatus) {
+  return {
+      type: SET_ACCURACY_STATUS,
+      payload: accuracyStatus
+  }
+}
+
 export function onNewPosition(position) {
     return (dispatch, getState) => {
 
@@ -209,6 +220,20 @@ export function onNewPosition(position) {
 
         dispatch(setPosition(position));
         dispatch(handleNewPosition(position));
+
+        // Compute accuracy status
+        let accuracyStatus = AccuracyStatus.Poor;
+        if(position) {
+          if(position.coords.accuracy <= 4 && getState().gnssmeasurements.dualFreqSupported) {
+            accuracyStatus = AccuracyStatus.Good;
+          } else if(position.coords.accuracy <= 6 && getState().gnssmeasurements.isGalileoSupported) {
+            accuracyStatus = AccuracyStatus.Medium;
+          } else {
+            accuracyStatus = AccuracyStatus.Poor;
+          }
+        }
+
+        dispatch(setAccuracyStatus(accuracyStatus));
     }
 }
 
@@ -276,6 +301,12 @@ const geolocationReducer = (
                 ...state,
                 positionsHistory: []
             }
+        }
+        case SET_ACCURACY_STATUS: {
+          return {
+            ...state,
+            accuracyStatus: action.payload
+          }
         }
     }
     return state;

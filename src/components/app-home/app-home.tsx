@@ -93,6 +93,7 @@ export class AppHome {
   }
 
   @State() status: RecordingStatus;
+  @State() rawMeasurements: any
   recordedPositions: Array<Array<number>>;
 
   isFirstStart: boolean;
@@ -134,7 +135,8 @@ export class AppHome {
         geolocation: { position },
         guiding: { referenceLine, equipmentWidth, isDefiningGuidingLines, guidingLines, bboxContainer },
         map: { mapView },
-        app: { isFirstStart, nbOpeningBeforeDisplayingGalileoNotificationAgain }
+        app: { isFirstStart, nbOpeningBeforeDisplayingGalileoNotificationAgain },
+        gnssmeasurements: { rawMeasurements }
       } = state;
       return {
         position,
@@ -147,7 +149,8 @@ export class AppHome {
         recordedPositions,
         mapView,
         isFirstStart,
-        nbOpeningBeforeDisplayingGalileoNotificationAgain
+        nbOpeningBeforeDisplayingGalileoNotificationAgain,
+        rawMeasurements
       };
     });
 
@@ -615,11 +618,11 @@ export class AppHome {
         </ion-toolbar>
       </ion-header>,
 
-      <ion-content style={{ "position": "relative"}}>
-        <div id="map"></div>
-        {this.position &&
+      <ion-content class="flex" style={{ "position": "relative"}}>
+        {this.rawMeasurements !== null &&
           <accuracy-helper />
         }
+        <div id="map"></div>
         <div class="container">
           <div class="ctas-container">
             <div class="ctas-help">

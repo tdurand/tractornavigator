@@ -22,6 +22,7 @@ export class GuidingInterface {
 
   dateStart: string;
   area: number;
+  equipmentWidth: number;
 
 
   @Prop() position: GeolocationPosition;
@@ -36,14 +37,15 @@ export class GuidingInterface {
     this.store.mapStateToProps(this, state => {
       const {
         recording: { status, dateStart, area },
-        guiding: { distanceToClosestGuidingLine, isGuidingLineOnRightOrLeft }
+        guiding: { distanceToClosestGuidingLine, isGuidingLineOnRightOrLeft, equipmentWidth }
       } = state;
       return {
         status,
         distanceToClosestGuidingLine,
         isGuidingLineOnRightOrLeft,
         dateStart,
-        area
+        area,
+        equipmentWidth
       };
     });
 
@@ -81,6 +83,10 @@ export class GuidingInterface {
               <div class="flex items-center">
                 <ion-icon name="map"></ion-icon>
                 <div class="ml-1">{this.area} ha</div>
+              </div>
+              <div class="flex items-center">
+                <ion-icon name="resize"></ion-icon>
+                <div class="ml-1">{this.equipmentWidth} m</div>
               </div>
             </div>
           }

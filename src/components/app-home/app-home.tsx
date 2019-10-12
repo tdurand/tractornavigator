@@ -661,7 +661,10 @@ export class AppHome {
             <guiding-interface />
           }
           {this.mapView &&
-            <div class={`mapbox-control mapboxgl-ctrl mapboxgl-ctrl-group ${!this.isDefiningGuidingLines && !this.guidingLines ? 'pt-s' : ''} ${!this.isDefiningGuidingLines && this.guidingLines && this.status === RecordingStatus.Recording ? 'pt-l' : ''}`}>
+            <div class={`mapbox-control mapboxgl-ctrl mapboxgl-ctrl-group 
+              ${!this.isDefiningGuidingLines && !this.guidingLines ? 'pt-s' : ''} 
+              ${!this.isDefiningGuidingLines && this.guidingLines && this.status !== RecordingStatus.Idle ? 'pt-l' : ''}`
+            }>
               <button onClick={() => this.zoomIn()} class="mapboxgl-ctrl-icon mapboxgl-ctrl-zoom-in" type="button" title="Zoom in" aria-label="Zoom in"></button>
               <button onClick={() => this.zoomOut()} class="mapboxgl-ctrl-icon mapboxgl-ctrl-zoom-out" type="button" title="Zoom out" aria-label="Zoom out"></button>
               {this.mapView.pitch === 0 &&

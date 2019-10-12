@@ -8,6 +8,7 @@ interface GuidingState {
     bearingToClosestGuidingLine: number;
     isGuidingLineOnRightOrLeft: string;
     guidingLines: any;
+    closestLine: any;
     isDefiningGuidingLines: boolean;
     bboxContainer: any
 }
@@ -20,6 +21,7 @@ const getInitialState = (): GuidingState => {
         bearingToClosestGuidingLine: null,
         isGuidingLineOnRightOrLeft: null,
         guidingLines: null,
+        closestLine: null,
         isDefiningGuidingLines: false,
         bboxContainer: null
     };
@@ -34,6 +36,7 @@ const SET_GUIDING_LINE_LEFT_OR_RIGHT = 'Guiding/SET_GUIDING_LINE_LEFT_OR_RIGHT';
 const CREATE_OR_UPDATE_GUIDING_LINES = 'Guiding/CREATE_OR_UPDATE_GUIDING_LINES';
 const START_DEFINING_GUIDINGLINES = 'Guiding/START_DEFINING_GUIDINGLINES';
 const SET_BBOX_CONTAINER = 'Guiding/SET_BBOX_CONTAINER';
+const SET_CLOSESTLINE = 'Guiding/SET_CLOSESTLINE';
 const RESET = 'Guiding/RESET';
 
 
@@ -61,6 +64,13 @@ export function setDistanceToClosestGuidingLine(distanceToClosestGuidingLine) {
 export function startDefiningGuidingLines() {
     return {
         type: START_DEFINING_GUIDINGLINES
+    }
+}
+
+export function setClosestLine(closestLine) {
+    return {
+        type: SET_CLOSESTLINE,
+        payload: closestLine
     }
 }
 
@@ -109,6 +119,34 @@ export function createOrUpdateGuidingLines(initialBbox) {
         })
 
         dispatch(setBboxContainer(largerNewBbox));
+    }
+}
+
+export function updateGuidingLinesOnNewPosition(position) {
+    return (dispatch, getState) => {
+        const guidingLines = getState().guiding.guidingLines;
+        if(position && guidingLines) {
+            const newClosests = guidingLines.getClosestLine([position.coords.longitude, position.coords.latitude]);
+            let newClosest = newClosests[0];
+            let newSecondClosest = newClosests[1];
+
+            const previousClosest = getState().guiding.closestLine;
+
+            // Add tolerance, only change closestLine when closestLine < 0.5m
+            if(previousClosest && previousClosest.index !== newClosest.index) {
+                if(newClosest.distance > 0.5 && 
+                   previousClosest.index === newSecondClosest.index) {
+                    // Keep second closest
+                    newClosest = newSecondClosest;
+                }
+            }
+
+            dispatch(setClosestLine(newClosest));
+            dispatch(setDistanceToClosestGuidingLine(newClosest.distance))
+            dispatch(setBearingToClosestGuidingLine(newClosest.bearingToLine))
+            
+            
+        }
     }
 }
 
@@ -191,6 +229,12 @@ const guidingStateReducer = (
             return {
                 ...state,
                 bboxContainer: action.payload
+            }
+        }
+        case SET_CLOSESTLINE: {
+            return {
+                ...state,
+                closestLine: action.payload
             }
         }
         case RESET: {

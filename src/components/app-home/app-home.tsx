@@ -67,7 +67,14 @@ export class AppHome {
       
     }
 
+    // Update on position change when guidingLines aren't defined
+    // otherwise update map on closest line change 
+    // as position and closestLine could get out of sync
+    // (closestLine is computed a few ms after position)
+    // if(!this.guidingLines) {
     this.updateMapDisplay();
+    // }
+    
   }
   @State() referenceLine: Array<Array<number>>;
   @State() isDefiningGuidingLines: boolean;
@@ -81,6 +88,7 @@ export class AppHome {
   }
   @State() equipmentWidth: number;
 
+  closestLine: any
   @State() guidingLines: any;
   @Watch('guidingLines')
   guidingLinesChangeHandler() {
@@ -133,7 +141,7 @@ export class AppHome {
       const {
         recording: { status, recordedPositions },
         geolocation: { position },
-        guiding: { referenceLine, equipmentWidth, isDefiningGuidingLines, guidingLines, bboxContainer },
+        guiding: { referenceLine, equipmentWidth, isDefiningGuidingLines, guidingLines, bboxContainer, closestLine },
         map: { mapView },
         app: { isFirstStart, nbOpeningBeforeDisplayingGalileoNotificationAgain },
         gnssmeasurements: { rawMeasurements }
@@ -144,6 +152,7 @@ export class AppHome {
         equipmentWidth,
         isDefiningGuidingLines,
         guidingLines,
+        closestLine,
         bboxContainer,
         status,
         recordedPositions,
@@ -329,14 +338,9 @@ export class AppHome {
 
   addOrUpdateClosestGuidingLineToMap(guidingLines, position) {
     const layerAndSourceId = 'closest-guiding-line';
-    if (guidingLines && position) {
-      let sourceClosestLine = this.map.getSource(layerAndSourceId);
-      // TODO compute this in the position change handler In state management
-      // And store closest line in guidinglinestatemanagement
-      const closestLine = guidingLines.getClosestLine([position.coords.longitude, position.coords.latitude]);
-      const closestLineGeojson = closestLine.line;
-      this.setDistanceToClosestGuidingLine(closestLine.distance);
-      this.setBearingToClosestGuidingLine(closestLine.bearingToLine);
+    if (guidingLines && position && this.closestLine) {
+      let sourceClosestLine = this.map.getSource(layerAndSourceId);  
+      const closestLineGeojson = this.closestLine.line;
       if (sourceClosestLine) {
         //console.log('Update closest guiding lines')
         sourceClosestLine.setData(closestLineGeojson)

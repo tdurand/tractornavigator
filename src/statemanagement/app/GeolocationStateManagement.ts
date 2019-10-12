@@ -5,6 +5,7 @@ import Geosimulation from '../../helpers/geolocationsimulator';
 import { recordingOnNewPosition } from './RecordingStateManagement';
 import { handleNewPosition } from "./MapStateManagement";
 import { initGnssMeasurements } from "./GnssMeasurementsStateManagement";
+import { updateGuidingLinesOnNewPosition } from "./GuidingStateManagement";
 
 export enum AccuracyStatus { Poor, Medium, Good}
 
@@ -218,8 +219,9 @@ export function onNewPosition(position) {
             dispatch(recordingOnNewPosition([position.coords.longitude, position.coords.latitude]))
         }
 
-        dispatch(setPosition(position));
+        dispatch(updateGuidingLinesOnNewPosition(position))
         dispatch(handleNewPosition(position));
+        dispatch(setPosition(position));
 
         // Compute accuracy status
         let accuracyStatus = AccuracyStatus.Poor;

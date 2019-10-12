@@ -159,8 +159,13 @@ export default class GuidingLines {
         let intersectionWithBoundA = null;
         let intersectionWithBoundB = null;
         let closestDistance = this.bboxDiagonalLength;
+        let secondClosestDistance = this.bboxDiagonalLength;
+        let closestIndex = null;
+        let secondClosestIndex = null;
         let closest = null;
-        let bearingToIntersection = null;
+        let secondClosest = null;
+        let bearingToIntersection = null
+        let secondClosestBearingToIntersection = null;
 
         while (!found) {
             //console.log(`boundA: ${boundA}, boundB: ${boundB}`)
@@ -182,41 +187,50 @@ export default class GuidingLines {
             if(distanceToBoundA > distanceToBoundB) {
                 // If 1 between A and B , floor will keep giving same number
                 if(boundB - boundA === 1) {
-                    boundA = boundB;
+                    closestIndex = boundB;
+                    closestDistance = distanceToBoundB;
+                    secondClosestIndex = boundA;
+                    secondClosestDistance = distanceToBoundA;
+                    bearingToIntersection = bearing(position, intersectionWithBoundB.features[0].geometry.coordinates)
+                    secondClosestBearingToIntersection = bearing(position, intersectionWithBoundA.features[0].geometry.coordinates)
+                    found = true;
                 } else {
                     boundA = boundA + Math.floor((boundB - boundA) / 2);
-                }
-                //console.log(`closest to boundB, move boundA to ${boundA}`)
-                if(boundA === boundB){
-                    closestDistance = distanceToBoundB;
-                    bearingToIntersection = bearing(position, intersectionWithBoundB.features[0].geometry.coordinates)
-                    found = true;
                 }
             } else {
                 // If 1 between A and B , floor will keep giving same number
                 if(boundB - boundA === 1) {
-                    boundB = boundA;
+                    closestIndex = boundA;
+                    closestDistance = distanceToBoundA;
+                    secondClosestIndex = boundB;
+                    secondClosestDistance = distanceToBoundB;
+                    bearingToIntersection = bearing(position, intersectionWithBoundA.features[0].geometry.coordinates)
+                    secondClosestBearingToIntersection = bearing(position, intersectionWithBoundB.features[0].geometry.coordinates)
+                    found = true;
                 } else {
                     boundB = boundB - Math.floor((boundB - boundA) / 2);
-                }
-                //console.log(`closest to boundA, move boundB to ${boundB}`)
-                if(boundA === boundB){
-                    closestDistance = distanceToBoundA;
-                    bearingToIntersection = bearing(position, intersectionWithBoundA.features[0].geometry.coordinates)
-                    found = true;
                 }
             }
         }
 
         closest = {
-            index: boundA,
+            index: closestIndex,
             distance: closestDistance,
-            line: this.lines[boundA],
+            line: this.lines[closestIndex],
             bearingToLine: bearingToIntersection,
-            perpendicularLine: perpendicularLine
+            // perpendicularLine: perpendicularLine
         }
 
-        return closest;
+        secondClosest = {
+            index: secondClosestIndex,
+            distance: secondClosestDistance,
+            line: this.lines[secondClosestIndex],
+            bearingToLine: secondClosestBearingToIntersection,
+        }
+
+        
+
+        return [closest, secondClosest];
     }
 
     // Get guiding lines in geojson to display on a map
@@ -252,7 +266,7 @@ export default class GuidingLines {
             return false;
         } else {
             console.log('Update Bbox and recompute everything')
-            this.referenceLine = newReferenceLine.line.geometry.coordinates;
+            this.referenceLine = newReferenceLine[0].line.geometry.coordinates;
             this.bbox = newBbox;
             this.computeDerivedParams();
             return true;

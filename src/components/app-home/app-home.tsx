@@ -13,7 +13,7 @@ import {
   onBboxChanged,
   createOrUpdateGuidingLines
 } from '../../statemanagement/app/GuidingStateManagement';
-import { handleNewPosition } from '../../statemanagement/app/MapStateManagement';
+import { handleNewPosition, zoomIn, zoomOut, set2D, set3D } from '../../statemanagement/app/MapStateManagement';
 import { getDeviceInfo } from '../../statemanagement/app/DeviceStateManagement';
 import { restoreHistory } from '../../statemanagement/app/HistoryStateManagement';
 import { restoreAppState, registerAppOpening } from '../../statemanagement/app/AppStateManagement';
@@ -119,6 +119,10 @@ export class AppHome {
   restoreHistory: Action;
   restoreAppState: Action;
   registerAppOpening: Action;
+  zoomIn: Action;
+  zoomOut: Action;
+  set2D: Action;
+  set3D: Action;
 
   map: any;
   mapIsReady: boolean = false;
@@ -174,7 +178,11 @@ export class AppHome {
       getDeviceInfo,
       restoreHistory,
       restoreAppState,
-      registerAppOpening
+      registerAppOpening,
+      zoomIn,
+      zoomOut,
+      set2D, 
+      set3D
     });
 
 
@@ -651,6 +659,22 @@ export class AppHome {
           }
           {!this.isDefiningGuidingLines && this.guidingLines &&
             <guiding-interface />
+          }
+          {this.mapView &&
+            <div class={`mapbox-control mapboxgl-ctrl mapboxgl-ctrl-group ${!this.isDefiningGuidingLines && !this.guidingLines ? 'pt-s' : ''} ${!this.isDefiningGuidingLines && this.guidingLines && this.status === RecordingStatus.Recording ? 'pt-l' : ''}`}>
+              <button onClick={() => this.zoomIn()} class="mapboxgl-ctrl-icon mapboxgl-ctrl-zoom-in" type="button" title="Zoom in" aria-label="Zoom in"></button>
+              <button onClick={() => this.zoomOut()} class="mapboxgl-ctrl-icon mapboxgl-ctrl-zoom-out" type="button" title="Zoom out" aria-label="Zoom out"></button>
+              {this.mapView.pitch === 0 &&
+                <button onClick={() => this.set3D()} class="mapboxgl-ctrl-icon" type="button" title="3D" aria-label="3D">
+                  3D
+                </button>
+              }
+              {this.mapView.pitch > 0 &&
+                <button onClick={() => this.set2D()} class="mapboxgl-ctrl-icon" type="button" title="3D" aria-label="3D">
+                  2D
+                </button>
+              }
+            </div>
           }
         </div>
       </ion-content>

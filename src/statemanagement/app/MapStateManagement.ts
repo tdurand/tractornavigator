@@ -3,8 +3,8 @@ import { point } from '@turf/helpers';
 import computeBearing from '@turf/bearing';
 
 const MIN_DISTANCE_TO_MOVE_VIEW = 5;
-const ZOOM_OUT = 18;
-const ZOOM_IN = 19;
+const ZOOMED_OUT = 18;
+const ZOOMED_IN = 19;
 
 interface MapState {
     mapView: any
@@ -17,11 +17,50 @@ const getInitialState = (): MapState => {
 };
 
 const SET_MAP_VIEW = 'Map/SET_MAP_VIEW';
+const DO_ZOOM_IN = 'Map/ZOOM_IN';
+const DO_ZOOM_OUT = 'Map/DO_ZOOM_OUT';
+const SET_PITCH = 'Map/SET_PITCH';
+const SET_ZOOM = 'Map/SET_ZOOM';
+
 
 export function setMapView(mapView) {
     return {
         type: SET_MAP_VIEW,
         payload: mapView
+    }
+}
+
+export function zoomIn() {
+    return {
+        type: DO_ZOOM_IN
+    }
+}
+
+export function zoomOut() {
+    return {
+        type: DO_ZOOM_OUT
+    }
+}
+
+export function setZoom(zoom) {
+    return {
+        type: SET_ZOOM, 
+        payload: zoom
+    }
+}
+
+
+export function set2D() {
+    return {
+        type: SET_PITCH,
+        payload: 0
+    }
+}
+
+export function set3D() {
+    return {
+        type: SET_PITCH,
+        payload: 60
     }
 }
 
@@ -36,7 +75,7 @@ export function handleNewPosition(newPosition, forceRefresh = false) {
                 center: [newPosition.coords.longitude, newPosition.coords.latitude],
                 bearing: 0,
                 pitch: 0,
-                zoom: ZOOM_OUT
+                zoom: ZOOMED_OUT
             }))
         } else {
             // Check if newPosition distance to lastPosition
@@ -69,9 +108,11 @@ export function handleNewPosition(newPosition, forceRefresh = false) {
                             }
                         }
 
-                        // Zoom and pitch
-                        pitch = 60;
-                        zoom = ZOOM_IN;
+                        if(forceRefresh) {
+                            // Zoom and pitch
+                            pitch = 60;
+                            zoom = ZOOMED_IN;
+                        }
 
                     } else {
                         // Update bearing in view only if bearing changed 
@@ -82,8 +123,11 @@ export function handleNewPosition(newPosition, forceRefresh = false) {
                             newBearing = newBearing;
                         }
 
-                        pitch = 0;
-                        zoom = ZOOM_OUT;
+                        if(forceRefresh) {
+                            // Zoom and pitch
+                            pitch = 0;
+                            zoom = ZOOMED_OUT;
+                        }
                     }
                 } else {
                     newBearing = currentBearing;
@@ -94,7 +138,7 @@ export function handleNewPosition(newPosition, forceRefresh = false) {
                     bearing: newBearing,
                     pitch: pitch,
                     zoom: zoom,
-                    offset: [0, 50] // TODO set offset depending on map size on screen
+                    offset: [0, 60] // TODO set offset depending on map size on screen
                 }))
             }
         }
@@ -111,6 +155,42 @@ const mapStateReducer = (
                 ...state,
                 mapView: action.payload
             };
+        }
+        case DO_ZOOM_IN: {
+            return {
+                ...state,
+                mapView: {
+                    ...state.mapView,
+                    zoom: Math.min(state.mapView.zoom + 1, 20)
+                }
+            }
+        }
+        case DO_ZOOM_OUT: {
+            return {
+                ...state,
+                mapView: {
+                    ...state.mapView,
+                    zoom: Math.max(state.mapView.zoom - 1, 15)
+                }
+            }
+        }
+        case SET_PITCH: {
+            return {
+                ...state,
+                mapView: {
+                    ...state.mapView,
+                    pitch: action.payload
+                }
+            }
+        }
+        case SET_ZOOM: {
+            return {
+                ...state,
+                mapView: {
+                    ...state.mapView,
+                    zoom: action.payload
+                }
+            }
         }
     }
     return state;

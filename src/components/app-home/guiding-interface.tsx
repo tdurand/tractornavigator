@@ -73,7 +73,7 @@ export class GuidingInterface {
       <div class="content flex flex-col flex-auto justify-between">
         <div class="shadow">
           {this.status === RecordingStatus.Recording &&
-            <div class="flex message-box justify-around">
+            <div class="flex message-box justify-around" style={{"margin-bottom": "-1px"}}>
               <div class="flex items-center">
                 <ion-icon name="time"></ion-icon>
                 <div class="ml-1">{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}</div>

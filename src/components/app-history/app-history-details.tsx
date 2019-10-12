@@ -59,6 +59,11 @@ export class AppHistoryDetails {
       zoom: 18
     });
 
+    var nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    this.map.addControl(nav, 'top-right');
+
     //const navControl = new mapboxgl.NavigationControl();
     //this.map.addControl(navControl, 'top-right');
 

@@ -238,7 +238,10 @@ const guidingStateReducer = (
             }
         }
         case RESET: {
-            return getInitialState();
+            return {
+                ...getInitialState(),
+                equipmentWidth: state.equipmentWidth
+            }
         }
 
     }

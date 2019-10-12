@@ -65,7 +65,9 @@ export class GuidingInterface {
 
   render() {
 
-    if(this.status === RecordingStatus.Recording) {
+    const isRecordingOrPaused = (this.status === RecordingStatus.Recording || this.status === RecordingStatus.Paused)
+
+    if(isRecordingOrPaused) {
       var diff = Math.abs(new Date(this.dateStart).getTime() - new Date().getTime());
       var seconds = Math.floor(diff/1000) % 60;
       var minutes = Math.floor((diff/1000)/60);
@@ -74,7 +76,7 @@ export class GuidingInterface {
     return (
       <div class="content flex flex-col flex-auto justify-between">
         <div class="shadow">
-          {this.status === RecordingStatus.Recording &&
+          {isRecordingOrPaused &&
             <div class="flex message-box justify-around" style={{"margin-bottom": "-1px"}}>
               <div class="flex items-center">
                 <ion-icon name="time"></ion-icon>
@@ -116,14 +118,8 @@ export class GuidingInterface {
               </ion-button>
             </div>
           }
-          {this.status === RecordingStatus.Recording &&
+          {isRecordingOrPaused &&
             <div>
-              {/* <ion-button
-                color="medium"
-                onClick={() => this.pauseRecording() }
-              >
-                Pause
-              </ion-button> */}
               <ion-button
                 color="medium"
                 onClick={() => this.cancelRecording() }
@@ -138,28 +134,22 @@ export class GuidingInterface {
                 }}
               >
                 Stop and save
-            </ion-button>
-            </div>
-          }
-          {this.status === RecordingStatus.Paused &&
-            <div>
-              <ion-button
-                color="secondary"
-                onClick={() => this.resumeRecording()}
-              >
-                Resume
               </ion-button>
-              <ion-button
-                color="primary"
-                onClick={() => {
-                  this.stopRecordingAndSave()
-                  this.goToHistory()
-                }}
-              >
-                Stop and save
-            </ion-button>
+              <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+                {this.status === RecordingStatus.Recording &&
+                  <ion-fab-button color="primary" onClick={() => this.pauseRecording()}>
+                    <ion-icon name="pause"></ion-icon>
+                  </ion-fab-button>
+                }
+                {this.status === RecordingStatus.Paused &&
+                  <ion-fab-button color="primary" onClick={() => this.resumeRecording()}>
+                    <ion-icon name="play"></ion-icon>
+                  </ion-fab-button>
+                }
+              </ion-fab>
             </div>
           }
+          
         </div>
       </div>
     );

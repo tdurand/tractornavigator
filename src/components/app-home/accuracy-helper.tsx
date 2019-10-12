@@ -9,7 +9,9 @@ import { AccuracyStatus } from '../../statemanagement/app/GeolocationStateManage
 export class AccuracyHelper {
 
   // @ts-ignore
-  @State() accuracyStatus: AccuracyStatus
+  @State() accuracyStatus: AccuracyStatus;
+  // @ts-ignore
+  @State() position: any;
   
   // @ts-ignore
   @Prop({ context: "store" }) store: Store;
@@ -17,10 +19,11 @@ export class AccuracyHelper {
   componentWillLoad() {
     this.store.mapStateToProps(this, state => {
       const {
-        geolocation: { accuracyStatus }
+        geolocation: { accuracyStatus, position }
       } = state;
       return {
-        accuracyStatus
+        accuracyStatus,
+        position
       };
     });
   }
@@ -41,13 +44,13 @@ export class AccuracyHelper {
       <ion-router-link href="/gpsstatus">
         <div class={`accuracy-helper ${this.getAccuracyStatusString(this.accuracyStatus)}`}>
             {this.accuracyStatus === AccuracyStatus.Poor &&
-              <p>Poor positioning accuracy</p>
+              <p>Poor positioning accuracy ({this.position.coords.accuracy}m)</p>
             }
             {this.accuracyStatus === AccuracyStatus.Medium &&
-              <p>Medium positioning accuracy</p>
+              <p>Medium positioning accuracy ({this.position.coords.accuracy}m)</p>
             }
             {this.accuracyStatus === AccuracyStatus.Good &&
-              <p>Good positioning accuracy</p>
+              <p>Good positioning accuracy ({this.position.coords.accuracy}m)</p>
             }
         </div>
       </ion-router-link>

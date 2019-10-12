@@ -161,7 +161,7 @@ const mapStateReducer = (
                 ...state,
                 mapView: {
                     ...state.mapView,
-                    zoom: Math.min(state.mapView.zoom + 1, 20)
+                    zoom: Math.min(state.mapView.zoom + 1, 22)
                 }
             }
         }

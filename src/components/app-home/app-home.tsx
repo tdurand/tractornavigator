@@ -17,7 +17,7 @@ import { handleNewPosition, zoomIn, zoomOut, set2D, set3D } from '../../stateman
 import { getDeviceInfo } from '../../statemanagement/app/DeviceStateManagement';
 import { restoreHistory } from '../../statemanagement/app/HistoryStateManagement';
 import { restoreAppState, registerAppOpening } from '../../statemanagement/app/AppStateManagement';
-import { point, lineString } from '@turf/helpers';
+import { point, lineString, multiPolygon } from '@turf/helpers';
 import generateCircle from '@turf/circle';
 import generateSector from '@turf/sector';
 const { SplashScreen } = Plugins;
@@ -428,22 +428,29 @@ export class AppHome {
 
   addOrUpdateTraceHistory(positionsHistory) {
     const layerAndSourceId = 'trace-history';
-    if (positionsHistory.length > 1) {
+    if (positionsHistory[0].length > 1) {
       let source = this.map.getSource(layerAndSourceId);
       // TODO replace 10 by tool width
-      // Could improve perfs of this by avoiding recomputing everything each new position, but just push the new ones...
-      const linePositionHistory = lineString(positionsHistory);
-      // This doesn't work if line history contains duplicates
-      // Using this because turf buffer funciton isn't working properly for some reason
-      // Width in meters
-      const traceAsPolygon = lineToPolygon(linePositionHistory, this.equipmentWidth);
+      // Could improve perfs of this by avoiding recomputing everything each new position, but just push the new ones...    
+      const traceAsPolygons = positionsHistory.map((positions) => {
+        if(positions.length > 1) {
+          let linePositionHistory = lineString(positions);
+          // This doesn't work if line history contains duplicates
+          // Using this because turf buffer funciton isn't working properly for some reason
+          let traceAsPolygon = lineToPolygon(linePositionHistory, this.equipmentWidth)
+          return traceAsPolygon;
+        }
+      }).filter((polygon) => polygon !== undefined);
+
+      const traceAsMultiPolygon = multiPolygon(traceAsPolygons);
+      
       if (source) {
-        source.setData(traceAsPolygon)
+        source.setData(traceAsMultiPolygon)
       } else {
         console.log('Create position source and layer');
         this.map.addSource(layerAndSourceId, {
           "type": "geojson",
-          "data": traceAsPolygon
+          "data": traceAsMultiPolygon
         });
         this.map.addLayer({
           "id": layerAndSourceId,

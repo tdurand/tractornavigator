@@ -1,5 +1,5 @@
 import lineOffset from '@turf/line-offset';
-import { polygon, point } from '@turf/helpers';
+import { point } from '@turf/helpers';
 import transformScale from '@turf/transform-scale';
 import bboxFromGeojson from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -351,7 +351,7 @@ export function lineToPolygon(line, width) {
   offsetLineLeft.geometry.coordinates.reverse().map((coordinate) => {
     linePolygonCoordinates.push(coordinate);
   })
-  return polygon([linePolygonCoordinates])
+  return [linePolygonCoordinates]
 }
 
 // TODO, this probably should go inside the guiding line library

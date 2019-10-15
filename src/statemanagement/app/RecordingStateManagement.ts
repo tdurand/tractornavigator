@@ -1,14 +1,14 @@
 import { saveRecording } from "./HistoryStateManagement";
 import { resetGuidingState } from "./GuidingStateManagement";
 import { lineToPolygon } from "../../helpers/utils";
-import { lineString } from '@turf/helpers';
+import { lineString, multiPolygon } from '@turf/helpers';
 import computeArea from "@turf/area";
 
 export enum RecordingStatus { Idle, Recording, Paused}
 
 interface RecordingState {
     status: RecordingStatus
-    recordedPositions: Array<Array<number>>
+    recordedPositions: Array<Array<Array<number>>>
     area: number
     equipmentWidth: number
     dateStart: string
@@ -18,7 +18,7 @@ interface RecordingState {
 const getInitialState = (): RecordingState => {
     return {
         status: RecordingStatus.Idle,
-        recordedPositions: [],
+        recordedPositions: [[]],
         area: 0.00,
         equipmentWidth: null,
         dateStart: null
@@ -28,6 +28,7 @@ const getInitialState = (): RecordingState => {
 
 const SET_STATUS = 'Recording/SET_STATUS';
 const ADD_RECORDED_POSITION = 'Recording/ADD_RECORDED_POSITION';
+const PAUSE_RECORDING = 'Recording/PAUSE_RECORDING';
 const SET_AREA = 'Recording/SET_AREA';
 const INIT_RECORDING_METADATA = 'Recording/INIT_RECORDING_METADATA';
 const RESET = 'Recording/RESET';
@@ -75,10 +76,20 @@ export function recordingOnNewPosition(newPosition) {
         if(getState().recording.status === RecordingStatus.Recording) {
             dispatch(addRecordedPosition(newPosition));
 
-            if(getState().recording.recordedPositions.length > 2) {
-                const traceAsPolygon = lineToPolygon(lineString(getState().recording.recordedPositions), getState().recording.equipmentWidth);
+            const traceAsPolygons = getState().recording.recordedPositions.map((positions) => {
+                if(positions.length > 1) {
+                    let linePositionHistory = lineString(positions);
+                    // This doesn't work if line history contains duplicates
+                    // Using this because turf buffer funciton isn't working properly for some reason
+                    let traceAsPolygon = lineToPolygon(linePositionHistory, getState().recording.equipmentWidth)
+                    return traceAsPolygon;
+                }
+            }).filter((polygon) => polygon !== undefined);
+
+            if(traceAsPolygons.length > 0) {
+                const traceAsMultiPolygon = multiPolygon(traceAsPolygons);
                 // Area in ha
-                const area = Math.round((computeArea(traceAsPolygon) / 10000) * 100) / 100;
+                const area = Math.round((computeArea(traceAsMultiPolygon) / 10000) * 100) / 100;
                 dispatch(setArea(area));
             }
         }
@@ -99,6 +110,9 @@ export function pauseRecording() {
     return (dispatch) => {
         // set status
         dispatch(setStatus(RecordingStatus.Paused))
+        dispatch({
+            type: PAUSE_RECORDING
+        })
     }
 }
 
@@ -151,9 +165,31 @@ const recordingStateReducer = (
             };
         }
         case ADD_RECORDED_POSITION: {
+            if(state.recordedPositions.length > 1) {
+                const newRecordedPositions = [
+                    ...state.recordedPositions.slice(0, state.recordedPositions.length - 1),
+                    state.recordedPositions[state.recordedPositions.length - 1].concat([action.payload])
+                ]
+                return {
+                    ...state,
+                    recordedPositions: newRecordedPositions
+                };
+            } else {
+                return {
+                    ...state,
+                    recordedPositions: [
+                        state.recordedPositions[state.recordedPositions.length - 1].concat([action.payload])
+                    ]
+                };
+            }
+        }
+        case PAUSE_RECORDING: {
             return {
                 ...state,
-                recordedPositions: state.recordedPositions.concat([action.payload])
+                recordedPositions: [
+                    ...state.recordedPositions,
+                    []
+                ]
             };
         }
         case SET_STATUS: {

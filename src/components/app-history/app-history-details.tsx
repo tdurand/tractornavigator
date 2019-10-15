@@ -1,7 +1,7 @@
 import { Component, h, State, Prop, Watch } from '@stencil/core';
 import { Store } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
-import { lineString } from '@turf/helpers';
+import { lineString, multiPolygon } from '@turf/helpers';
 import bbox from '@turf/bbox';
 import config from '../../config.json';
 
@@ -95,12 +95,18 @@ export class AppHistoryDetails {
       let source = this.map.getSource(layerAndSourceId);
       // TODO replace 10 by tool width
       // Could improve perfs of this by avoiding recomputing everything each new position, but just push the new ones...
-      const linePositionHistory = lineString(positionsHistory);
-      // This doesn't work if line history contains duplicates
-      // Using this because turf buffer funciton isn't working properly for some reason
-      // Width in meters
-      const traceAsPolygon = lineToPolygon(linePositionHistory, equipmentWidth);
-      const bboxOfTrace = bbox(traceAsPolygon);
+      const traceAsPolygons = positionsHistory.map((positions) => {
+        if(positions.length > 1) {
+          let linePositionHistory = lineString(positions);
+          // This doesn't work if line history contains duplicates
+          // Using this because turf buffer funciton isn't working properly for some reason
+          let traceAsPolygon = lineToPolygon(linePositionHistory, equipmentWidth)
+          return traceAsPolygon;
+        }
+      }).filter((polygon) => polygon !== undefined);
+
+      const traceAsMultiPolygon = multiPolygon(traceAsPolygons);
+      const bboxOfTrace = bbox(traceAsMultiPolygon);
       // Fit map to bbox
       this.map.fitBounds(bboxOfTrace, {
         padding: {top: 50, bottom:50, left: 50, right: 50},
@@ -108,12 +114,12 @@ export class AppHistoryDetails {
         maxZoom: 18
       });
       if (source) {
-        source.setData(traceAsPolygon)
+        source.setData(traceAsMultiPolygon)
       } else {
         console.log('Create position source and layer');
         this.map.addSource(layerAndSourceId, {
           "type": "geojson",
-          "data": traceAsPolygon
+          "data": traceAsMultiPolygon
         });
         this.map.addLayer({
           "id": layerAndSourceId,

@@ -44,13 +44,13 @@ export class AccuracyHelper {
       <ion-router-link href="/gpsstatus">
         <div class={`accuracy-helper ${this.getAccuracyStatusString(this.accuracyStatus)}`}>
             {this.accuracyStatus === AccuracyStatus.Poor &&
-              <p>Poor positioning accuracy ({this.position.coords.accuracy}m)</p>
+              <p>Poor positioning accuracy</p>
             }
             {this.accuracyStatus === AccuracyStatus.Medium &&
-              <p>Medium positioning accuracy ({this.position.coords.accuracy}m)</p>
+              <p>Medium positioning accuracy</p>
             }
             {this.accuracyStatus === AccuracyStatus.Good &&
-              <p>Good positioning accuracy ({this.position.coords.accuracy}m)</p>
+              <p>Good positioning accuracy</p>
             }
         </div>
       </ion-router-link>

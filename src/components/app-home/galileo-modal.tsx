@@ -54,7 +54,7 @@ export class GalileoModal {
         </ion-toolbar>
       </ion-header>,
 
-      <ion-content>
+      <ion-content class="ion-padding">
         {this.rawMeasurements === null &&
           <div class="flex items-center justify-center mt-2">
             <div>Fetching Galileo status...</div>

@@ -16,7 +16,7 @@ interface GuidingState {
 const getInitialState = (): GuidingState => {
     return {
         referenceLine: [],
-        equipmentWidth: 8,
+        equipmentWidth: 13,
         distanceToClosestGuidingLine: null,
         bearingToClosestGuidingLine: null,
         isGuidingLineOnRightOrLeft: null,

@@ -12,7 +12,7 @@ export default function Geosimulation(params) {
             coords: {
                 latitude: 0,
                 longitude: 0,
-                accuracy: 10,
+                accuracy: 3,
                 altitude: null,
                 altitudeAccuracy: null,
                 heading: null,

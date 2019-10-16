@@ -81,8 +81,8 @@ export function initGnssMeasurements(platform) {
         } else if(platform === "web") {
             // simulate raw measurements to work on API
             dispatch(setGnssMeasurementsSupported(true))
-            dispatch(setGalileoSupport(false))
-            dispatch(setDualFreqSupport(false))
+            dispatch(setGalileoSupport(true))
+            dispatch(setDualFreqSupport(true))
         } else {
             dispatch(setGnssMeasurementsSupported(false))
             dispatch(setGalileoSupport(false))

@@ -49,7 +49,7 @@ export class AppGPSStatus {
             <ion-spinner class="ml-2"></ion-spinner>
           </div>
         }
-        {this.rawMeasurements &&
+        {this.rawMeasurements !== null &&
           <div>
             <accuracy-helper></accuracy-helper>
             {this.accuracyStatus === AccuracyStatus.Poor &&

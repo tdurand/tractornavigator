@@ -68,13 +68,13 @@ export class GalileoModal {
                 this.dualFreqSupported === true &&
                 <p>Your phone supports Galileo and can receive dual frequency signals, you are able to get the best accuracy possible thanks to Galileo.</p>
               }
-              {this.isGalileoSupported === true && this.dualFreqSupported === false &&
+              {this.isGalileoSupported === true && this.dualFreqSupported !== true &&
                 <div>
                   <p>Your phone supports Galileo but can't receive dual frequency signals.</p> 
                   <p><strong>You should consider <a target="_blank" href="https://www.usegalileo.eu/EN/inner.html#data=smartphone">upgrading to a phone that supports dual frequency signals offered by Galileo</a></strong></p>
                 </div>
               }
-              {this.isGalileoSupported === false &&
+              {this.isGalileoSupported !== true &&
                 <div>
                   <p>Your phone does not support Galileo, your positioning accuracy will be limited.</p>
                   <p><strong>You will be able to get better accuracy by <a target="_blank" href="https://www.usegalileo.eu/EN/inner.html#data=smartphone">upgrading to a phone that supports Galileo</a></strong></p>

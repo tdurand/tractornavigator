@@ -49,33 +49,28 @@ export class AppGPSStatus {
             <ion-spinner class="ml-2"></ion-spinner>
           </div>
         }
-        {this.rawMeasurements !== null &&
+        {this.rawMeasurements &&
           <div>
             <accuracy-helper></accuracy-helper>
             {this.accuracyStatus === AccuracyStatus.Poor &&
               <div>
-                {this.isGalileoSupported === true &&
-                this.dualFreqSupported === true &&
+                {this.isGalileoSupported === true && this.dualFreqSupported === true &&
                   <p>Your phone supports Galileo and can receive dual frequency signals, you should be able to get a much better accuracy... Try to move in an open sky environment</p>
                 }
-                {this.isGalileoSupported === true && 
-                this.dualFreqSupported === false &&
+                {this.isGalileoSupported === true && this.dualFreqSupported !== true &&
                   <p>Your phone supports Galileo but can't receive dual frequency signals, you should be able to get medium accuracy ... Try to move in an open sky environment</p>
                 }
-                {this.isGalileoSupported === false && 
-                this.dualFreqSupported === false &&
+                {this.isGalileoSupported !== true && this.dualFreqSupported !== true &&
                   <p>Your phone does not support Galileo and can't receive dual frequency signals, your positioning accuracy will be limited.</p>
                 }
               </div>
             }
             {this.accuracyStatus === AccuracyStatus.Medium &&
               <div>
-                {this.isGalileoSupported === true &&
-                this.dualFreqSupported === true &&
+                {this.isGalileoSupported === true && this.dualFreqSupported === true &&
                   <p>Your phone supports Galileo and can receive dual frequency signals, you should be able to get a better accuracy. Try to move in an open sky environment</p>
                 }
-                {this.isGalileoSupported === true && 
-                this.dualFreqSupported === false &&
+                {this.isGalileoSupported === true && this.dualFreqSupported !== true &&
                   <div>
                     <p>Your phone supports Galileo but can't receive dual frequency signals, you won't be able to get a better accuracy than this.</p>
                   </div>

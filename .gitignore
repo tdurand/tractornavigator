@@ -31,3 +31,5 @@ src/assets/countries
 
 android/*/.*
 android/.*
+
+android/app/release/

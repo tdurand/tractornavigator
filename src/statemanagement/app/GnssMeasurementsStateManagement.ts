@@ -85,7 +85,8 @@ export function initGnssMeasurements(platform) {
             dispatch(setDualFreqSupport(true))
         } else {
             dispatch(setGnssMeasurementsSupported(false))
-            dispatch(setGalileoSupport(false))
+            dispatch(setGalileoSupport(true))
+            dispatch(setDualFreqSupport(false))
             // TODO hardcode from deviceName for iOS
         }
     }

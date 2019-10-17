@@ -23,6 +23,8 @@ export function getDeviceInfo() {
                 payload: deviceInfo
             })
 
+            //console.log(deviceInfo);
+
             if(deviceInfo.platform === "web") {
                 //Simulate geolocation
                 console.log('simulateGeolocation')

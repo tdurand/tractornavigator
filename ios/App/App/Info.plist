@@ -40,6 +40,8 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Allow geolocation for guiding ?</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>To Pick Photos from Library</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

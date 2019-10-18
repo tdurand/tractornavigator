@@ -22,7 +22,10 @@ const en = {
     POOR_NO_GALILEO_NO_DUAL_FREQ: "Your phone does not support Galileo and can't receive dual frequency signals, your positioning accuracy will be limited.",
     MEDIUM_GALILEO_DUAL_FREQ: "Your phone supports Galileo and can receive dual frequency signals, you should be able to get a better accuracy. Try to move in an open sky environment",
     MEDIUM_GALILEO_NO_DUAL_FREQ: "Your phone supports Galileo but can't receive dual frequency signals, you won't be able to get a better accuracy than this.",
-    GOOD_GALILEO_DUAL_FREQ: "Your phone supports Galileo but can't receive dual frequency signals, you won't be able to get a better accuracy than this."
+    GOOD_GALILEO_DUAL_FREQ: "Your phone supports Galileo and can receive dual frequency signals, you have the best accuracy possible thanks to Galileo.",
+    GALILEO_GALILEO_DUALFREQ: "Your phone supports Galileo and can receive dual frequency signals, you are able to get the best accuracy possible thanks to Galileo.",
+    GALILEO_GALILEO_NO_DUALFREQ: "Your phone supports Galileo but can't receive dual frequency signals.",
+    GALILEO_NO_GALILEO_NO_DUALFREQ: "Your phone does not support Galileo, your positioning accuracy will be limited."
 }
 
 const fr = {
@@ -42,7 +45,19 @@ const fr = {
     TAB_NAVIGATION: "Navigation",
     TAB_GPSSTATUS: "GPS Status",
     TAB_HISTORY: "Historique",
-    TAB_ABOUT: "A propos"
+    TAB_ABOUT: "A propos",
+    FETCHING_GALILEO_STATUS: "Chargement du status Galileo...",
+    POOR_GALILEO_DUAL_FREQ: "Votre téléphone supporte Galileo et peut recevoir les signaux double fréquence, vous devriez pouvoir avoir une meilleure précision... Essayez d’aller dans un endroit dégagé.",
+    POOR_GALILEO_NO_DUAL_FREQ: "Votre téléphone supporte Galileo mais ne peut pas recevoir les signaux double fréquence, cependant vous devriez pouvoir avoir une meilleure précision... Essayez d’aller dans un endroit dégagé.",
+    POOR_NO_GALILEO_NO_DUAL_FREQ: "Votre téléphone ne supporte pas Galileo, votre précision sera limitée.",
+    MEDIUM_GALILEO_DUAL_FREQ: "Votre téléphone supporte Galileo et peut recevoir les signaux double fréquence, vous devriez pouvoir avoir une meilleure précision... Essayez d’aller dans un endroit dégagé.",
+    MEDIUM_GALILEO_NO_DUAL_FREQ: "Votre téléphone supporte Galileo mais ne peut pas recevoir les signaux double fréquence, vous n’aurez pas de bien meilleure précision",
+    GOOD_GALILEO_DUAL_FREQ: "Votre téléphone supporte Galileo et peut recevoir les signaux double fréquence, vous avez la meilleure précision possible grâce à Galileo.",
+    GALILEO_GALILEO_DUALFREQ: "Votre téléphone supporte Galileo et peut recevoir les signaux double fréquence, vous avez la meilleure précision possible grâce à Galileo.",
+    GALILEO_GALILEO_NO_DUALFREQ: "Votre téléphone supporte galileo mais ne peut pas recevoir les signaux double fréquence",
+    GALILEO_NO_GALILEO_NO_DUALFREQ: "Votre téléphone ne supporte pas galileo, votre précision sera limitée."
+
+
 }
 
 export function getString(id, lang) {

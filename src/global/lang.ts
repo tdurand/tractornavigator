@@ -25,7 +25,8 @@ const en = {
     GOOD_GALILEO_DUAL_FREQ: "Your phone supports Galileo and can receive dual frequency signals, you have the best accuracy possible thanks to Galileo.",
     GALILEO_GALILEO_DUALFREQ: "Your phone supports Galileo and can receive dual frequency signals, you are able to get the best accuracy possible thanks to Galileo.",
     GALILEO_GALILEO_NO_DUALFREQ: "Your phone supports Galileo but can't receive dual frequency signals.",
-    GALILEO_NO_GALILEO_NO_DUALFREQ: "Your phone does not support Galileo, your positioning accuracy will be limited."
+    GALILEO_NO_GALILEO_NO_DUALFREQ: "Your phone does not support Galileo, your positioning accuracy will be limited.",
+    HISTORY_NO_RECORDING: "No recording yet."
 }
 
 const fr = {
@@ -55,9 +56,8 @@ const fr = {
     GOOD_GALILEO_DUAL_FREQ: "Votre téléphone supporte Galileo et peut recevoir les signaux double fréquence, vous avez la meilleure précision possible grâce à Galileo.",
     GALILEO_GALILEO_DUALFREQ: "Votre téléphone supporte Galileo et peut recevoir les signaux double fréquence, vous avez la meilleure précision possible grâce à Galileo.",
     GALILEO_GALILEO_NO_DUALFREQ: "Votre téléphone supporte galileo mais ne peut pas recevoir les signaux double fréquence",
-    GALILEO_NO_GALILEO_NO_DUALFREQ: "Votre téléphone ne supporte pas galileo, votre précision sera limitée."
-
-
+    GALILEO_NO_GALILEO_NO_DUALFREQ: "Votre téléphone ne supporte pas galileo, votre précision sera limitée.",
+    HISTORY_NO_RECORDING: "Pas d'enregistrement pour l'instant"
 }
 
 export function getString(id, lang) {

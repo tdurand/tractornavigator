@@ -1,6 +1,7 @@
 import { Component, h, Prop, State } from '@stencil/core';
 import { Store } from "@stencil/redux";
 import dayjs from 'dayjs';
+import { getString } from '../../global/lang';
 
 
 @Component({
@@ -10,16 +11,19 @@ import dayjs from 'dayjs';
 export class AppHistory {
 
   @State() recordings: Array<any>
+  @State() lang: any
 
   @Prop({ context: "store" }) store: Store;
 
   componentWillLoad() {
     this.store.mapStateToProps(this, state => {
       const {
-        history: { recordings }
+        history: { recordings },
+        device: { lang }
       } = state;
       return {
-        recordings
+        recordings,
+        lang
       };
     });
 
@@ -41,7 +45,7 @@ export class AppHistory {
           <ion-buttons slot="start">
             <ion-back-button defaultHref="/" />
           </ion-buttons>
-          <ion-title>History</ion-title>
+          <ion-title>{getString('TAB_HISTORY', this.lang)}</ion-title>
         </ion-toolbar>
       </ion-header>,
 
@@ -76,7 +80,7 @@ export class AppHistory {
         </ion-list>
         }
         {this.recordings.length === 0 &&
-          <div class="text-center ion-padding">No recording yet.</div>
+          <div class="text-center ion-padding">{getString('HISTORY_NO_RECORDING', this.lang)}</div>
         }
       </ion-content>
     ];

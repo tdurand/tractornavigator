@@ -8,8 +8,7 @@ interface HistoryState {
 
 const getInitialState = (): HistoryState => {
     return {
-        recordings: [],
-
+        recordings: []
     };
 };
 
@@ -19,6 +18,7 @@ const RESTORE_ALL_RECORDINGS = 'History/RESTORE_ALL_RECORDINGS';
 
 export function saveRecording(recording) {
     return (dispatch) => {
+
         dispatch({
             type: SAVE_RECORDING,
             payload: recording
@@ -53,10 +53,20 @@ const historyStateReducer = (
 ): HistoryState => {
     switch (action.type) {
         case SAVE_RECORDING: {
-            return {
-                ...state,
-                recordings: state.recordings.concat([action.payload])
-            };
+            const MAX_ITEMS = 20;
+            if(state.recordings.length > MAX_ITEMS) {
+                // Remove oldest item before concat (index 0)
+                // .filter((_value, index) => index > 0)
+                return {
+                    ...state,
+                    recordings: state.recordings.concat([action.payload]).filter((_value, index) => index > 0)
+                };
+            } else {
+                return {
+                    ...state,
+                    recordings: state.recordings.concat([action.payload])
+                };
+            }
         }
         case RESTORE_ALL_RECORDINGS: {
             return {

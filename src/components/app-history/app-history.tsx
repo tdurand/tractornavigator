@@ -48,7 +48,7 @@ export class AppHistory {
       <ion-content>
         {this.recordings.length > 0 &&
         <ion-list>
-          {this.recordings.reverse().map((recording, index) =>
+          {this.recordings.slice().reverse().map((recording, index) =>
             <ion-item key={index}> 
               <ion-label>
                 <h3>{dayjs(recording.dateStart).format('MMM DD, YYYY')}</h3>

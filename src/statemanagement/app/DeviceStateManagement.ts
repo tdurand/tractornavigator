@@ -35,6 +35,11 @@ export function getDeviceInfo() {
                 window.plugins.insomnia.keepAwake();
             }
         });
+
+        Device.getLanguageCode().then((languageCode) => {
+            console.log(languageCode);
+            //
+        })
     }
 }
 

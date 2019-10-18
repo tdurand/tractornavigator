@@ -3,5 +3,10 @@
   "appName": "TractorNavigator",
   "bundledWebRuntime": false,
   "npmClient": "npm",
-  "webDir": "www"
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 20000
+    }
+  }
 }

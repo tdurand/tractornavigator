@@ -46,6 +46,7 @@ export class AppHistory {
       </ion-header>,
 
       <ion-content>
+        {this.recordings.length > 0 &&
         <ion-list>
           {this.recordings.reverse().map((recording, index) =>
             <ion-item key={index}> 
@@ -72,31 +73,11 @@ export class AppHistory {
               </ion-button>
             </ion-item>
           )}
-          {/* <ion-item-divider>
-            <ion-label>
-              Finished fields
-            </ion-label>
-          </ion-item-divider>
-          {finishedTracks.map((item, index) =>
-            <ion-item key={index}> 
-              <ion-thumbnail slot="start">
-                <img src="/assets/field-vignette.png" />
-              </ion-thumbnail>
-              <ion-label>
-                <h3>{item.name}</h3>
-                <p>{item.date} | {item.length}km</p>
-              </ion-label>
-              <ion-button 
-                slot="end" 
-                color="medium"
-                onClick={() => console.log('todo')}
-              >
-                  <ion-icon name="refresh" slot="end"></ion-icon>
-                Reload
-              </ion-button>
-            </ion-item>
-          )} */}
         </ion-list>
+        }
+        {this.recordings.length === 0 &&
+          <div class="text-center ion-padding">No recording yet.</div>
+        }
       </ion-content>
     ];
   }

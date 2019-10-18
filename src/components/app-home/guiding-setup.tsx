@@ -2,6 +2,9 @@ import { Component, h, Prop, State } from '@stencil/core';
 import { Store, Action } from "@stencil/redux";
 import { setReferenceLine, setEquipmentWidth, resetGuidingState } from '../../statemanagement/app/GuidingStateManagement';
 import { GeolocationPosition } from '@capacitor/core';
+import distance from '@turf/distance';
+import { point } from '@turf/helpers';
+
 
 @Component({
     tag: 'guiding-setup',
@@ -82,9 +85,17 @@ export class GuidingSetup {
                             </ion-button>
                             <ion-button
                                 color="primary"
-                                onClick={() =>
-                                    this.setReferenceLine([this.referenceLine[0], [this.position.coords.longitude, this.position.coords.latitude]])
-                                }
+                                onClick={() => {
+                                    // only confirm is distance between two points is more than 1 meter
+                                    if(
+                                        distance(
+                                            point(this.referenceLine[0]), 
+                                            point([this.position.coords.longitude, this.position.coords.latitude])
+                                        ) > 0.001
+                                    ) {
+                                        this.setReferenceLine([this.referenceLine[0], [this.position.coords.longitude, this.position.coords.latitude]])
+                                    }
+                                }}
                             >
                                 Confirm
                             </ion-button>

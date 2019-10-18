@@ -1,10 +1,14 @@
-#map,#mapHistoryDetails {
+#map {
     position: absolute;
     top: 30px;
     bottom: 0;
     right: 0;
     left: 0;
     z-index: 2;
+}
+
+#mapHistoryDetails {
+    flex: 1;
 }
 
 .inset-modal .modal-wrapper {
@@ -113,6 +117,12 @@
 
 .mapbox-control.pt-l {
     top: 90px;
+}
+
+.app-history-metadata {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 20px;
 }
 
 /** Utility classes (from tailwind) **/

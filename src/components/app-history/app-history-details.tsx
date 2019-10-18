@@ -4,6 +4,7 @@ import mapboxgl from 'mapbox-gl';
 import { lineString, multiPolygon } from '@turf/helpers';
 import bbox from '@turf/bbox';
 import config from '../../config.json';
+import dayjs from 'dayjs';
 
 import { lineToPolygon } from '../../helpers/utils';
 
@@ -150,6 +151,13 @@ export class AppHistoryDetails {
 
   }
 
+  computeTimeRecording(dateStart, dateEnd) {
+    var diff = Math.abs(new Date(dateStart).getTime() - new Date(dateEnd).getTime());
+    var seconds = Math.floor(diff/1000) % 60;
+    var minutes = Math.floor((diff/1000)/60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+  }
+
   render() {
     return [
       <ion-header>
@@ -162,18 +170,24 @@ export class AppHistoryDetails {
       </ion-header>,
 
       <ion-content>
-        <div id="mapHistoryDetails"></div>
-        <div class="ctas-container">
-          <div class="ctas-help">
-          </div>
-          <div class="ctas-buttons">
-            {/* <ion-button
-              color="primary"
-              onClick={() => console.log('todo')}
-            >
-              Continue guiding
-            </ion-button> */}
-          </div>
+        <div class="flex flex-col" style={{"height": "100%", "width": "100%"}}>
+          {this.recording &&
+            <div class="message-box app-history-metadata">
+              <h5>{dayjs(this.recording.dateStart).format('MMM DD, YYYY')}</h5>
+              <p>{dayjs(this.recording.dateStart).format('hh:mm a')} - {dayjs(this.recording.dateEnd).format('hh:mm a')}</p>
+              <div class="flex justify-center">
+                <div class="flex items-center">
+                  <ion-icon name="time"></ion-icon>
+                  <div class="ml-1">{this.computeTimeRecording(this.recording.dateStart, this.recording.dateEnd)}</div>
+                </div>
+                <div class="flex items-center ml-2">
+                  <ion-icon name="map"></ion-icon>
+                  <div class="ml-1">{this.recording.area} ha</div>
+                </div>
+              </div>
+            </div>
+          }
+          <div id="mapHistoryDetails"></div>
         </div>
       </ion-content>
     ];

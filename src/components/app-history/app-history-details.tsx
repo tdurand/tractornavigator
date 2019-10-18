@@ -92,7 +92,7 @@ export class AppHistoryDetails {
 
   addOrUpdateTraceHistory(positionsHistory, equipmentWidth) {
     const layerAndSourceId = 'trace-history';
-    if (positionsHistory.length > 1) {
+    if (positionsHistory[0].length > 1) {
       let source = this.map.getSource(layerAndSourceId);
       // TODO replace 10 by tool width
       // Could improve perfs of this by avoiding recomputing everything each new position, but just push the new ones...

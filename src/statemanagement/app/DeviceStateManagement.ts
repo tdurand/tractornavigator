@@ -1,19 +1,47 @@
 import { Plugins } from '@capacitor/core';
 import { simulateGeolocation } from './GeolocationStateManagement';
-const { Device } = Plugins;
+const { Device, Network } = Plugins;
 
 interface DeviceState {
     deviceInfo: any
+    offline: any
 }
 
 const getInitialState = (): DeviceState => {
     return {
-        deviceInfo: null
+        deviceInfo: null,
+        offline: false
     };
 };
 
-
 const SET_DEVICE_INFO = 'DEVICE/SET_DEVICE_INFO';
+const SET_OFFLINE = 'DEVICE/SET_OFFLINE';
+
+export function initNetworkListener() {
+    return (dispatch) => {
+        Network.addListener('networkStatusChange', (status) => {
+            if(status.connected) {
+                dispatch({
+                    type: SET_OFFLINE,
+                    payload: false
+                })
+            } else {
+                dispatch({
+                    type: SET_OFFLINE,
+                    payload: true
+                })
+            }
+        });
+        Network.getStatus().then((status) => {
+            if(!status.connected) {
+                dispatch({
+                    type: SET_OFFLINE,
+                    payload: true
+                })
+            }
+        });
+    }
+}
 
 export function getDeviceInfo() {
     return (dispatch) => {
@@ -53,6 +81,12 @@ const deviceStateReducer = (
                 ...state,
                 deviceInfo: action.payload
             };
+        }
+        case SET_OFFLINE: {
+            return {
+                ...state,
+                offline: action.payload
+            }
         }
     }
     return state;

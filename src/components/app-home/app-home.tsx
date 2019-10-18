@@ -14,7 +14,7 @@ import {
   createOrUpdateGuidingLines
 } from '../../statemanagement/app/GuidingStateManagement';
 import { handleNewPosition, zoomIn, zoomOut, set2D, set3D } from '../../statemanagement/app/MapStateManagement';
-import { getDeviceInfo } from '../../statemanagement/app/DeviceStateManagement';
+import { getDeviceInfo, initNetworkListener } from '../../statemanagement/app/DeviceStateManagement';
 import { restoreHistory } from '../../statemanagement/app/HistoryStateManagement';
 import { restoreAppState, registerAppOpening } from '../../statemanagement/app/AppStateManagement';
 import { point, lineString, multiPolygon } from '@turf/helpers';
@@ -27,8 +27,8 @@ import config from '../../config.json';
 import { lineToPolygon } from '../../helpers/utils';
 import { RecordingStatus } from '../../statemanagement/app/RecordingStateManagement';
 
-//import { styleMapboxOffline } from '../../helpers/utils';
-// import { blankMapStyle } from '../../helpers/utils';
+// import { styleMapboxOffline } from '../../helpers/utils';
+import { blankMapStyle } from '../../helpers/utils';
 
 /*
 
@@ -100,6 +100,22 @@ export class AppHome {
     }
   }
 
+  @State() offline: any
+  @Watch('offline')
+  offlineWatchHandler(isOffline) {
+    if(this.map) {
+      if(isOffline) {
+        let mapStyle = blankMapStyle;
+        // Change map
+        this.map.setStyle(mapStyle)
+      } else {
+        let mapStyle = 'mapbox://styles/mapbox/satellite-v9';
+        this.map.setStyle(mapStyle)
+      }
+      
+    }
+  }
+
   @State() status: RecordingStatus;
   @State() rawMeasurements: any
   recordedPositions: Array<Array<number>>;
@@ -123,6 +139,7 @@ export class AppHome {
   zoomOut: Action;
   set2D: Action;
   set3D: Action;
+  initNetworkListener: Action;
 
   map: any;
   mapIsReady: boolean = false;
@@ -148,7 +165,8 @@ export class AppHome {
         guiding: { referenceLine, equipmentWidth, isDefiningGuidingLines, guidingLines, bboxContainer, closestLine },
         map: { mapView },
         app: { isFirstStart, nbOpeningBeforeDisplayingGalileoNotificationAgain },
-        gnssmeasurements: { rawMeasurements }
+        gnssmeasurements: { rawMeasurements },
+        device: { offline }
       } = state;
       return {
         position,
@@ -163,7 +181,8 @@ export class AppHome {
         mapView,
         isFirstStart,
         nbOpeningBeforeDisplayingGalileoNotificationAgain,
-        rawMeasurements
+        rawMeasurements,
+        offline
       };
     });
 
@@ -182,7 +201,8 @@ export class AppHome {
       zoomIn,
       zoomOut,
       set2D, 
-      set3D
+      set3D,
+      initNetworkListener
     });
 
 
@@ -192,6 +212,7 @@ export class AppHome {
     SplashScreen.hide();
 
     this.getDeviceInfo();
+    this.initNetworkListener();
 
     this.loadingModal.present()
 
@@ -201,14 +222,12 @@ export class AppHome {
     this.restoreAppState();
     this.registerAppOpening();
 
-    // if online
+
     let mapStyle = 'mapbox://styles/mapbox/satellite-v9';
-    // else
-    // mapStyle = blankMapStyle;
-    // TODO implement a reducer that watch network status and change 
-    // blankMap -> satellite map
-    // // If online, set satellite
-    //this.map.setStyle('mapbox://styles/mapbox/satellite-v9');
+    if(this.offline) {
+      // @ts-ignore
+      mapStyle = blankMapStyle;
+    }
 
     mapboxgl.accessToken = config.mapboxToken;
     this.map = new mapboxgl.Map({
@@ -229,7 +248,13 @@ export class AppHome {
 
     this.map.on('style.load', () => {
       // Triggered when `setStyle` is called.
+      if(this.guidingLines) {
+        // Bbox container updated, refresh guidinglines display
+        this.addOrUpdateGuidinglineToMap(this.guidingLines)
+      }
       this.updateMapDisplay();
+      // console.log('blabla')
+      // this.map.setPaintProperty('guiding-lines', 'line-color', this.offline ? 'black' : 'white')
     });
 
     this.map.on('load', () => {
@@ -336,7 +361,7 @@ export class AppHome {
         "type": "line",
         "source": layerAndSourceId,
         "paint": {
-          "line-color": "white",
+          "line-color": this.offline ? "black" : "white",
           "line-width": 2
         }
       });

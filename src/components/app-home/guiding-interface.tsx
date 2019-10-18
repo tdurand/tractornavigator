@@ -3,6 +3,7 @@ import { Store, Action } from "@stencil/redux";
 import { startRecording, resumeRecording, stopRecordingAndSave, cancelRecording, pauseRecording, RecordingStatus } from '../../statemanagement/app/RecordingStateManagement';
 import { startDefiningGuidingLines } from '../../statemanagement/app/GuidingStateManagement';
 import { GeolocationPosition } from '@capacitor/core';
+import { getString } from '../../global/lang';
 
 @Component({
   tag: 'guiding-interface',
@@ -11,6 +12,8 @@ import { GeolocationPosition } from '@capacitor/core';
 export class GuidingInterface {
 
   @State() status: RecordingStatus;
+
+  @State() lang: any;
 
   @Prop({ context: "store" }) store: Store;
   startRecording: Action;
@@ -37,7 +40,8 @@ export class GuidingInterface {
     this.store.mapStateToProps(this, state => {
       const {
         recording: { status, dateStart, area },
-        guiding: { distanceToClosestGuidingLine, isGuidingLineOnRightOrLeft, equipmentWidth }
+        guiding: { distanceToClosestGuidingLine, isGuidingLineOnRightOrLeft, equipmentWidth },
+        device: { lang }
       } = state;
       return {
         status,
@@ -45,7 +49,8 @@ export class GuidingInterface {
         isGuidingLineOnRightOrLeft,
         dateStart,
         area,
-        equipmentWidth
+        equipmentWidth,
+        lang
       };
     });
 
@@ -114,7 +119,7 @@ export class GuidingInterface {
                   this.startRecording()
                 }}
               >
-                Start recording
+                {getString('START_RECORDING_CTA', this.lang)}
               </ion-button>
             </div>
           }
@@ -124,7 +129,7 @@ export class GuidingInterface {
                 color="medium"
                 onClick={() => this.cancelRecording() }
               >
-                Cancel
+                {getString('CANCEL', this.lang)}
               </ion-button>
               <ion-button
                 color="primary"
@@ -133,7 +138,7 @@ export class GuidingInterface {
                   this.goToHistory()
                 }}
               >
-                Stop and save
+                {getString('SAVE_CTA', this.lang)}
               </ion-button>
               <ion-fab vertical="bottom" horizontal="end" slot="fixed">
                 {this.status === RecordingStatus.Recording &&

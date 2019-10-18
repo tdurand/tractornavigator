@@ -23,6 +23,7 @@ import generateSector from '@turf/sector';
 const { SplashScreen } = Plugins;
 import LoadingIndicator from '../../helpers/loadingIndicator';
 import config from '../../config.json';
+import { getString } from '../../global/lang';
 
 import { lineToPolygon } from '../../helpers/utils';
 import { RecordingStatus } from '../../statemanagement/app/RecordingStateManagement';
@@ -49,7 +50,7 @@ export class AppHome {
 
     if (!this.position) {
       this.loadingModal.present();
-      this.loadingModal.setMessage("Getting your position...");
+      this.loadingModal.setMessage(getString('GETTING_POSITION', this.lang));
     } else {
       if (this.mapIsReady) {
         this.loadingModal.dismiss();
@@ -62,7 +63,7 @@ export class AppHome {
           }
         }
       } else {
-        this.loadingModal.setMessage("Loading map...")
+        this.loadingModal.setMessage(getString('LOADING_MAP', this.lang))
       }
       
     }
@@ -87,6 +88,8 @@ export class AppHome {
     }
   }
   @State() equipmentWidth: number;
+
+  @State() lang: any = 'en';
 
   closestLine: any
   @State() guidingLines: any;
@@ -151,7 +154,7 @@ export class AppHome {
     this.changeMapView(mapView);
   }
 
-  loadingModal: LoadingIndicator = new LoadingIndicator("Getting your position...");
+  loadingModal: LoadingIndicator = new LoadingIndicator(getString('GETTING_POSITION', this.lang));
   galileoModal: HTMLIonModalElement;
 
   @Prop({ context: "store" }) store: Store;
@@ -166,7 +169,7 @@ export class AppHome {
         map: { mapView },
         app: { isFirstStart, nbOpeningBeforeDisplayingGalileoNotificationAgain },
         gnssmeasurements: { rawMeasurements },
-        device: { offline }
+        device: { offline, lang }
       } = state;
       return {
         position,
@@ -182,7 +185,8 @@ export class AppHome {
         isFirstStart,
         nbOpeningBeforeDisplayingGalileoNotificationAgain,
         rawMeasurements,
-        offline
+        offline,
+        lang
       };
     });
 
@@ -678,7 +682,7 @@ export class AppHome {
                   size="large"
                   onClick={() => this.startDefiningGuidingLines()}
                 >
-                  Start guiding
+                  {getString('START_GUIDING_CTA', this.lang)}
                 </ion-button>
               }
             </div>

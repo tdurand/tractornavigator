@@ -1,6 +1,7 @@
 import { Component, h, Prop, State } from '@stencil/core';
 import { Store } from "@stencil/redux";
 import { AccuracyStatus } from '../../statemanagement/app/GeolocationStateManagement';
+import { getString } from '../../global/lang';
 
 @Component({
   tag: 'app-gpsstatus',
@@ -14,20 +15,24 @@ export class AppGPSStatus {
   @State() dualFreqSupported: any
   @State() accuracyStatus: AccuracyStatus
 
+  @State() lang: any
+
   @Prop({ context: "store" }) store: Store;
 
   componentWillLoad() {
     this.store.mapStateToProps(this, state => {
       const {
         gnssmeasurements: { isGalileoSupported, satelliteData, rawMeasurements, dualFreqSupported },
-        geolocation: { accuracyStatus }
+        geolocation: { accuracyStatus },
+        device: { lang }
       } = state;
       return {
         isGalileoSupported,
         dualFreqSupported,
         satelliteData,
         rawMeasurements,
-        accuracyStatus
+        accuracyStatus,
+        lang
       };
     });
   }
@@ -39,13 +44,13 @@ export class AppGPSStatus {
           <ion-buttons slot="start">
             <ion-back-button defaultHref="/" />
           </ion-buttons>
-          <ion-title>GPS Status</ion-title>
+          <ion-title>{getString('TAB_GPSSTATUS', this.lang)}</ion-title>
         </ion-toolbar>
       </ion-header>,
       <ion-content class="ion-padding">
         {this.rawMeasurements === null &&
           <div class="flex items-center justify-center mt-2">
-            <div>Fetching Galileo status...</div>
+            <div>{getString('FETCHING_GALILEO_STATUS', this.lang)}</div>
             <ion-spinner class="ml-2"></ion-spinner>
           </div>
         }
@@ -55,24 +60,24 @@ export class AppGPSStatus {
             {this.accuracyStatus === AccuracyStatus.Poor &&
               <div>
                 {this.isGalileoSupported === true && this.dualFreqSupported === true &&
-                  <p>Your phone supports Galileo and can receive dual frequency signals, you should be able to get a much better accuracy... Try to move in an open sky environment</p>
+                  <p>{getString('POOR_GALILEO_DUAL_FREQ', this.lang)}</p>
                 }
                 {this.isGalileoSupported === true && this.dualFreqSupported !== true &&
-                  <p>Your phone supports Galileo but can't receive dual frequency signals, you should be able to get medium accuracy ... Try to move in an open sky environment</p>
+                  <p>{getString('POOR_GALILEO_NO_DUAL_FREQ', this.lang)}</p>
                 }
                 {this.isGalileoSupported !== true && this.dualFreqSupported !== true &&
-                  <p>Your phone does not support Galileo and can't receive dual frequency signals, your positioning accuracy will be limited.</p>
+                  <p>{getString('POOR_NO_GALILEO_NO_DUAL_FREQ', this.lang)}</p>
                 }
               </div>
             }
             {this.accuracyStatus === AccuracyStatus.Medium &&
               <div>
                 {this.isGalileoSupported === true && this.dualFreqSupported === true &&
-                  <p>Your phone supports Galileo and can receive dual frequency signals, you should be able to get a better accuracy. Try to move in an open sky environment</p>
+                  <p>{getString('MEDIUM_GALILEO_DUAL_FREQ', this.lang)}</p>
                 }
                 {this.isGalileoSupported === true && this.dualFreqSupported !== true &&
                   <div>
-                    <p>Your phone supports Galileo but can't receive dual frequency signals, you won't be able to get a better accuracy than this.</p>
+                    <p>{getString('MEDIUM_GALILEO_NO_DUAL_FREQ', this.lang)}</p>
                   </div>
                 }
               </div>
@@ -81,7 +86,7 @@ export class AppGPSStatus {
               <div>
                 {this.isGalileoSupported === true &&
                 this.dualFreqSupported === true &&
-                  <p>Your phone supports Galileo and can receive dual frequency signals, you have the best accuracy possible thanks to Galileo.</p>
+                  <p>{getString('GOOD_GALILEO_DUAL_FREQ', this.lang)}</p>
                 }
               </div>
             }

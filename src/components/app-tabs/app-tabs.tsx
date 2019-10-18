@@ -1,12 +1,31 @@
-import { Component, h } from "@stencil/core";
+import { Component, h, Prop, State } from "@stencil/core";
+import { Store } from "@stencil/redux";
+import { getString } from "../../global/lang";
 
 @Component({
   tag: "app-tabs",
   styleUrl: "app-tabs.css"
 })
 export class AppTabs {
+
+  @State() lang: any;
+
+  @Prop({ context: "store" }) store: Store;
+
+  componentWillLoad() {
+
+    this.store.mapStateToProps(this, state => {
+      return {
+        lang: state.device.lang
+      }
+    });
+
+    // Here add action to restore a recording
+    //this.store.mapDispatchToProps(this, {});
+  }
+
   render() {
-    return [
+    return this.lang ? [
       <ion-tabs>
         <ion-tab tab="tab-home" component="app-home" />
         <ion-tab tab="tab-gpsstatus" component="app-gpsstatus" />
@@ -18,22 +37,22 @@ export class AppTabs {
         <ion-tab-bar slot="bottom">
           <ion-tab-button tab="tab-home">
             <ion-icon name="map"></ion-icon>
-            <ion-label>Navigation</ion-label>
+            <ion-label>{getString("TAB_NAVIGATION", this.lang)}</ion-label>
           </ion-tab-button>
           <ion-tab-button tab="tab-gpsstatus">
             <ion-icon name="locate"></ion-icon>
-            <ion-label>GPS Status</ion-label>
+            <ion-label>{getString("TAB_GPSSTATUS", this.lang)}</ion-label>
           </ion-tab-button>
           <ion-tab-button tab="tab-history">
             <ion-icon name="list"></ion-icon>
-            <ion-label>History</ion-label>
+            <ion-label>{getString("TAB_HISTORY", this.lang)}</ion-label>
           </ion-tab-button>
           <ion-tab-button tab="tab-about">
             <ion-icon name="information-circle"></ion-icon>
-            <ion-label>About</ion-label>
+            <ion-label>{getString("TAB_ABOUT", this.lang)}</ion-label>
           </ion-tab-button>
         </ion-tab-bar>
       </ion-tabs>
-    ];
+    ] : [];
   }
 }

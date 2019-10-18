@@ -4,18 +4,21 @@ const { Device, Network } = Plugins;
 
 interface DeviceState {
     deviceInfo: any
-    offline: any
+    offline: any,
+    lang: any
 }
 
 const getInitialState = (): DeviceState => {
     return {
         deviceInfo: null,
-        offline: false
+        offline: false,
+        lang: 'en'
     };
 };
 
 const SET_DEVICE_INFO = 'DEVICE/SET_DEVICE_INFO';
 const SET_OFFLINE = 'DEVICE/SET_OFFLINE';
+const SET_LANGUAGE = 'DEVICE/SET_LANGUAGE';
 
 export function initNetworkListener() {
     return (dispatch) => {
@@ -65,8 +68,10 @@ export function getDeviceInfo() {
         });
 
         Device.getLanguageCode().then((languageCode) => {
-            console.log(languageCode);
-            //
+            dispatch({
+                type: SET_LANGUAGE,
+                payload: languageCode.value
+            })
         })
     }
 }
@@ -86,6 +91,12 @@ const deviceStateReducer = (
             return {
                 ...state,
                 offline: action.payload
+            }
+        }
+        case SET_LANGUAGE: {
+            return {
+                ...state,
+                lang: action.payload
             }
         }
     }

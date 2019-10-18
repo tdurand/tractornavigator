@@ -1,6 +1,7 @@
 import { Component, h, State, Prop } from '@stencil/core';
 import { Store } from "@stencil/redux";
 import { AccuracyStatus } from '../../statemanagement/app/GeolocationStateManagement';
+import { getString } from '../../global/lang';
 
 @Component({
   tag: 'accuracy-helper'
@@ -12,6 +13,8 @@ export class AccuracyHelper {
   @State() accuracyStatus: AccuracyStatus;
   // @ts-ignore
   @State() position: any;
+
+  @State() lang: any;
   
   // @ts-ignore
   @Prop({ context: "store" }) store: Store;
@@ -19,11 +22,13 @@ export class AccuracyHelper {
   componentWillLoad() {
     this.store.mapStateToProps(this, state => {
       const {
-        geolocation: { accuracyStatus, position }
+        geolocation: { accuracyStatus, position },
+        device: { lang }
       } = state;
       return {
         accuracyStatus,
-        position
+        position,
+        lang
       };
     });
   }
@@ -44,13 +49,13 @@ export class AccuracyHelper {
       <ion-router-link href="/gpsstatus">
         <div class={`accuracy-helper ${this.getAccuracyStatusString(this.accuracyStatus)}`}>
             {this.accuracyStatus === AccuracyStatus.Poor &&
-              <p>Poor positioning accuracy</p>
+              <p>{getString('POOR_ACCURACY', this.lang)}</p>
             }
             {this.accuracyStatus === AccuracyStatus.Medium &&
-              <p>Medium positioning accuracy</p>
+              <p>{getString('MEDIUM_ACCURACY', this.lang)}</p>
             }
             {this.accuracyStatus === AccuracyStatus.Good &&
-              <p>Good positioning accuracy</p>
+              <p>{getString('GOOD_ACCURACY', this.lang)}</p>
             }
         </div>
       </ion-router-link>

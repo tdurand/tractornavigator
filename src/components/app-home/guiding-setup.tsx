@@ -4,6 +4,7 @@ import { setReferenceLine, setEquipmentWidth, resetGuidingState } from '../../st
 import { GeolocationPosition } from '@capacitor/core';
 import distance from '@turf/distance';
 import { point } from '@turf/helpers';
+import { getString } from '../../global/lang';
 
 
 @Component({
@@ -17,6 +18,8 @@ export class GuidingSetup {
     @State() referenceLine: Array<Array<number>>;
     @State() equipmentWidth: number;
 
+    @State() lang: any;
+
     @Prop() onGuidingLinesDefined: Function;
     @Prop({ context: "store" }) store: Store;
     setReferenceLine: Action;
@@ -27,12 +30,14 @@ export class GuidingSetup {
         this.store.mapStateToProps(this, state => {
             const {
                 guiding: { referenceLine, equipmentWidth },
-                geolocation: { position }
+                geolocation: { position },
+                device: { lang }
             } = state;
             return {
                 referenceLine,
                 equipmentWidth,
-                position
+                position,
+                lang
             };
         });
 
@@ -49,7 +54,7 @@ export class GuidingSetup {
                 {this.referenceLine.length === 0 &&
                     <div class="flex flex-col flex-auto justify-between">
                         <div class="message-box shadow">
-                            Defining guiding reference line, go to starting point and confirm
+                            {getString('DEFINING_GUIDING_LINE_START', this.lang)}
                         </div>
                         <div class="flex justify-center pb-2">
                             <ion-button
@@ -58,7 +63,7 @@ export class GuidingSetup {
                                     this.resetGuidingState()
                                 }
                             >
-                                Cancel
+                                {getString('CANCEL', this.lang)}
                             </ion-button>
                             <ion-button
                                 color="primary"
@@ -66,7 +71,7 @@ export class GuidingSetup {
                                     this.setReferenceLine([[this.position.coords.longitude, this.position.coords.latitude]])
                                 }
                             >
-                                Set Reference start
+                                {getString('CONFIRM', this.lang)}
                             </ion-button>
                         </div>
                     </div>
@@ -74,14 +79,14 @@ export class GuidingSetup {
                 {this.referenceLine.length === 1 &&
                     <div class="flex flex-col flex-auto justify-between">
                         <div class="message-box">
-                            Starting point defined, go to end point (Point B) and confirm
+                            {getString('EFINING_GUIDING_LINE_START_CONFIRMED', this.lang)}
                         </div>
                         <div class="flex justify-center pb-2">
                             <ion-button
                                 color="medium"
                                 onClick={() => this.setReferenceLine([]) }
                             >
-                                Cancel
+                                {getString('CANCEL', this.lang)}
                             </ion-button>
                             <ion-button
                                 color="primary"
@@ -97,7 +102,7 @@ export class GuidingSetup {
                                     }
                                 }}
                             >
-                                Confirm
+                                {getString('CONFIRM', this.lang)}
                             </ion-button>
                         </div>
                     </div>
@@ -107,7 +112,7 @@ export class GuidingSetup {
                         <div></div>
                         <div class="message-box flex flex-col justify-center pb-2">
                             <ion-item>
-                                <ion-label position="stacked">Specify equipment width (meters)</ion-label>
+                                <ion-label position="stacked">{getString('SPECIFY_EQUIPMENT_WIDTH', this.lang)}</ion-label>
                                 <ion-input 
                                     type="number" 
                                     value={this.equipmentWidth.toString()}
@@ -121,13 +126,13 @@ export class GuidingSetup {
                                     color="medium"
                                     onClick={() => this.setReferenceLine([this.referenceLine[0]]) }
                                 >
-                                    Cancel
+                                    {getString('CANCEL', this.lang)}
                                 </ion-button>
                                 <ion-button
                                     color="primary"
                                     onClick={() => this.onGuidingLinesDefined()}
                                 >
-                                    Confirm
+                                    {getString('CONFIRM', this.lang)}
                                 </ion-button>
                             </div>
                         </div>

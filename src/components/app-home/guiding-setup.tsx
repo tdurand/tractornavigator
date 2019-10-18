@@ -79,7 +79,7 @@ export class GuidingSetup {
                 {this.referenceLine.length === 1 &&
                     <div class="flex flex-col flex-auto justify-between">
                         <div class="message-box">
-                            {getString('EFINING_GUIDING_LINE_START_CONFIRMED', this.lang)}
+                            {getString('DEFINING_GUIDING_LINE_START_CONFIRMED', this.lang)}
                         </div>
                         <div class="flex justify-center pb-2">
                             <ion-button

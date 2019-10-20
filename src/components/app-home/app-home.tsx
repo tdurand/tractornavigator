@@ -144,6 +144,7 @@ export class AppHome {
   set2D: Action;
   set3D: Action;
   initNetworkListener: Action;
+  restoreEquipmentWidth: Action;
 
   map: any;
   mapIsReady: boolean = false;

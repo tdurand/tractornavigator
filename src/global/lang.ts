@@ -25,7 +25,7 @@ const en = {
     POOR_GALILEO_NO_DUAL_FREQ: "Your phone supports Galileo but can't receive dual frequency signals, you should be able to get medium accuracy ... Try to move in an open sky environment",
     POOR_NO_GALILEO_NO_DUAL_FREQ: "Your phone does not support Galileo and can't receive dual frequency signals, your positioning accuracy will be limited.",
     MEDIUM_GALILEO_DUAL_FREQ: "Your phone supports Galileo and can receive dual frequency signals, you should be able to get a better accuracy. Try to move in an open sky environment",
-    MEDIUM_GALILEO_NO_DUAL_FREQ: "Your phone supports Galileo but can't receive dual frequency signals, you won't be able to get a better accuracy than this.",
+    MEDIUM_GALILEO_NO_DUAL_FREQ: "Your phone supports Galileo but can't receive dual frequency signals, you won't be able to get a better accuracy than this with this phone.",
     GOOD_GALILEO_DUAL_FREQ: "Your phone supports Galileo and can receive dual frequency signals, you have the best accuracy possible thanks to Galileo.",
     GALILEO_GALILEO_DUALFREQ: "Your phone supports Galileo and can receive dual frequency signals, you are able to get the best accuracy possible thanks to Galileo.",
     GALILEO_GALILEO_NO_DUALFREQ: "Your phone supports Galileo but can't receive dual frequency signals.",

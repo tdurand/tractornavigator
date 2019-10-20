@@ -11,7 +11,8 @@ import {
   setBearingToClosestGuidingLine, 
   startDefiningGuidingLines,
   onBboxChanged,
-  createOrUpdateGuidingLines
+  createOrUpdateGuidingLines,
+  restoreEquipmentWidth
 } from '../../statemanagement/app/GuidingStateManagement';
 import { handleNewPosition, zoomIn, zoomOut, set2D, set3D } from '../../statemanagement/app/MapStateManagement';
 import { getDeviceInfo, initNetworkListener } from '../../statemanagement/app/DeviceStateManagement';
@@ -201,6 +202,7 @@ export class AppHome {
       getDeviceInfo,
       restoreHistory,
       restoreAppState,
+      restoreEquipmentWidth,
       registerAppOpening,
       zoomIn,
       zoomOut,
@@ -224,6 +226,7 @@ export class AppHome {
 
     this.restoreHistory();
     this.restoreAppState();
+    this.restoreEquipmentWidth();
     this.registerAppOpening();
 
 

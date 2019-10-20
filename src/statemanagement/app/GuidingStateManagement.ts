@@ -1,5 +1,6 @@
 import { isPointOnLeftOfRight, computeLargerBbox } from "../../helpers/utils";
 import GuidingLines from '../../helpers/guidinglines';
+import { loadState, persistState } from "../localStorage";
 
 interface GuidingState {
     referenceLine: Array<Array<number>>;
@@ -16,7 +17,7 @@ interface GuidingState {
 const getInitialState = (): GuidingState => {
     return {
         referenceLine: [],
-        equipmentWidth: 13,
+        equipmentWidth: 8,
         distanceToClosestGuidingLine: null,
         bearingToClosestGuidingLine: null,
         isGuidingLineOnRightOrLeft: null,
@@ -48,9 +49,12 @@ export function setReferenceLine(referenceLine) {
 }
 
 export function setEquipmentWidth(equipmentWidth) {
-    return {
-        type: SET_EQUIPMENT_WIDTH,
-        payload: equipmentWidth
+    return (dispatch, getState) => {
+        dispatch({
+            type: SET_EQUIPMENT_WIDTH,
+            payload: equipmentWidth
+        });
+        persistState(getState().guiding.equipmentWidth, 'equipmentWidth');
     }
 }
 
@@ -71,6 +75,25 @@ export function setClosestLine(closestLine) {
     return {
         type: SET_CLOSESTLINE,
         payload: closestLine
+    }
+}
+
+export function persistEquipmentWidth() {
+    // @ts-ignore
+    return (dispatch, getState) => {
+        persistState(getState().guiding.equipmentWidth, 'equipmentWidth');
+    }
+}
+
+export function restoreEquipmentWidth() {
+    return (dispatch) => {
+        const equipmentWidth = loadState('equipmentWidth');
+        if(equipmentWidth) {
+            dispatch({
+                type: SET_EQUIPMENT_WIDTH,
+                payload: equipmentWidth
+            })
+        }
     }
 }
 

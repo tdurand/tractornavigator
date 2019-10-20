@@ -63,7 +63,7 @@ export class GuidingSetup {
                                     this.resetGuidingState()
                                 }
                             >
-                                {getString('CANCEL', this.lang)}
+                                {getString('BACK', this.lang)}
                             </ion-button>
                             <ion-button
                                 color="primary"
@@ -71,7 +71,7 @@ export class GuidingSetup {
                                     this.setReferenceLine([[this.position.coords.longitude, this.position.coords.latitude]])
                                 }
                             >
-                                {getString('CONFIRM', this.lang)}
+                                {getString('CONFIRM_POINT_A', this.lang)}
                             </ion-button>
                         </div>
                     </div>
@@ -86,7 +86,7 @@ export class GuidingSetup {
                                 color="medium"
                                 onClick={() => this.setReferenceLine([]) }
                             >
-                                {getString('CANCEL', this.lang)}
+                                {getString('BACK', this.lang)}
                             </ion-button>
                             <ion-button
                                 color="primary"
@@ -102,7 +102,7 @@ export class GuidingSetup {
                                     }
                                 }}
                             >
-                                {getString('CONFIRM', this.lang)}
+                                {getString('CONFIRM_POINT_B', this.lang)}
                             </ion-button>
                         </div>
                     </div>
@@ -126,13 +126,13 @@ export class GuidingSetup {
                                     color="medium"
                                     onClick={() => this.setReferenceLine([this.referenceLine[0]]) }
                                 >
-                                    {getString('CANCEL', this.lang)}
+                                    {getString('BACK', this.lang)}
                                 </ion-button>
                                 <ion-button
                                     color="primary"
                                     onClick={() => this.onGuidingLinesDefined()}
                                 >
-                                    {getString('CONFIRM', this.lang)}
+                                    {getString('OK', this.lang)}
                                 </ion-button>
                             </div>
                         </div>

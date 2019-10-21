@@ -1,6 +1,6 @@
 # Tractor Navigator
 
-App for Galileo App Challenge 2019.
+App for #MyGalileoApp Challenge 2019.
 
 See demo video: https://www.youtube.com/watch?v=9yNK1JyhWI4 
 

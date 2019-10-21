@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tractor Navigator</title>
+    <meta name="description" content="Guiding app for small scale farming">
+    <link rel="apple-touch-icon" sizes="180x180" href="landingpage/apple-touch-icon.png">
+    <link rel="icon" type="image/x-icon" href="landingpage/favicon.ico">
+</head>
+<style>
+    html,body {
+        width: 100%;
+        height: 100%;
+        padding:0;
+        margin:0;
+    }
+    body {
+        background-color: white;
+        color: black;
+        text-align: center;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-container {
+        margin-top: 30px;
+        display: flex;
+        align-items: center;
+    }
+
+    @media (max-width: 560px) {
+        .resp-iframe {
+            display: none;
+        }
+
+        .btn-container {
+            flex-direction: column;
+        }
+    }
+
+</style>
+<body>
+    <div style="display:flex;align-items: center;margin-bottom: 30px;">
+        <img style="width:80px;height:80px" src="landingpage/ic_launcher-web.png" />
+        <h2>Tractor Navigator</h2>
+    </div>
+    <iframe class="resp-iframe" width="560" height="349" src="https://www.youtube.com/embed/9yNK1JyhWI4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <div class="btn-container">
+        <a href="https://play.google.com/store/apps/details?id=com.tractornavigator">
+            <img class="btn" style="width: 190px" src="landingpage/googleplay.png" />
+        </a>
+        <a href="https://apps.apple.com/us/app/tractor-navigator/id1483953701?ls=1">
+            <img class="btn" style="width: 150px" src="landingpage/appstore.png" />
+        </a>
+    </div>
+</body>
+</html>

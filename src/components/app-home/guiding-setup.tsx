@@ -115,9 +115,11 @@ export class GuidingSetup {
                                 <ion-label position="stacked">{getString('SPECIFY_EQUIPMENT_WIDTH', this.lang)}</ion-label>
                                 <ion-input 
                                     type="number" 
+                                    step="0.1"
+                                    min="2"
                                     value={this.equipmentWidth.toString()}
                                     onIonChange={(event: any) => {
-                                        this.setEquipmentWidth(parseInt(event.target.value, 10))
+                                        this.setEquipmentWidth(Math.round( event.target.value * 10) / 10)
                                     }}
                                 ></ion-input>
                             </ion-item>

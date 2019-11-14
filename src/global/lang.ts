@@ -30,7 +30,12 @@ const en = {
     GALILEO_GALILEO_DUALFREQ: "Your phone supports Galileo and can receive dual frequency signals, you are able to get the best accuracy possible thanks to Galileo.",
     GALILEO_GALILEO_NO_DUALFREQ: "Your phone supports Galileo but can't receive dual frequency signals.",
     GALILEO_NO_GALILEO_NO_DUALFREQ: "Your phone does not support Galileo, your positioning accuracy will be limited.",
-    HISTORY_NO_RECORDING: "No recording yet."
+    HISTORY_NO_RECORDING: "No recording yet.",
+    SATELLITE_STATUS: "Satellite status",
+    NB_SATELLITE_IN_RANGE: "Number of satellites in range",
+    NB_GALILEO_SATELLITE_IN_RANGE: "Number of Galileo satellites in range",
+    NB_SATELLITE_USED: "Number of satellites used",
+    NB_GALILEO_SATELLITE_USED: "Number of Galileo satellites used",
 }
 
 const fr = {
@@ -65,7 +70,12 @@ const fr = {
     GALILEO_GALILEO_DUALFREQ: "Votre téléphone supporte Galileo et peut recevoir les signaux double fréquence, vous avez la meilleure précision possible grâce à Galileo.",
     GALILEO_GALILEO_NO_DUALFREQ: "Votre téléphone supporte galileo mais ne peut pas recevoir les signaux double fréquence",
     GALILEO_NO_GALILEO_NO_DUALFREQ: "Votre téléphone ne supporte pas galileo, votre précision sera limitée.",
-    HISTORY_NO_RECORDING: "Pas d'enregistrement pour l'instant"
+    HISTORY_NO_RECORDING: "Pas d'enregistrement pour l'instant",
+    SATELLITE_STATUS: "Satellite status",
+    NB_SATELLITE_IN_RANGE: "Nombre de satellite dans le champs de vision",
+    NB_GALILEO_SATELLITE_IN_RANGE: "Nombre de satellite Galileo dans le champs de vision",
+    NB_SATELLITE_USED: "Nombre de satellite utilisés",
+    NB_GALILEO_SATELLITE_USED: "Nombre de satellite Galileo utilisés",
 }
 
 export function getString(id, lang) {

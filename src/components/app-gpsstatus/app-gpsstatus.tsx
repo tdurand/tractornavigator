@@ -103,23 +103,39 @@ export class AppGPSStatus {
         }
         {this.rawMeasurements !== null && this.satelliteData &&
           <div>
-            <h4>Satellite data</h4>
+            <h4>{getString('SATELLITE_STATUS', this.lang)}</h4>
             <ul>
-              <li>Number of Satellites in range: {this.satelliteData.nbSatellitesInRange}</li>
-              <li>Number of <strong>Galileo</strong> satellites in range: {this.satelliteData.nbGalileoSatelliteInRange}</li>
-              <li>Number of Satellites in fix: {this.satelliteData.nbSatelliteInFix}</li>
-              <li>Number of <strong>Galileo</strong> satellites in fix: {this.satelliteData.nbGalileoSatelliteInFix}</li>
+              <li>{getString('NB_SATELLITE_IN_RANGE', this.lang)}: {this.satelliteData.nbSatellitesInRange}</li>
+              <li>{getString('NB_GALILEO_SATELLITE_IN_RANGE', this.lang)}: {this.satelliteData.nbGalileoSatelliteInRange}</li>
+              <li>{getString('NB_SATELLITE_USED', this.lang)}: {this.satelliteData.nbSatelliteInFix}</li>
+              <li>{getString('NB_GALILEO_SATELLITE_USED', this.lang)}: {this.satelliteData.nbGalileoSatelliteInFix}</li>
             </ul>
           </div>
         }
-        <h4>About positioning accuracy</h4>
-        <p>Your phone positioning accuracy depends on multiple factors:</p>
-        <ul>
-          <li>Is it compatible with the Galileo constellation ?</li>
-          <li>Does it support receiving multiple frequency signals ?</li>
-          <li>How many satellites does it has currently in sight ?</li>
-          <li>Are you in an open sky or urban area environment ?</li>
-        </ul>
+        {this.lang.indexOf('fr') > -1 && 
+          <div>
+            <h4>A propos de la précision de positionnement</h4>
+            <p>La précision de positionnement renvoyée par votre téléphone dépend de plusieurs facteurs:</p>
+            <ul>
+              <li>Est-ce que votre téléphone est compatibles avec la constellation de satellites Galileo ?</li>
+              <li>Est ce qu’il supporte les signaux doubles fréquences ?</li>
+              <li>Combien de satellites sont dans le champs de vision de l’antenne ?</li>
+              <li>Êtes-vous dans une environnement ouvert, en ville, ou proche d’obstacles ?</li>
+            </ul>
+          </div>
+        } 
+        {this.lang.indexOf('fr') <= -1 && 
+          <div>
+            <h4>About positioning accuracy</h4>
+            <p>Your phone positioning accuracy depends on multiple factors:</p>
+            <ul>
+              <li>Is it compatible with the Galileo constellation ?</li>
+              <li>Does it support receiving multiple frequency signals ?</li>
+              <li>How many satellites does it has currently in sight ?</li>
+              <li>Are you in an open sky or urban area environment ?</li>
+            </ul>
+          </div>
+        } 
       </ion-content>
     ];
   }

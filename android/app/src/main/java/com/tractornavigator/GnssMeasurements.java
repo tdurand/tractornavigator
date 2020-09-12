@@ -3,12 +3,11 @@ package com.tractornavigator;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.location.GnssMeasurementsEvent;
 import android.location.GnssStatus;
 import android.location.LocationManager;
 import android.os.Build;
 import android.annotation.SuppressLint;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.util.Log;
 
 import com.getcapacitor.JSObject;

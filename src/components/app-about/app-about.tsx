@@ -1,6 +1,6 @@
-import { Component, h, State, Prop } from '@stencil/core';
+import { Component, h, State } from '@stencil/core';
 import { getString } from '../../global/lang';
-import { Store } from "@stencil/redux";
+import { store } from "@stencil/redux";
 
 @Component({
   tag: 'app-about',
@@ -10,10 +10,8 @@ export class AppAbout {
 
   @State() lang: any
 
-  @Prop({ context: "store" }) store: Store;
-
   componentWillLoad() {
-    this.store.mapStateToProps(this, state => {
+    store.mapStateToProps(this, state => {
       const {
         device: { lang }
       } = state;

@@ -12,13 +12,13 @@
     "start": "stencil build --dev --watch --serve"
   },
   "dependencies": {
-    "@capacitor/android": "^1.5.1",
-    "@capacitor/cli": "^1.5.1",
-    "@capacitor/core": "^1.5.1",
-    "@capacitor/ios": "^1.5.1",
-    "@ionic/core": "5.0.5",
-    "@mapbox/mapbox-gl-draw": "^1.1.2",
-    "@stencil/redux": "^0.1.2",
+    "@capacitor/android": "^2.4.1",
+    "@capacitor/cli": "^2.4.1",
+    "@capacitor/core": "^2.4.1",
+    "@capacitor/ios": "^2.4.1",
+    "@ionic/core": "5.3.2",
+    "@mapbox/mapbox-gl-draw": "^1.2.0",
+    "@stencil/redux": "^0.2.0",
     "@turf/area": "^6.0.1",
     "@turf/bbox": "^6.0.1",
     "@turf/bbox-polygon": "^6.0.1",
@@ -35,8 +35,8 @@
     "@turf/square": "^5.1.5",
     "@turf/transform-scale": "^5.1.5",
     "cordova-plugin-insomnia": "^4.3.0",
-    "dayjs": "^1.8.23",
-    "mapbox-gl": "^1.8.1",
+    "dayjs": "^1.8.35",
+    "mapbox-gl": "^1.12.0",
     "mapbox-gl-draw-rectangle-mode": "^1.0.4",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",
@@ -44,12 +44,12 @@
     "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
-    "@stencil/core": "1.11.0",
-    "@types/jest": "25.1.4",
-    "@types/puppeteer": "2.0.1",
-    "jest": "25.1.0",
-    "jest-cli": "25.1.0",
-    "puppeteer": "2.1.1",
+    "@stencil/core": "2.0.3",
+    "@types/jest": "26.0.13",
+    "@types/puppeteer": "3.0.2",
+    "jest": "26.4.2",
+    "jest-cli": "26.4.2",
+    "puppeteer": "5.3.0",
     "rollup-plugin-node-polyfills": "^0.2.1"
   }
 }

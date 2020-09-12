@@ -5,7 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { GeolocationPosition, } from "@capacitor/core";
+import { GeolocationPosition } from "@capacitor/core";
 export namespace Components {
     interface AccuracyHelper {
     }
@@ -36,7 +36,7 @@ export namespace Components {
         "position": GeolocationPosition;
     }
     interface GuidingSetup {
-        "onGuidingLinesDefined": Function;
+        "handleGuidingLinesDefined": Function;
     }
 }
 declare global {
@@ -164,7 +164,7 @@ declare namespace LocalJSX {
         "position"?: GeolocationPosition;
     }
     interface GuidingSetup {
-        "onGuidingLinesDefined"?: Function;
+        "handleGuidingLinesDefined"?: Function;
     }
     interface IntrinsicElements {
         "accuracy-helper": AccuracyHelper;

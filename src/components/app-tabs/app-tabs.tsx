@@ -1,5 +1,5 @@
-import { Component, h, Prop, State } from "@stencil/core";
-import { Store } from "@stencil/redux";
+import { Component, h, State } from "@stencil/core";
+import { store } from "@stencil/redux";
 import { getString } from "../../global/lang";
 
 @Component({
@@ -10,11 +10,9 @@ export class AppTabs {
 
   @State() lang: any;
 
-  @Prop({ context: "store" }) store: Store;
-
   componentWillLoad() {
 
-    this.store.mapStateToProps(this, state => {
+    store.mapStateToProps(this, state => {
       return {
         lang: state.device.lang
       }

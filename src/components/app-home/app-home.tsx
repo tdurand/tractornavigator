@@ -1,7 +1,7 @@
-import { Component, h, State, Prop, Watch } from '@stencil/core';
+import { Component, h, State, Watch } from '@stencil/core';
 import { modalController } from '@ionic/core';
 import { Plugins, GeolocationPosition } from '@capacitor/core';
-import { Store, Action } from "@stencil/redux";
+import { store, Action } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
 import { 
   getAndWatchPosition
@@ -159,11 +159,9 @@ export class AppHome {
   loadingModal: LoadingIndicator = new LoadingIndicator(getString('GETTING_POSITION', this.lang));
   galileoModal: HTMLIonModalElement;
 
-  @Prop({ context: "store" }) store: Store;
-
   componentWillLoad() {
 
-    this.store.mapStateToProps(this, state => {
+    store.mapStateToProps(this, state => {
       const {
         recording: { status, recordedPositions },
         geolocation: { position },
@@ -192,7 +190,7 @@ export class AppHome {
       };
     });
 
-    this.store.mapDispatchToProps(this, {
+    store.mapDispatchToProps(this, {
       getAndWatchPosition,
       setDistanceToClosestGuidingLine,
       setBearingToClosestGuidingLine,
@@ -692,7 +690,7 @@ export class AppHome {
             </div>
           </div>
           {this.isDefiningGuidingLines &&
-            <guiding-setup onGuidingLinesDefined={() => {
+            <guiding-setup handleGuidingLinesDefined={() => {
               this.createOrUpdateGuidingLines(this.getBbox());
               this.map.resize();
             }} />

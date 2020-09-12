@@ -1,5 +1,5 @@
-import { Component, State, Element, Prop, h } from '@stencil/core';
-import { Store } from "@stencil/redux";
+import { Component, State, Element, h } from '@stencil/core';
+import { store } from "@stencil/redux";
 import { AccuracyStatus } from '../../statemanagement/app/GeolocationStateManagement';
 import { getString } from '../../global/lang';
 
@@ -15,8 +15,6 @@ export class GalileoModal {
   @State() dualFreqSupported: any
   @State() accuracyStatus: AccuracyStatus
 
-  @Prop({ context: "store" }) store: Store;
-
   @State() lang: any
 
   dismiss() {
@@ -25,7 +23,7 @@ export class GalileoModal {
   }
 
   componentWillLoad() {
-    this.store.mapStateToProps(this, state => {
+    store.mapStateToProps(this, state => {
       const {
         gnssmeasurements: { isGalileoSupported, satelliteData, rawMeasurements, dualFreqSupported },
         geolocation: { accuracyStatus },

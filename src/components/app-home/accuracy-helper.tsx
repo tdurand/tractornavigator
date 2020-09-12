@@ -1,5 +1,5 @@
-import { Component, h, State, Prop } from '@stencil/core';
-import { Store } from "@stencil/redux";
+import { Component, h, State } from '@stencil/core';
+import { store } from "@stencil/redux";
 import { AccuracyStatus } from '../../statemanagement/app/GeolocationStateManagement';
 import { getString } from '../../global/lang';
 
@@ -15,12 +15,9 @@ export class AccuracyHelper {
   @State() position: any;
 
   @State() lang: any;
-  
-  // @ts-ignore
-  @Prop({ context: "store" }) store: Store;
 
   componentWillLoad() {
-    this.store.mapStateToProps(this, state => {
+    store.mapStateToProps(this, state => {
       const {
         geolocation: { accuracyStatus, position },
         device: { lang }

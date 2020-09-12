@@ -1,5 +1,5 @@
 import { Component, h, State, Prop, Watch } from '@stencil/core';
-import { Store } from "@stencil/redux";
+import { store } from "@stencil/redux";
 import mapboxgl from 'mapbox-gl';
 import { lineString, multiPolygon } from '@turf/helpers';
 import bbox from '@turf/bbox';
@@ -28,11 +28,9 @@ export class AppHistoryDetails {
   mapIsReady: boolean = false;
   mapFirstRender: boolean = false;
 
-  @Prop({ context: "store" }) store: Store;
-
   componentWillLoad() {
 
-    this.store.mapStateToProps(this, state => {
+    store.mapStateToProps(this, state => {
       return {
         recording: state.history.recordings[this.indexOfRecording] 
       }

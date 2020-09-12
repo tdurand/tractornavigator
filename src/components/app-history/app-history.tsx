@@ -1,5 +1,5 @@
-import { Component, h, Prop, State } from '@stencil/core';
-import { Store } from "@stencil/redux";
+import { Component, h, State } from '@stencil/core';
+import { store } from "@stencil/redux";
 import dayjs from 'dayjs';
 import { getString } from '../../global/lang';
 
@@ -13,10 +13,8 @@ export class AppHistory {
   @State() recordings: Array<any>
   @State() lang: any
 
-  @Prop({ context: "store" }) store: Store;
-
   componentWillLoad() {
-    this.store.mapStateToProps(this, state => {
+    store.mapStateToProps(this, state => {
       const {
         history: { recordings },
         device: { lang }
@@ -25,9 +23,6 @@ export class AppHistory {
         recordings,
         lang
       };
-    });
-
-    this.store.mapDispatchToProps(this, {
     });
   }
 

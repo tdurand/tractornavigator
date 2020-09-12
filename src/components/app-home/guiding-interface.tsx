@@ -1,5 +1,5 @@
 import { Component, h, State, Prop } from '@stencil/core';
-import { Store, Action } from "@stencil/redux";
+import { store, Action } from "@stencil/redux";
 import { startRecording, resumeRecording, stopRecordingAndSave, cancelRecording, pauseRecording, RecordingStatus } from '../../statemanagement/app/RecordingStateManagement';
 import { startDefiningGuidingLines } from '../../statemanagement/app/GuidingStateManagement';
 import { GeolocationPosition } from '@capacitor/core';
@@ -15,7 +15,6 @@ export class GuidingInterface {
 
   @State() lang: any;
 
-  @Prop({ context: "store" }) store: Store;
   startRecording: Action;
   resumeRecording: Action;
   pauseRecording: Action;
@@ -37,7 +36,7 @@ export class GuidingInterface {
   private router: HTMLIonRouterElement = document.querySelector('ion-router')
 
   componentWillLoad() {
-    this.store.mapStateToProps(this, state => {
+    store.mapStateToProps(this, state => {
       const {
         recording: { status, dateStart, area },
         guiding: { distanceToClosestGuidingLine, isGuidingLineOnRightOrLeft, equipmentWidth },
@@ -54,8 +53,8 @@ export class GuidingInterface {
       };
     });
 
-    this.store.mapDispatchToProps(this, {
-      startRecording, 
+    store.mapDispatchToProps(this, {
+      startRecording,
       resumeRecording,
       pauseRecording,
       stopRecordingAndSave,

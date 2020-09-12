@@ -1,5 +1,5 @@
-import { Component, h, Prop, State } from '@stencil/core';
-import { Store } from "@stencil/redux";
+import { Component, h, State } from '@stencil/core';
+import { store } from "@stencil/redux";
 import { AccuracyStatus } from '../../statemanagement/app/GeolocationStateManagement';
 import { getString } from '../../global/lang';
 
@@ -17,10 +17,8 @@ export class AppGPSStatus {
 
   @State() lang: any
 
-  @Prop({ context: "store" }) store: Store;
-
   componentWillLoad() {
-    this.store.mapStateToProps(this, state => {
+    store.mapStateToProps(this, state => {
       const {
         gnssmeasurements: { isGalileoSupported, satelliteData, rawMeasurements, dualFreqSupported },
         geolocation: { accuracyStatus },

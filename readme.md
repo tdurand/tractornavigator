@@ -18,6 +18,22 @@ Download on Google Play and AppStore:
 
 First version developed for #MyGalileoApp Challenge 2019.
 
+### Dev notes
+
+When cloning on a new machine
+
+- create a `config.json` file at root with a `mapboxToken`
+
+```json
+{
+    "mapboxToken": "your_mapbox_token"
+}
+```
+
+- run `npx cap update android` , `npm i`, `npm run build` , `npx cap copy`
+
+- open in native IDE (android studio / Xcode)
+
 ### Acknowledgements:
 
 Based on [Ionic PWA toolkit](https://github.com/ionic-team/ionic-pwa-toolkit) augmented with capacitor [https://capacitor.ionicframework.com](https://capacitor.ionicframework.com)
